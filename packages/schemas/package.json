@@ -1,0 +1,20 @@
+{
+  "name": "@storyecho/schemas",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.25.51"
+  },
+  "devDependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@storyecho/config": "workspace:*",
+    "typescript": "^5.8.3"
+  }
+}

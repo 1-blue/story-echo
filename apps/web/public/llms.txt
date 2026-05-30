@@ -1,0 +1,15 @@
+# StoryEcho — 이야기해줘
+
+> Daily questions. Stories for later.
+
+StoryEcho is a daily reflection app. Users receive one question per day, optionally write private stories, compare answers after one year (Echo), use time capsules, and share to a community feed.
+
+## Links
+
+- Landing: /
+- API health: /api/v1/health
+
+## Tech
+
+- Next.js PWA + Expo mobile
+- Supabase Auth + Prisma + orval

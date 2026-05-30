@@ -1,0 +1,186 @@
+// StoryEcho — PostgreSQL (Supabase Postgres)
+// Prisma ORM 스키마. Auth는 Supabase Auth, 비즈니스 데이터는 Route Handler + Prisma로 접근.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+/// PostgreSQL 15+ (Supabase managed). `DATABASE_URL`: PgBouncer pooler(6543), `DIRECT_URL`: direct(5432, migrate용).
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// 사용자 역할. guest=비로그인(device_id), member=로그인 회원, admin=운영·대시보드.
+enum UserRole {
+  guest  /// 비로그인·device_id (F16)
+  member /// 로그인 회원 (일반 유저)
+  admin  /// 운영·대시보드 접근
+}
+
+/// 이야기 공개 범위. 기본 private(나만 보기).
+enum Visibility {
+  private   /// 서랍·본인만 열람
+  community /// 커뮤니티 feed 노출
+}
+
+/// 읽기·쓰기 화면 글자 크기 (F13). 기본 md.
+enum FontSize {
+  sm /// 소
+  md /// 중 (기본)
+  lg /// 대
+}
+
+/// StoryEcho 사용자. 게스트·회원 통합 테이블. Supabase Auth user.id와 PK 동기화.
+model User {
+  /// PK. UUID v4. Supabase Auth `auth.users.id`와 1:1 (가입 시 upsert).
+  id                   String      @id @default(uuid()) @db.Uuid
+
+  /// 게스트 식별용 기기 UUID. F16. unique, nullable(회원은 null 가능).
+  deviceId             String?     @unique @map("device_id")
+
+  /// 회원 이메일. Supabase Auth와 동일. unique, nullable(게스트는 null).
+  email                String?     @unique
+
+  /// guest | member | admin. 기본 guest.
+  role                 UserRole    @default(guest) @map("role")
+
+  /// Supabase Auth email_verified 연동. 커뮤니티 공개·IAP 시 true 필수.
+  emailVerified        Boolean     @default(false) @map("email_verified")
+
+  /// 커뮤니티·프로필 표시 이름 (F12). 게스트 포함.
+  nickname             String?    
+
+  /// 광고 제거 IAP 평생 유지 (F19). 회원 user_id에 저장.
+  adFree               Boolean     @default(false) @map("ad_free")
+
+  /// 글자 크기 설정 (F13). sm | md | lg, 기본 md.
+  fontSize             FontSize    @default(md) @map("font_size")
+
+  /// 같은 질문 받지 않기 (F14). ON 시 이미 받은 질문 제외. Echo는 예외.
+  skipRepeatQuestions  Boolean     @default(false) @map("skip_repeat_questions")
+
+  /// 알림 ON/OFF (F15). ON 시 20:00 로컬 리마인더 등.
+  notificationsEnabled Boolean     @default(false) @map("notifications_enabled")
+
+  /// 레코드 생성 시각 (UTC).
+  createdAt            DateTime    @default(now()) @map("created_at")
+
+  /// 게스트→회원 전환 시각. null이면 미전환.
+  upgradedAt           DateTime?   @map("upgraded_at")
+
+  stories      Story[]
+  questionLogs UserQuestionLog[]
+  storyReports StoryReport[]
+
+  @@map("users")
+}
+
+/// 일일 질문 풀. F1 오늘의 질문·1년 Echo용 annual_key 포함.
+model Question {
+  /// PK. UUID v4.
+  id        String   @id @default(uuid()) @db.Uuid
+
+  /// 질문 본문 텍스트.
+  text      String  
+
+  /// 1년 Echo 그룹·관리용 키. Echo 트리거는 user_question_log.shown_at 기준.
+  annualKey String?  @map("annual_key")
+
+  /// 질문 등록 시각 (UTC).
+  createdAt DateTime @default(now()) @map("created_at")
+
+  stories      Story[]
+  questionLogs UserQuestionLog[]
+
+  @@map("questions")
+}
+
+/// 사용자 이야기. 질문에 대한 텍스트·사진·공개범위·타임캡슐.
+model Story {
+  /// PK. UUID v4.
+  id              String     @id @default(uuid()) @db.Uuid
+
+  /// 작성자 FK → users.id.
+  userId          String     @map("user_id") @db.Uuid
+
+  /// 연결된 질문 FK → questions.id. nullable(질문 없이 작성 시).
+  questionId      String?    @map("question_id") @db.Uuid
+
+  /// 본문. 최대 5,000자 (기획 §4.1).
+  bodyText        String     @map("body_text") @db.Text
+
+  /// S3 URL/key 배열 JSON. 최대 8장 (F3).
+  photoUrls       Json       @default("[]") @map("photo_urls")
+
+  /// private(기본) | community. F8.
+  visibility      Visibility @default(private)
+
+  /// 타임캡슐 여부 (F6).
+  isCapsule       Boolean    @default(false) @map("is_capsule")
+
+  /// 타임캡슐 해제 시각. null이면 즉시 열람.
+  unlockAt        DateTime?  @map("unlock_at")
+
+  /// 봉인 중 여부. Free 타임캡슐 1개 한도는 active만 카운트.
+  isCapsuleActive Boolean    @default(false) @map("is_capsule_active")
+
+  /// 신고 3건 누적 시 feed 자동 숨김 (moderation).
+  hiddenFromFeed  Boolean    @default(false) @map("hidden_from_feed")
+
+  /// 작성 시각 (UTC).
+  createdAt       DateTime   @default(now()) @map("created_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question? @relation(fields: [questionId], references: [id], onDelete: SetNull)
+  reports  StoryReport[]
+
+  @@index([userId, createdAt])
+  @@index([visibility, hiddenFromFeed, createdAt(sort: Desc)])
+  @@map("stories")
+}
+
+/// 사용자별 질문 노출 이력. 1년 Echo 트리거 기준일(shown_at).
+model UserQuestionLog {
+  /// PK. UUID v4.
+  id         String   @id @default(uuid()) @db.Uuid
+
+  /// 사용자 FK → users.id.
+  userId     String   @map("user_id") @db.Uuid
+
+  /// 질문 FK → questions.id.
+  questionId String   @map("question_id") @db.Uuid
+
+  /// 질문 최초 노출 시각. Echo: 동일 월·일 다음 해 재등장 기준.
+  shownAt    DateTime @default(now()) @map("shown_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId, shownAt])
+  @@index([userId, shownAt])
+  @@index([userId, questionId])
+  @@map("user_question_log")
+}
+
+/// 커뮤니티 이야기 신고. 동일 story_id 3건 → feed 숨김.
+model StoryReport {
+  /// PK. UUID v4.
+  id             String   @id @default(uuid()) @db.Uuid
+
+  /// 신고 대상 이야기 FK → stories.id.
+  storyId        String   @map("story_id") @db.Uuid
+
+  /// 신고자 FK → users.id.
+  reporterUserId String   @map("reporter_user_id") @db.Uuid
+
+  /// 신고 접수 시각 (UTC).
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  story    Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  reporter User  @relation(fields: [reporterUserId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, reporterUserId])
+  @@map("story_reports")
+}

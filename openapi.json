@@ -1,0 +1,288 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "StoryEcho API",
+    "version": "0.0.1",
+    "description": "StoryEcho MVP API — SSOT from @storyecho/schemas"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local dev"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ],
+            "example": "ok"
+          },
+          "version": {
+            "type": "string",
+            "example": "0.0.1"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-05-30T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "status",
+          "version",
+          "timestamp"
+        ]
+      },
+      "Visibility": {
+        "type": "string",
+        "enum": [
+          "private",
+          "community"
+        ]
+      },
+      "Story": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "bodyText": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "photoUrls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "maxItems": 8
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility"
+          },
+          "isCapsule": {
+            "type": "boolean"
+          },
+          "unlockAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "isCapsuleActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "questionId",
+          "bodyText",
+          "photoUrls",
+          "visibility",
+          "isCapsule",
+          "unlockAt",
+          "isCapsuleActive",
+          "createdAt"
+        ]
+      },
+      "StoryListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Story"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "StoryResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Story"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "CreateStoryRequest": {
+        "type": "object",
+        "properties": {
+          "bodyText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000
+          },
+          "photoUrls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "maxItems": 8,
+            "default": []
+          },
+          "visibility": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              },
+              {
+                "default": "private"
+              }
+            ]
+          },
+          "isCapsule": {
+            "type": "boolean",
+            "default": false
+          },
+          "unlockAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "bodyText"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stories": {
+      "get": {
+        "tags": [
+          "Stories"
+        ],
+        "responses": {
+          "200": {
+            "description": "List stories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryListResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Stories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Story created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

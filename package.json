@@ -1,0 +1,38 @@
+{
+  "name": "story-echo",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=web",
+    "dev:mobile": "turbo dev --filter=mobile",
+
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "postinstall": "pnpm generate:api",
+
+    "generate:openapi": "tsx scripts/generate-openapi.ts",
+    "generate:api": "pnpm generate:openapi && orval",
+    "db:generate": "pnpm --filter @storyecho/database db:generate",
+    "db:migrate": "pnpm --filter @storyecho/database db:migrate",
+    "db:push": "pnpm --filter @storyecho/database db:push",
+    "db:seed": "pnpm --filter @storyecho/database db:seed"
+  },
+  "devDependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@storyecho/config": "workspace:*",
+    "@storyecho/schemas": "workspace:*",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "orval": "^7.9.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "tsx": "^4.19.4",
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "pnpm@10.16.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

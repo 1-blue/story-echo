@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build
+.next
+out
+dist
+.turbo
+*.tsbuildinfo
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Orval generated (regenerate with pnpm generate:api)
+packages/api-client/src/generated/
+
+# Prisma
+packages/database/prisma/migrations/**/migration_lock.toml
+
+# IDE
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+
+# OS
+.DS_Store
+
+# Expo
+apps/mobile/.expo
+apps/mobile/dist
+
+# Debug
+npm-debug.log*
+pnpm-debug.log*
+
+# Serwist
+apps/web/public/sw.js
+apps/web/public/sw.js.map

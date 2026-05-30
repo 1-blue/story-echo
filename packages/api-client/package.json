@@ -1,0 +1,23 @@
+{
+  "name": "@storyecho/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./custom-fetch": "./src/custom-fetch.ts"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.80.0",
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@storyecho/config": "workspace:*",
+    "@tanstack/react-query": "^5.80.7",
+    "react": "^19.1.0",
+    "typescript": "^5.8.3"
+  }
+}

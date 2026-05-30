@@ -1,0 +1,13 @@
+node_modules
+.pnpm-store
+.next
+out
+dist
+.turbo
+*.tsbuildinfo
+pnpm-lock.yaml
+openapi.json
+packages/api-client/src/generated
+apps/web/.next
+apps/mobile/.expo
+apps/mobile/dist
