@@ -3,6 +3,7 @@ import { apiFetch } from "../../helpers/api";
 import { setupGuestClient } from "../../helpers/auth";
 import { cleanupTestUserByDeviceId, disconnectTestPrisma } from "../../helpers/db";
 import { createCapsuleStory } from "../../helpers/factories";
+import { parseCapsuleDetail, parseCapsuleList, parseStory } from "../../helpers/parse-api";
 import { hasIntegrationEnv } from "../../setup/env";
 
 const integration = hasIntegrationEnv() ? describe : describe.skip;
@@ -19,7 +20,7 @@ integration("Capsule API", () => {
 
     const res = await apiFetch("/api/v1/stories/capsule", {}, { deviceId });
     expect(res.status).toBe(200);
-    const data = (res.json as { data: { sealed: unknown[]; opened: unknown[] } }).data;
+    const data = parseCapsuleList(res.json).data;
     expect(data.sealed.length + data.opened.length).toBeGreaterThan(0);
     await cleanupTestUserByDeviceId(deviceId);
   });
@@ -28,11 +29,11 @@ integration("Capsule API", () => {
     const { deviceId } = await setupGuestClient("capsule-detail");
     const unlockAt = new Date(Date.now() + 86_400_000 * 30).toISOString();
     const created = await createCapsuleStory("detail capsule", unlockAt, { deviceId });
-    const id = created.json.data.id;
+    const id = parseStory(created.json).data.id;
 
     const res = await apiFetch(`/api/v1/stories/capsule/${id}`, {}, { deviceId });
     expect(res.status).toBe(200);
-    expect((res.json as { data: { isCapsuleActive: boolean } }).data.isCapsuleActive).toBe(true);
+    expect(parseCapsuleDetail(res.json).data.isCapsuleActive).toBe(true);
     await cleanupTestUserByDeviceId(deviceId);
   });
 
@@ -40,7 +41,7 @@ integration("Capsule API", () => {
     const { deviceId } = await setupGuestClient("capsule-delete");
     const unlockAt = new Date(Date.now() + 86_400_000 * 30).toISOString();
     const created = await createCapsuleStory("delete capsule", unlockAt, { deviceId });
-    const id = created.json.data.id;
+    const id = parseStory(created.json).data.id;
 
     const res = await apiFetch(`/api/v1/stories/${id}`, { method: "DELETE" }, { deviceId });
     expect(res.status).toBe(204);

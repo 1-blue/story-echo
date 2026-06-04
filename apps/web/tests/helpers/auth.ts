@@ -1,4 +1,5 @@
 import { apiFetch } from "./api";
+import { createGuestUser } from "./db";
 import { createTestDeviceId } from "../setup/env";
 
 export async function registerGuest(deviceId: string) {
@@ -49,5 +50,12 @@ export function randomDeviceId(label: string): string {
 export async function setupGuestClient(label: string) {
   const deviceId = randomDeviceId(label);
   await registerGuest(deviceId);
+  return { deviceId };
+}
+
+/** Arrange 전용: Prisma로 게스트 생성 (report 등 HTTP 부하 줄이기). Act/Assert는 apiFetch 유지 */
+export async function ensureGuestInDb(label: string) {
+  const deviceId = randomDeviceId(label);
+  await createGuestUser(deviceId);
   return { deviceId };
 }

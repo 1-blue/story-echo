@@ -95,3 +95,4 @@ CI Secrets 설정: [`.github/workflows/README.md`](.github/workflows/README.md)
 
 1. 개발자에게 커피
 2. 구글 에드센스 넣기
+3. 모바일 스플래쉬 화면, 404 화면 등 필수적인 요소들 물어보기

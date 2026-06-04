@@ -21,3 +21,12 @@ export const ErrorResponseSchema = z
   .openapi("ErrorResponse");
 
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
+
+export const EmailNotVerifiedErrorSchema = z
+  .object({
+    message: z.string(),
+    code: z.literal("EMAIL_NOT_VERIFIED"),
+  })
+  .openapi("EmailNotVerifiedError");
+
+export type EmailNotVerifiedError = z.infer<typeof EmailNotVerifiedErrorSchema>;

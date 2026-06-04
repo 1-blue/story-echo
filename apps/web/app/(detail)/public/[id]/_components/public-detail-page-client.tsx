@@ -55,6 +55,13 @@ function PublicDetailPageInner({ storyId }: PublicDetailPageClientProps) {
             <div className="flex min-h-dvh flex-col items-center justify-center px-5 py-16 text-center">
               <p className="text-charcoal text-base font-medium">이야기를 불러오지 못했어요</p>
               <p className="text-stone mt-2 text-sm">{getErrorMessage(error)}</p>
+              <button
+                type="button"
+                className="text-primary mt-4 text-sm font-medium"
+                onClick={() => reset()}
+              >
+                다시 시도
+              </button>
             </div>
           )}
         >

@@ -32,12 +32,13 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
+  // CI: workflow에서 build 후 여기서는 start만 (integration과 동일 — 이중 빌드 방지)
   webServer: process.env.CI
     ? {
-        command: "pnpm build && pnpm start",
+        command: "pnpm start",
         url: baseURL,
         reuseExistingServer: false,
-        timeout: 180_000,
+        timeout: 120_000,
         cwd: __dirname,
         env: {
           ...process.env,

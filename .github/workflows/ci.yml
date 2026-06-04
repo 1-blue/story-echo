@@ -84,6 +84,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      # integration global-setup: BUILD_ID 있으면 build 생략 → next start만
       - run: pnpm --filter web build
       - run: pnpm --filter web test:integration
 
@@ -117,5 +118,6 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      - run: pnpm --filter web build
       - run: pnpm --filter web exec playwright install chromium --with-deps
       - run: pnpm --filter web test:e2e

@@ -15,7 +15,7 @@ export type WriteStoryFormValues = z.infer<typeof WriteStoryFormSchema>;
 
 export type WriteStoryPayload = CreateStoryRequest;
 
-export interface StoryListItem extends Pick<Story, "id" | "bodyText" | "createdAt"> {}
+export type StoryListItem = Pick<Story, "id" | "bodyText" | "createdAt">;
 
 export interface DrawerStoryItem
   extends Pick<

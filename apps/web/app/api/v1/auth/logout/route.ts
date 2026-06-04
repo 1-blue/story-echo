@@ -1,6 +1,6 @@
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
+import { apiErrorResponse } from "@/lib/api/errors";
 
 export async function POST() {
   if (!isSupabaseConfigured()) {

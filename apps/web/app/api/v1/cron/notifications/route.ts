@@ -1,6 +1,6 @@
 import { dispatchDailyNotifications } from "@/lib/notifications/dispatch-daily";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
+import { apiErrorResponse } from "@/lib/api/errors";
 
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;

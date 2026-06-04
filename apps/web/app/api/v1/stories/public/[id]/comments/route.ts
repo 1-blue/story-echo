@@ -55,7 +55,7 @@ export async function POST(request: Request, context: RouteContext) {
       return apiErrorResponse(404, "NOT_FOUND");
     }
 
-    let parentId: string | null = parsed.data.parentId ?? null;
+    const parentId: string | null = parsed.data.parentId ?? null;
 
     if (parentId) {
       const parent = await prisma.storyComment.findFirst({

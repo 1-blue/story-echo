@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 export type FontSizePreference = "sm" | "md" | "lg";
 
@@ -24,6 +24,17 @@ export const BODY_SIZE_CLASSES: Record<FontSizePreference, string> = {
   lg: "text-lg leading-relaxed",
 };
 
+const fontSizeListeners = new Set<() => void>();
+
+function emitFontSizeChange() {
+  fontSizeListeners.forEach((listener) => listener());
+}
+
+function subscribeFontSize(listener: () => void) {
+  fontSizeListeners.add(listener);
+  return () => fontSizeListeners.delete(listener);
+}
+
 function readStoredFontSize(): FontSizePreference {
   if (typeof window === "undefined") return "md";
   const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -31,16 +42,19 @@ function readStoredFontSize(): FontSizePreference {
   return "md";
 }
 
-export function useFontSize() {
-  const [fontSize, setFontSizeState] = useState<FontSizePreference>("md");
-
-  useEffect(() => {
-    setFontSizeState(readStoredFontSize());
-  }, []);
+export function useFontSize(): {
+  fontSize: FontSizePreference;
+  setFontSize: (next: FontSizePreference) => void;
+} {
+  const fontSize = useSyncExternalStore<FontSizePreference>(
+    subscribeFontSize,
+    readStoredFontSize,
+    () => "md",
+  );
 
   const setFontSize = useCallback((next: FontSizePreference) => {
-    setFontSizeState(next);
     window.localStorage.setItem(STORAGE_KEY, next);
+    emitFontSizeChange();
   }, []);
 
   return { fontSize, setFontSize };

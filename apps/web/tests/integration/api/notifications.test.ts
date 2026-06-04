@@ -9,6 +9,7 @@ import { apiFetch } from "../../helpers/api";
 import { setupGuestClient } from "../../helpers/auth";
 import { cleanupTestUserByDeviceId, setUserEmailVerified } from "../../helpers/db";
 import { createCommunityPost } from "../../helpers/factories";
+import { parseCommunityPost, parseNotificationList, parseUserMe } from "../../helpers/parse-api";
 
 integration("notifications API", () => {
   afterAll(async () => {
@@ -20,7 +21,7 @@ integration("notifications API", () => {
     const { deviceId } = await setupGuestClient("notify-list");
     const res = await apiFetch("/api/v1/notifications", {}, { deviceId });
     expect(res.status).toBe(200);
-    const body = res.json as { data: unknown[]; meta: { unreadCount: number } };
+    const body = parseNotificationList(res.json);
     expect(Array.isArray(body.data)).toBe(true);
     await cleanupTestUserByDeviceId(deviceId);
   });
@@ -28,25 +29,25 @@ integration("notifications API", () => {
   it("creates comment_on_post notification", async () => {
     const author = await setupGuestClient("notify-post-author");
     const meA = await apiFetch("/api/v1/users/me", {}, { deviceId: author.deviceId });
-    await setUserEmailVerified((meA.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(meA.json).data.id, true);
     const post = await createCommunityPost("notify target", { deviceId: author.deviceId });
-    const postId = post.json.data.id;
+    const postId = parseCommunityPost(post.json).data.id;
 
     const commenter = await setupGuestClient("notify-post-commenter");
     const meB = await apiFetch("/api/v1/users/me", {}, { deviceId: commenter.deviceId });
-    await setUserEmailVerified((meB.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(meB.json).data.id, true);
 
     const commentRes = await apiFetch(
       `/api/v1/community/posts/${postId}/comments`,
       {
         method: "POST",
-        body: JSON.stringify({ bodyText: "hello" }),
+        json: { bodyText: "hello" },
       },
       { deviceId: commenter.deviceId },
     );
     expect(commentRes.status).toBe(201);
 
-    const authorId = (meA.json as { data: { id: string } }).data.id;
+    const authorId = parseUserMe(meA.json).data.id;
     const row = await prisma.notification.findFirst({
       where: { recipientUserId: authorId, type: "comment_on_post", postId },
     });
@@ -59,7 +60,7 @@ integration("notifications API", () => {
   it("dispatchDailyNotifications creates daily_question_reminder once per KST day", async () => {
     const { deviceId } = await setupGuestClient("notify-daily");
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
-    const userId = (me.json as { data: { id: string } }).data.id;
+    const userId = parseUserMe(me.json).data.id;
     await prisma.user.update({
       where: { id: userId },
       data: { notificationsEnabled: true, role: "member", email: "daily@test.com" },

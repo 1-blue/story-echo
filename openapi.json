@@ -896,6 +896,24 @@
           "message"
         ]
       },
+      "EmailNotVerifiedError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "EMAIL_NOT_VERIFIED"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "code"
+        ]
+      },
       "CommunityPostSummary": {
         "type": "object",
         "properties": {
@@ -1639,11 +1657,18 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Validation error or email not verified",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EmailNotVerifiedError"
+                    }
+                  ]
                 }
               }
             }
