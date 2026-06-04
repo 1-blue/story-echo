@@ -1,18 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Linking,
-  Platform,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Linking, Platform, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebView, type WebViewMessageEvent, type WebViewNavigation } from "react-native-webview";
 import * as SplashScreen from "expo-splash-screen";
+import { AppScreen, AppScreenButton } from "@/components/AppScreen";
+import { BrandedLoading } from "@/components/BrandedLoading";
 import { useAndroidWebViewBack } from "@/hooks/useAndroidWebViewBack";
 import { getWebAppUrl, getWebBaseUrl } from "@/lib/get-web-url";
 import { buildSafeAreaInjectScript } from "@/lib/inject-safe-area";
@@ -139,31 +131,28 @@ export function StoryEchoWebView() {
 
   if (!appUrl || !baseUrl) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorTitle}>웹 URL이 설정되지 않았어요</Text>
-        <Text style={styles.errorBody}>
-          apps/mobile/.env에 EXPO_PUBLIC_WEB_URL을 설정해 주세요.{"\n"}
-          예: http://192.168.0.10:3000
-        </Text>
-      </View>
+      <AppScreen
+        title="웹 URL이 설정되지 않았어요"
+        body={`apps/mobile/.env에 EXPO_PUBLIC_WEB_URL을 설정해 주세요.\n예: http://192.168.0.10:3000`}
+      />
     );
   }
 
   if (loadError) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorTitle}>페이지를 불러오지 못했어요</Text>
-        <Text style={styles.errorBody}>{loadError}</Text>
-        <Pressable
-          style={styles.retryButton}
-          onPress={() => {
-            setLoadError(null);
-            webViewRef.current?.reload();
-          }}
-        >
-          <Text style={styles.retryLabel}>다시 시도</Text>
-        </Pressable>
-      </View>
+      <AppScreen
+        title="페이지를 불러오지 못했어요"
+        body={loadError}
+        action={
+          <AppScreenButton
+            label="다시 시도"
+            onPress={() => {
+              setLoadError(null);
+              webViewRef.current?.reload();
+            }}
+          />
+        }
+      />
     );
   }
 
@@ -182,7 +171,7 @@ export function StoryEchoWebView() {
       startInLoadingState
       renderLoading={() => (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator color={Colors.light.tint} size="large" />
+          <BrandedLoading message="이야기를 불러오는 중…" />
         </View>
       )}
       onLoadEnd={handleLoadEnd}
@@ -237,39 +226,6 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFill,
-    alignItems: "center",
-    justifyContent: "center",
     backgroundColor: Colors.light.background,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-    backgroundColor: Colors.light.background,
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: Colors.light.text,
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  errorBody: {
-    fontSize: 14,
-    color: "#6b6258",
-    textAlign: "center",
-    lineHeight: 20,
-  },
-  retryButton: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 999,
-    backgroundColor: Colors.light.tint,
-  },
-  retryLabel: {
-    color: "#fff",
-    fontWeight: "600",
   },
 });

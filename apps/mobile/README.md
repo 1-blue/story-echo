@@ -35,7 +35,25 @@ pnpm --filter web dev -- --hostname 0.0.0.0
 pnpm --filter mobile dev
 ```
 
-앱은 `{EXPO_PUBLIC_WEB_URL}/app`으로 진입합니다.
+앱은 `{EXPO_PUBLIC_WEB_URL}/` 로 WebView 진입합니다.
+
+**EAS preview/production:** `eas.json`에 `EXPO_PUBLIC_WEB_URL=https://story-echo.vercel.app` 설정됨. 로컬 `.env`는 `expo dev`용만 유지하면 됩니다.
+
+## Native shell (스토어·preview)
+
+- **스플래시 / 로딩 / 오류 / 404**: `expo-splash-screen`, `BrandedLoading`, `AppScreen`, `RootErrorBoundary`
+- **Play target API 35**: `expo-build-properties` in `app.json`
+- **스토어 제출 체크리스트**: [STORE_PREP.md](./STORE_PREP.md) (개인정보처리방침·스크린샷 등은 추후)
+
+## EAS preview build
+
+```bash
+cd apps/mobile
+eas build --profile preview --platform android   # APK (internal)
+# eas build --profile preview --platform ios
+```
+
+`preview` 프로필은 `EXPO_PUBLIC_WEB_URL=https://story-echo.vercel.app` 를 사용합니다.
 
 ## Features
 
@@ -71,4 +89,4 @@ pnpm --filter mobile dev
 | 하단 탭바 겹침 | 웹 최신 빌드 + 앱 재시작 (safe-area inject) |
 | Android 새로고침 안 됨 | 페이지 최상단에서만 당기기 (scroll-at-top) |
 
-EAS Build는 추후 `.md/개발.md` 로드맵 참고.
+Production 빌드·제출: [STORE_PREP.md](./STORE_PREP.md), `.md/개발.md` 로드맵 참고.
