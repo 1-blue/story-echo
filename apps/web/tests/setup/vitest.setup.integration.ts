@@ -7,7 +7,6 @@ config({ path: path.resolve(__dirname, "../../.env.local") });
 config({ path: path.resolve(__dirname, "../../../packages/database/.env") });
 
 declare global {
-  // eslint-disable-next-line no-var
   var __TEST_BASE_URL__: string | undefined;
 }
 

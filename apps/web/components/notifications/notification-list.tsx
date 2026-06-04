@@ -101,7 +101,7 @@ export function NotificationList({ enabled = true, onNavigate }: NotificationLis
     () => {
       if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
     },
-    { enabled: Boolean(hasNextPage && enabled), root: scrollRef.current },
+    { enabled: Boolean(hasNextPage && enabled), rootRef: scrollRef },
   );
 
   const notifications = (data?.pages ?? []).flatMap((page) => page.data ?? []);

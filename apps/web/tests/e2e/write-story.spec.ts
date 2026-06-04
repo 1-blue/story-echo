@@ -1,4 +1,4 @@
-import { test, expect } from "../fixtures/playwright-fixtures";
+import { test } from "../fixtures/playwright-fixtures";
 
 test.describe("Write story", () => {
   test("creates private story from write page", async ({ guestPage }) => {

@@ -8,6 +8,7 @@ import {
   CreateStoryRequestSchema,
   TodayStoryExistsErrorSchema,
   DrawerStoryListResponseSchema,
+  EmailNotVerifiedErrorSchema,
   ErrorResponseSchema,
   HealthResponseSchema,
   PresignUploadRequestSchema,
@@ -69,6 +70,7 @@ registry.register("PublicQuestionAnswerListResponse", PublicQuestionAnswerListRe
 registry.register("PresignUploadRequest", PresignUploadRequestSchema);
 registry.register("PresignUploadResponse", PresignUploadResponseSchema);
 registry.register("ErrorResponse", ErrorResponseSchema);
+registry.register("EmailNotVerifiedError", EmailNotVerifiedErrorSchema);
 registry.register("CommunityPostListResponse", CommunityPostListResponseSchema);
 registry.register("CommunityPostResponse", CommunityPostResponseSchema);
 registry.register("CommunityPostDetailResponse", CommunityPostDetailResponseSchema);
@@ -630,10 +632,10 @@ registry.registerPath({
       },
     },
     400: {
-      description: "Validation error",
+      description: "Validation error or email not verified",
       content: {
         "application/json": {
-          schema: ErrorResponseSchema,
+          schema: z.union([ErrorResponseSchema, EmailNotVerifiedErrorSchema]),
         },
       },
     },

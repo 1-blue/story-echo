@@ -38,11 +38,19 @@ export async function apiFetch<T = ApiJson>(
   }
 
   const url = `${resolveBaseUrl(options.baseUrl)}${path.startsWith("/") ? path : `/${path}`}`;
+  const fetchTimeoutMs = Number(process.env.TEST_FETCH_TIMEOUT_MS ?? 25_000);
+  const slowMs = Number(process.env.TEST_SLOW_MS ?? 10_000);
+  const startedAt = Date.now();
   const response = await fetch(url, {
     ...rest,
     headers,
     body: json !== undefined ? JSON.stringify(json) : rest.body,
+    signal: rest.signal ?? AbortSignal.timeout(fetchTimeoutMs),
   });
+  const elapsedMs = Date.now() - startedAt;
+  if (elapsedMs >= slowMs) {
+    console.warn(`[integration] slow apiFetch ${elapsedMs}ms ${path}`);
+  }
 
   let parsed: T;
   if (response.status === 204) {

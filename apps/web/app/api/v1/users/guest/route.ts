@@ -1,5 +1,4 @@
 import { CreateGuestRequestSchema, UserMeResponseSchema } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { getOrCreateGuestUser } from "@/lib/user/guest-user";
 import { toUserMeDto } from "@/lib/user/user-mapper";

@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
 type UseLoadMoreSentinelOptions = {
   enabled?: boolean;
-  root?: Element | null;
+  rootRef?: RefObject<Element | null>;
 };
 
 export function useLoadMoreSentinel(
   onLoadMore: () => void,
-  { enabled = true, root = null }: UseLoadMoreSentinelOptions = {},
+  { enabled = true, rootRef }: UseLoadMoreSentinelOptions = {},
 ) {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -22,12 +22,12 @@ export function useLoadMoreSentinel(
       (entries) => {
         if (entries[0]?.isIntersecting) onLoadMore();
       },
-      { root, rootMargin: "120px" },
+      { root: rootRef?.current ?? null, rootMargin: "120px" },
     );
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [enabled, onLoadMore, root]);
+  }, [enabled, onLoadMore, rootRef]);
 
   return sentinelRef;
 }

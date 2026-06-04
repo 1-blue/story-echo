@@ -9,10 +9,7 @@ import {
 } from "@/components/ui/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  FONT_SIZE_OPTIONS,
-  type FontSizePreference,
-} from "../_hooks/use-font-size";
+import { FONT_SIZE_OPTIONS, type FontSizePreference } from "../_hooks/use-font-size";
 
 type FontSizeDialogProps = {
   open: boolean;
@@ -32,9 +29,11 @@ export function FontSizeDialog({
       <BottomSheetContent>
         <BottomSheetHeader>
           <BottomSheetTitle>글자 크기</BottomSheetTitle>
-          <BottomSheetDescription className="sr-only">읽기 글자 크기를 선택합니다.</BottomSheetDescription>
+          <BottomSheetDescription className="sr-only">
+            읽기 글자 크기를 선택합니다.
+          </BottomSheetDescription>
         </BottomSheetHeader>
-        <div className="bg-muted flex gap-1 rounded-xl p-1">
+        <div className="flex gap-1 rounded-xl bg-muted p-1">
           {FONT_SIZE_OPTIONS.map(({ value, label }) => (
             <Button
               key={value}
@@ -47,7 +46,7 @@ export function FontSizeDialog({
             </Button>
           ))}
         </div>
-        <p className="text-stone mt-4 text-center text-xs">
+        <p className="mt-4 text-center text-xs text-stone">
           기기의 설정보다 이 앱의 설정이 우선 적용됩니다.
         </p>
       </BottomSheetContent>

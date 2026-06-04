@@ -15,13 +15,13 @@ function StoryDetailFallback() {
   return (
     <main className="mx-auto w-full max-w-lg flex-1 px-5 py-6">
       <div className="mb-6 flex gap-2">
-        <div className="bg-surface-cream/60 h-7 w-32 animate-pulse rounded-full" />
+        <div className="h-7 w-32 animate-pulse rounded-full bg-surface-cream/60" />
       </div>
-      <div className="bg-surface-cream/60 mb-8 h-10 w-full animate-pulse rounded" />
+      <div className="mb-8 h-10 w-full animate-pulse rounded bg-surface-cream/60" />
       <div className="space-y-3">
-        <div className="bg-surface-cream/60 h-4 w-full animate-pulse rounded" />
-        <div className="bg-surface-cream/60 h-4 w-full animate-pulse rounded" />
-        <div className="bg-surface-cream/60 h-4 w-3/4 animate-pulse rounded" />
+        <div className="h-4 w-full animate-pulse rounded bg-surface-cream/60" />
+        <div className="h-4 w-full animate-pulse rounded bg-surface-cream/60" />
+        <div className="h-4 w-3/4 animate-pulse rounded bg-surface-cream/60" />
       </div>
     </main>
   );
@@ -66,7 +66,7 @@ function StoryDetailPageInner({ storyId }: StoryDetailPageClientProps) {
   const [fontDialogOpen, setFontDialogOpen] = useState(false);
 
   return (
-    <div className="bg-canvas text-foreground mx-auto flex min-h-dvh w-full max-w-lg flex-col">
+    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-canvas text-foreground">
       <StoryDetailHeader storyId={storyId} onFontSizeClick={() => setFontDialogOpen(true)} />
       <QueryErrorResetBoundary>
         {({ reset }) => (
@@ -77,13 +77,18 @@ function StoryDetailPageInner({ storyId }: StoryDetailPageClientProps) {
 
               return (
                 <div className="flex flex-1 flex-col items-center justify-center px-5 py-16 text-center">
-                  <p className="text-charcoal text-base font-medium">
+                  <p className="text-base font-medium text-charcoal">
                     {isNotFound ? "이야기를 찾을 수 없어요" : "이야기를 불러오지 못했어요"}
                   </p>
-                  <p className="text-stone mt-2 text-sm">{getErrorMessage(error)}</p>
+                  <p className="mt-2 text-sm text-stone">{getErrorMessage(error)}</p>
                   <div className="mt-6 flex gap-3">
                     {!isNotFound && (
-                      <Button type="button" variant="outline" className="rounded-full" onClick={retry}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="rounded-full"
+                        onClick={retry}
+                      >
                         다시 시도
                       </Button>
                     )}

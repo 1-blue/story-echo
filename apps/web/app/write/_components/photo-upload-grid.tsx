@@ -79,6 +79,8 @@ export function PhotoUploadGrid({
             key={photo.id}
             className="group relative size-[72px] shrink-0 overflow-hidden rounded-lg border border-hairline"
           >
+            {/* blob preview — next/image not applicable */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={photo.previewUrl}
               alt="업로드한 사진"

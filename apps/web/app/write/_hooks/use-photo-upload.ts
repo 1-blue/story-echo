@@ -9,10 +9,8 @@ import type { PhotoUploadItem } from "@/features/stories/types";
 const ALLOWED_TYPES = new Set<string>(["image/jpeg", "image/png", "image/webp"]);
 
 function toPresignContentType(type: string): PresignContentType | null {
-  if (type === "image/jpeg" || type === "image/png" || type === "image/webp") {
-    return type;
-  }
-  return null;
+  if (!ALLOWED_TYPES.has(type)) return null;
+  return type as PresignContentType;
 }
 
 type UsePhotoUploadOptions = {

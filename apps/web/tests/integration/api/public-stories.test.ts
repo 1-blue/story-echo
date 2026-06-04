@@ -1,19 +1,19 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { apiFetch } from "../../helpers/api";
-import { setupGuestClient } from "../../helpers/auth";
-import {
-  cleanupTestUserByDeviceId,
-  countStoryReports,
-  disconnectTestPrisma,
-  isStoryHidden,
-  setUserEmailVerified,
-} from "../../helpers/db";
+import { ensureGuestInDb, setupGuestClient } from "../../helpers/auth";
+import { cleanupTestUserByDeviceId, disconnectTestPrisma, setUserEmailVerified } from "../../helpers/db";
 import {
   createCommunityStory,
   postStoryComment,
   reportStory,
   toggleStoryReaction,
 } from "../../helpers/factories";
+import {
+  parsePublicStoryDetail,
+  parsePublicStoryFeed,
+  parseStory,
+  parseUserMe,
+} from "../../helpers/parse-api";
 import { hasIntegrationEnv } from "../../setup/env";
 
 const integration = hasIntegrationEnv() ? describe : describe.skip;
@@ -25,10 +25,10 @@ integration("Public Story social API", () => {
 
   async function createPublicStory(deviceId: string) {
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
-    await setUserEmailVerified((me.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(me.json).data.id, true);
     const created = await createCommunityStory(`public ${Date.now()}`, { deviceId });
     expect(created.status).toBe(201);
-    return created.json.data.id;
+    return parseStory(created.json).data.id;
   }
 
   it("GET /stories/public lists community stories", async () => {
@@ -36,7 +36,7 @@ integration("Public Story social API", () => {
     await createPublicStory(deviceId);
     const res = await apiFetch("/api/v1/stories/public", {}, { deviceId });
     expect(res.status).toBe(200);
-    expect(Array.isArray((res.json as { data: unknown[] }).data)).toBe(true);
+    expect(Array.isArray(parsePublicStoryFeed(res.json).data)).toBe(true);
     await cleanupTestUserByDeviceId(deviceId);
   });
 
@@ -45,7 +45,7 @@ integration("Public Story social API", () => {
     const storyId = await createPublicStory(deviceId);
     const res = await apiFetch(`/api/v1/stories/public/${storyId}`, {}, { deviceId });
     expect(res.status).toBe(200);
-    expect((res.json as { data: { comments: unknown[] } }).data.comments).toBeDefined();
+    expect(parsePublicStoryDetail(res.json).data.comments).toBeDefined();
     await cleanupTestUserByDeviceId(deviceId);
   });
 
@@ -67,7 +67,7 @@ integration("Public Story social API", () => {
 
     const commenter = await setupGuestClient("public-social-commenter");
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId: commenter.deviceId });
-    await setUserEmailVerified((me.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(me.json).data.id, true);
 
     const commentRes = await postStoryComment(storyId, "nice story", {
       deviceId: commenter.deviceId,
@@ -83,24 +83,34 @@ integration("Public Story social API", () => {
     await cleanupTestUserByDeviceId(commenter.deviceId);
   });
 
-  it("POST report hides story after 3 reports", async () => {
-    const author = await setupGuestClient("public-report-author");
-    const storyId = await createPublicStory(author.deviceId);
-    const reporterDeviceIds: string[] = [];
+  it(
+    "POST report hides story after 3 reports",
+    async () => {
+      const deviceIds: string[] = [];
+      try {
+        const author = await setupGuestClient("public-report-author");
+        deviceIds.push(author.deviceId);
+        const storyId = await createPublicStory(author.deviceId);
+        const reporterDeviceIds: string[] = [];
 
-    for (let i = 0; i < 3; i += 1) {
-      const reporter = await setupGuestClient(`public-report-${i}`);
-      reporterDeviceIds.push(reporter.deviceId);
-      const res = await reportStory(storyId, { deviceId: reporter.deviceId });
-      expect(res.status).toBe(200);
-    }
+        for (let i = 0; i < 3; i += 1) {
+          const reporter = await ensureGuestInDb(`public-report-${i}`);
+          reporterDeviceIds.push(reporter.deviceId);
+          deviceIds.push(reporter.deviceId);
+          const res = await reportStory(storyId, { deviceId: reporter.deviceId });
+          expect(res.status).toBe(200);
+        }
 
-    expect(await countStoryReports(storyId)).toBeGreaterThanOrEqual(3);
-    expect(await isStoryHidden(storyId)).toBe(true);
-
-    for (const deviceId of reporterDeviceIds) {
-      await cleanupTestUserByDeviceId(deviceId);
-    }
-    await cleanupTestUserByDeviceId(author.deviceId);
-  });
+        const detail = await apiFetch(
+          `/api/v1/stories/public/${storyId}`,
+          {},
+          { deviceId: reporterDeviceIds[0] },
+        );
+        expect(detail.status).toBe(404);
+      } finally {
+        await Promise.all(deviceIds.map((id) => cleanupTestUserByDeviceId(id)));
+      }
+    },
+    120_000,
+  );
 });

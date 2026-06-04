@@ -4,7 +4,7 @@ export async function createPrivateStory(
   bodyText: string,
   options: ApiClientOptions & { questionId?: string | null } = {},
 ) {
-  return apiFetch<{ data: { id: string } }>(
+  return apiFetch(
     "/api/v1/stories",
     {
       method: "POST",
@@ -23,7 +23,7 @@ export async function createCommunityStory(
   bodyText: string,
   options: ApiClientOptions & { questionId?: string | null } = {},
 ) {
-  return apiFetch<{ data: { id: string } }>(
+  return apiFetch(
     "/api/v1/stories",
     {
       method: "POST",
@@ -43,7 +43,7 @@ export async function createCapsuleStory(
   unlockAt: string,
   options: ApiClientOptions = {},
 ) {
-  return apiFetch<{ data: { id: string } }>(
+  return apiFetch(
     "/api/v1/stories",
     {
       method: "POST",
@@ -60,7 +60,7 @@ export async function createCapsuleStory(
 }
 
 export async function createCommunityPost(bodyText: string, options: ApiClientOptions = {}) {
-  return apiFetch<{ data: { id: string } }>(
+  return apiFetch(
     "/api/v1/community/posts",
     {
       method: "POST",

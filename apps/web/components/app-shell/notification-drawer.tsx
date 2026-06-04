@@ -16,7 +16,7 @@ type NotificationDrawerProps = {
   unreadCount?: number;
 };
 
-export function NotificationDrawer({ trigger, unreadCount = 0 }: NotificationDrawerProps) {
+export function NotificationDrawer({ trigger }: NotificationDrawerProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {

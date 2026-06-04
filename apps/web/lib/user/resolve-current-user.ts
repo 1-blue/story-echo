@@ -11,6 +11,12 @@ export function getDeviceIdFromRequest(request: Request): string | null {
   return request.headers.get(DEVICE_ID_HEADER) ?? request.headers.get("X-Device-Id");
 }
 
+/** Supabase SSR 세션 쿠키 — 없으면 getUser() 원격 호출 생략 (integration·게스트 API) */
+function hasSupabaseAuthCookie(request: Request): boolean {
+  const cookie = request.headers.get("cookie") ?? "";
+  return /sb-[a-z0-9-]+-auth-token/i.test(cookie);
+}
+
 function isSupabaseConfigured(): boolean {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -69,7 +75,14 @@ export async function ensureMemberUser(authUserId: string, email: string, nickna
 }
 
 export async function resolveCurrentUser(request: Request) {
-  if (isSupabaseConfigured()) {
+  const deviceId = getDeviceIdFromRequest(request);
+
+  // 게스트·통합 테스트: Device-Id만 있을 때 Supabase getUser() 생략 (CI 타임아웃 방지)
+  if (deviceId && !hasSupabaseAuthCookie(request)) {
+    return getOrCreateGuestUser(deviceId);
+  }
+
+  if (isSupabaseConfigured() && hasSupabaseAuthCookie(request)) {
     const supabase = await createServerSupabaseClient();
     const {
       data: { user: authUser },
@@ -84,12 +97,11 @@ export async function resolveCurrentUser(request: Request) {
     }
   }
 
-  const deviceId = getDeviceIdFromRequest(request);
-  if (!deviceId) {
-    throw new Error("DEVICE_ID_REQUIRED");
+  if (deviceId) {
+    return getOrCreateGuestUser(deviceId);
   }
 
-  return getOrCreateGuestUser(deviceId);
+  throw new Error("DEVICE_ID_REQUIRED");
 }
 
 export async function resolveCurrentUserFromHeaders() {

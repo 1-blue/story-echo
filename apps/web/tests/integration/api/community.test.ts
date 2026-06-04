@@ -11,6 +11,7 @@ import {
   postCommunityComment,
   reportCommunityPost,
 } from "../../helpers/factories";
+import { parseCommunityPost, parseCommunityPostList, parseUserMe } from "../../helpers/parse-api";
 import { hasIntegrationEnv } from "../../setup/env";
 
 const integration = hasIntegrationEnv() ? describe : describe.skip;
@@ -30,17 +31,14 @@ integration("Community posts API", () => {
   it("GET /community/posts supports cursor pagination", async () => {
     const { deviceId } = await setupGuestClient("community-pagination");
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
-    await setUserEmailVerified((me.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(me.json).data.id, true);
 
     await createCommunityPost(`page-a ${Date.now()}`, { deviceId });
     await createCommunityPost(`page-b ${Date.now() + 1}`, { deviceId });
 
     const first = await apiFetch("/api/v1/community/posts?limit=1", {}, { deviceId });
     expect(first.status).toBe(200);
-    const firstJson = first.json as {
-      data: { id: string }[];
-      meta: { pagination: { hasMore: boolean; nextCursor: string | null } };
-    };
+    const firstJson = parseCommunityPostList(first.json);
     expect(firstJson.data).toHaveLength(1);
     expect(firstJson.meta.pagination.hasMore).toBe(true);
     expect(firstJson.meta.pagination.nextCursor).toBeTruthy();
@@ -50,7 +48,7 @@ integration("Community posts API", () => {
       {},
       { deviceId },
     );
-    const secondJson = second.json as { data: { id: string }[] };
+    const secondJson = parseCommunityPostList(second.json);
     expect(secondJson.data[0]?.id).not.toBe(firstJson.data[0]?.id);
 
     await cleanupTestUserByDeviceId(deviceId);
@@ -66,7 +64,7 @@ integration("Community posts API", () => {
   it("POST /community/posts creates post when verified", async () => {
     const { deviceId } = await setupGuestClient("community-post-create");
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
-    await setUserEmailVerified((me.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(me.json).data.id, true);
 
     const res = await createCommunityPost(`community ${Date.now()}`, { deviceId });
     expect(res.status).toBe(201);
@@ -76,10 +74,10 @@ integration("Community posts API", () => {
   it("GET/PATCH/DELETE post owner flow", async () => {
     const { deviceId } = await setupGuestClient("community-crud");
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
-    await setUserEmailVerified((me.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(me.json).data.id, true);
 
     const created = await createCommunityPost("crud post", { deviceId });
-    const postId = created.json.data.id;
+    const postId = parseCommunityPost(created.json).data.id;
 
     const getRes = await apiFetch(`/api/v1/community/posts/${postId}`, {}, { deviceId });
     expect(getRes.status).toBe(200);
@@ -103,13 +101,13 @@ integration("Community posts API", () => {
   it("POST comment on post", async () => {
     const author = await setupGuestClient("community-comment-author");
     const meA = await apiFetch("/api/v1/users/me", {}, { deviceId: author.deviceId });
-    await setUserEmailVerified((meA.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(meA.json).data.id, true);
     const post = await createCommunityPost("comment target", { deviceId: author.deviceId });
-    const postId = post.json.data.id;
+    const postId = parseCommunityPost(post.json).data.id;
 
     const commenter = await setupGuestClient("community-commenter");
     const meB = await apiFetch("/api/v1/users/me", {}, { deviceId: commenter.deviceId });
-    await setUserEmailVerified((meB.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(meB.json).data.id, true);
 
     const res = await postCommunityComment(postId, "hello community", {
       deviceId: commenter.deviceId,
@@ -130,9 +128,9 @@ integration("Community posts API", () => {
   it("POST report on community post", async () => {
     const author = await setupGuestClient("community-report-author");
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId: author.deviceId });
-    await setUserEmailVerified((me.json as { data: { id: string } }).data.id, true);
+    await setUserEmailVerified(parseUserMe(me.json).data.id, true);
     const post = await createCommunityPost("report me", { deviceId: author.deviceId });
-    const postId = post.json.data.id;
+    const postId = parseCommunityPost(post.json).data.id;
 
     const reporter = await setupGuestClient("community-reporter");
     const res = await reportCommunityPost(postId, { deviceId: reporter.deviceId });

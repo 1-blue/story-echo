@@ -2,6 +2,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { apiFetch } from "../../helpers/api";
 import { setupGuestClient, loginAsAdmin } from "../../helpers/auth";
 import { cleanupTestUserByDeviceId, disconnectTestPrisma } from "../../helpers/db";
+import { parseUserMe } from "../../helpers/parse-api";
 import { hasIntegrationEnv } from "../../setup/env";
 
 const integration = hasIntegrationEnv() ? describe : describe.skip;
@@ -36,7 +37,7 @@ integration("Health · Users · Auth API", () => {
     const { deviceId } = await setupGuestClient("guest-me");
     const res = await apiFetch("/api/v1/users/me", {}, { deviceId });
     expect(res.status).toBe(200);
-    expect((res.json as { data: { role: string } }).data.role).toBe("guest");
+    expect(parseUserMe(res.json).data.role).toBe("guest");
     await cleanupTestUserByDeviceId(deviceId);
   });
 

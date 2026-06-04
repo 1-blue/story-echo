@@ -9,7 +9,6 @@ type StoryWithQuestion = DbStory & {
 export function toCapsuleStorySummary(story: StoryWithQuestion): CapsuleStorySummary {
   const unlockAt = story.unlockAt!.toISOString();
   const isSealed = story.isCapsuleActive;
-  const photoUrls = Array.isArray(story.photoUrls) ? (story.photoUrls as string[]) : [];
 
   return {
     id: story.id,

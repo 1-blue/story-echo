@@ -1,19 +1,17 @@
 import { PrismaClient } from "@storyecho/database";
 import { createTestDeviceId } from "../setup/env";
 
-const globalForTestPrisma = globalThis as unknown as { testPrisma?: PrismaClient };
-
 export function getTestPrisma(): PrismaClient {
-  if (!globalForTestPrisma.testPrisma) {
-    globalForTestPrisma.testPrisma = new PrismaClient();
+  if (!globalThis.testPrisma) {
+    globalThis.testPrisma = new PrismaClient();
   }
-  return globalForTestPrisma.testPrisma;
+  return globalThis.testPrisma;
 }
 
 export async function disconnectTestPrisma() {
-  if (globalForTestPrisma.testPrisma) {
-    await globalForTestPrisma.testPrisma.$disconnect();
-    globalForTestPrisma.testPrisma = undefined;
+  if (globalThis.testPrisma) {
+    await globalThis.testPrisma.$disconnect();
+    globalThis.testPrisma = undefined;
   }
 }
 

@@ -35,11 +35,15 @@ pnpm generate:api
 pnpm --filter @storyecho/schemas test:unit
 pnpm --filter web test:unit
 
-# Integration (apps/web/.env.local + packages/database/.env)
-pnpm --filter web build
+# Integration (packages/database/.env — dev DB + Supabase; CI는 GitHub Secrets)
+pnpm --filter web build   # CI workflow에서 1회만; vitest global-setup은 BUILD_ID 있으면 build 생략
 pnpm --filter web test:integration
+# · next start + fetch — 프로덕션과 동일 스택 (의도적으로 무겁음)
+# · 게스트 API: X-Device-Id만 (Supabase getUser 생략)
+# · dev DB에 pnpm db:seed 권장
 
-# E2E
+# E2E (CI와 동일: build 1회 → playwright webServer는 pnpm start만)
+pnpm --filter web build
 pnpm --filter web exec playwright install chromium
 pnpm --filter web test:e2e
 ```
