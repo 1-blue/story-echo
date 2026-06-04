@@ -4,11 +4,11 @@ import { redirect } from "next/navigation";
 import { resolveCurrentUserFromHeaders } from "./resolve-current-user";
 
 function redirectToLogin(nextPath: string): never {
-  redirect(`/app/settings/login?next=${encodeURIComponent(nextPath)}`);
+  redirect(`/settings/login?next=${encodeURIComponent(nextPath)}`);
 }
 
 export async function requireMemberUser(redirectTo?: string) {
-  const next = redirectTo ?? "/app/community/write";
+  const next = redirectTo ?? "/community/write";
 
   let user;
   try {

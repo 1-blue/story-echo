@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Archive, Lock, NotebookPen, Settings, Users } from "lucide-react";
+import { SHELL_FIXED_CHROME_CLASS } from "@/lib/app-layout";
 import { cn } from "@/lib/utils";
 
 const tabs: Array<{
@@ -11,11 +12,11 @@ const tabs: Array<{
   icon: typeof Archive;
   exact?: boolean;
 }> = [
-  { href: "/app/drawer", label: "서랍", icon: Archive },
-  { href: "/app/community", label: "커뮤니티", icon: Users },
-  { href: "/app", label: "오늘의 질문", icon: NotebookPen, exact: true },
-  { href: "/app/capsule", label: "타임캡슐", icon: Lock },
-  { href: "/app/settings", label: "설정", icon: Settings },
+  { href: "/drawer", label: "서랍", icon: Archive },
+  { href: "/community", label: "커뮤니티", icon: Users },
+  { href: "/", label: "오늘의 질문", icon: NotebookPen, exact: true },
+  { href: "/capsule", label: "타임캡슐", icon: Lock },
+  { href: "/settings", label: "설정", icon: Settings },
 ];
 
 function isTabActive(pathname: string, href: string, exact?: boolean) {
@@ -29,7 +30,12 @@ export function BottomTabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="border-hairline fixed inset-x-0 bottom-0 z-50 flex min-h-[calc(4rem+var(--safe-area-bottom))] items-center justify-around border-t bg-white pt-2 pb-[var(--safe-area-bottom)]">
+    <nav
+      className={cn(
+        SHELL_FIXED_CHROME_CLASS,
+        "border-hairline bottom-0 z-50 flex min-h-[calc(var(--shell-tab-height)+var(--safe-area-bottom))] items-center justify-around border-t bg-white pt-2 pb-[var(--safe-area-bottom)]",
+      )}
+    >
       {tabs.map(({ href, label, icon: Icon, exact }) => {
         const active = isTabActive(pathname, href, exact);
 

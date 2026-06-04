@@ -7,8 +7,8 @@ export default function NotFound() {
       description="주소가 바뀌었거나 삭제된 페이지일 수 있어요."
       primaryHref="/"
       primaryLabel="시작하기"
-      secondaryHref="/app"
-      secondaryLabel="앱으로 이동"
+      secondaryHref="/drawer"
+      secondaryLabel="서랍으로"
     />
   );
 }

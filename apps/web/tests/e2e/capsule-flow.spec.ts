@@ -11,7 +11,7 @@ test.describe("Capsule flow", () => {
     const { json } = await createCapsuleStory(bodyText, unlockAt, { deviceId });
     const capsuleId = (json as { data: { id: string } }).data.id;
 
-    await guestPage.goto(`/app/capsule/${capsuleId}`);
+    await guestPage.goto(`/capsule/${capsuleId}`);
     await expect(guestPage.getByText("봉인된 편지예요")).toBeVisible({ timeout: 20_000 });
   });
 });

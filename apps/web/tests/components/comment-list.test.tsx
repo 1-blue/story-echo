@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { CommunityComment } from "@storyecho/schemas";
-import { CommentList } from "@/app/app/(detail)/community/[id]/_components/comment-list";
+import { CommentList } from "@/app/(detail)/community/[id]/_components/comment-list";
 
 vi.mock("@storyecho/api-client", () => ({
   useDeleteApiV1CommunityCommentsId: () => ({ mutateAsync: vi.fn(), isPending: false }),

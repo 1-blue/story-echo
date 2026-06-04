@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`${gowunBatang.variable} h-full`} suppressHydrationWarning>
-      <body className="flex min-h-full flex-col antialiased">
+      <body className="bg-canvas flex min-h-full flex-col antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

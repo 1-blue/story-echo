@@ -41,11 +41,11 @@ export const test = base.extend<Fixtures>({
       window.localStorage.setItem("storyecho_device_id", id);
     }, deviceId);
 
-    await page.goto("/app/settings/login");
+    await page.goto("/settings/login");
     await page.getByLabel("이메일").fill(email);
     await page.getByLabel("비밀번호").fill(password);
     await page.getByRole("button", { name: "로그인" }).click();
-    await page.waitForURL(/\/app\/settings/, { timeout: 20_000 });
+    await page.waitForURL(/\/settings/, { timeout: 20_000 });
     await page.waitForLoadState("networkidle");
 
     await use(page);

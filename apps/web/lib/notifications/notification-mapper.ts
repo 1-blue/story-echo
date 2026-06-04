@@ -23,19 +23,19 @@ export function getNotificationHref(notification: Notification): string {
   switch (notification.type) {
     case "comment_on_post":
     case "reply_to_comment":
-      return notification.postId ? `/app/community/${notification.postId}` : "/app/community";
+      return notification.postId ? `/community/${notification.postId}` : "/community";
     case "mention":
-      if (notification.postId) return `/app/community/${notification.postId}`;
-      if (notification.storyId) return `/app/public/${notification.storyId}`;
-      return "/app/community";
+      if (notification.postId) return `/community/${notification.postId}`;
+      if (notification.storyId) return `/public/${notification.storyId}`;
+      return "/community";
     case "comment_on_public_story":
     case "reply_to_story_comment":
-      return notification.storyId ? `/app/public/${notification.storyId}` : "/app";
+      return notification.storyId ? `/public/${notification.storyId}` : "/";
     case "daily_question_reminder":
-      return "/app";
+      return "/";
     case "capsule_unlocked":
-      return notification.storyId ? `/app/capsule/${notification.storyId}` : "/app/capsule";
+      return notification.storyId ? `/capsule/${notification.storyId}` : "/capsule";
     default:
-      return "/app";
+      return "/";
   }
 }

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 import { describe, expect, it, vi } from "vitest";
-import { VisibilityToggle } from "@/app/app/write/_components/visibility-toggle";
+import { VisibilityToggle } from "@/app/write/_components/visibility-toggle";
 
 vi.mock("sonner", () => ({
   toast: vi.fn(),

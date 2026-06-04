@@ -3,13 +3,13 @@ import { resolveCurrentUserFromHeaders } from "@/lib/user/resolve-current-user";
 
 export async function getTodayWriteHref(): Promise<string> {
   const question = await getTodayQuestion();
-  if (!question.id) return "/app/write";
+  if (!question.id) return "/write";
 
   try {
     const user = await resolveCurrentUserFromHeaders();
     const storyId = await getTodayStoryForUser(user.id, question.id);
-    return storyId ? `/app/write/${storyId}` : "/app/write";
+    return storyId ? `/write/${storyId}` : "/write";
   } catch {
-    return "/app/write";
+    return "/write";
   }
 }

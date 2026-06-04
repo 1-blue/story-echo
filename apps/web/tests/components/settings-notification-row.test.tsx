@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { UserMe } from "@storyecho/schemas";
-import { SettingsNotificationRow } from "@/app/app/(shell)/settings/_components/settings-notification-row";
+import { SettingsNotificationRow } from "@/app/(shell)/settings/_components/settings-notification-row";
 
 const mutateAsync = vi.fn().mockResolvedValue({ data: {} });
 

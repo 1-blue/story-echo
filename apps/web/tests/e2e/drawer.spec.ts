@@ -2,7 +2,7 @@ import { test, expect } from "../fixtures/playwright-fixtures";
 
 test.describe("Drawer", () => {
   test("loads drawer tab", async ({ guestPage }) => {
-    await guestPage.goto("/app/drawer");
+    await guestPage.goto("/drawer");
     await expect(
       guestPage
         .getByRole("heading", { name: "서랍" })
@@ -11,7 +11,7 @@ test.describe("Drawer", () => {
   });
 
   test("search bar accepts input", async ({ guestPage }) => {
-    await guestPage.goto("/app/drawer");
+    await guestPage.goto("/drawer");
     const search = guestPage.getByPlaceholder(/검색/);
     if (await search.isVisible()) {
       await search.fill("테스트");

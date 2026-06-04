@@ -28,7 +28,7 @@ export function LandingHero() {
               <Link href="/dev/api-test">API 테스트</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/app">앱 미리보기 (준비 중)</Link>
+              <Link href="/">앱 미리보기 (준비 중)</Link>
             </Button>
           </CardContent>
         </Card>

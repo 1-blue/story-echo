@@ -5,5 +5,5 @@ export function getWebBaseUrl(): string | null {
 
 export function getWebAppUrl(): string | null {
   const base = getWebBaseUrl();
-  return base ? `${base}/app` : null;
+  return base ? `${base.replace(/\/$/, "")}/` : null;
 }

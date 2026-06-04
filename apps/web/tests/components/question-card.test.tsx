@@ -6,8 +6,8 @@ describe("QuestionCard", () => {
   it("renders question text and write link", () => {
     render(<QuestionCard question="오늘의 질문입니다" />);
     expect(screen.getByRole("heading", { name: "오늘의 질문입니다" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /이야기하기/ })).toHaveAttribute("href", "/app/write");
-    expect(screen.getByRole("link", { name: "나중에" })).toHaveAttribute("href", "/app/drawer");
+    expect(screen.getByRole("link", { name: /이야기하기/ })).toHaveAttribute("href", "/write");
+    expect(screen.getByRole("link", { name: "나중에" })).toHaveAttribute("href", "/drawer");
   });
 
   it("links to edit when todayStoryId is set", () => {
@@ -16,7 +16,7 @@ describe("QuestionCard", () => {
     );
     expect(screen.getByRole("link", { name: /이야기 수정/ })).toHaveAttribute(
       "href",
-      "/app/write/550e8400-e29b-41d4-a716-446655440000",
+      "/write/550e8400-e29b-41d4-a716-446655440000",
     );
   });
 });

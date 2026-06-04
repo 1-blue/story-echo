@@ -14,7 +14,7 @@ type ErrorPageProps = {
 export function ErrorPage({
   title,
   description,
-  primaryHref = "/app",
+  primaryHref = "/",
   primaryLabel = "홈으로",
   secondaryHref,
   secondaryLabel,

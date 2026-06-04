@@ -8,7 +8,7 @@ type QuestionCardProps = {
 };
 
 export function QuestionCard({ question, todayStoryId }: QuestionCardProps) {
-  const writeHref = todayStoryId ? `/app/write/${todayStoryId}` : "/app/write";
+  const writeHref = todayStoryId ? `/write/${todayStoryId}` : "/write";
   const ctaLabel = todayStoryId ? "이야기 수정" : "이야기하기";
 
   return (
@@ -35,7 +35,7 @@ export function QuestionCard({ question, todayStoryId }: QuestionCardProps) {
           variant="outline"
           className="h-auto w-full rounded-full border-hairline-strong bg-transparent py-3.5 text-[15px] text-charcoal hover:bg-surface-cream active:scale-[0.98]"
         >
-          <Link href="/app/drawer">나중에</Link>
+          <Link href="/drawer">나중에</Link>
         </Button>
       </div>
     </article>

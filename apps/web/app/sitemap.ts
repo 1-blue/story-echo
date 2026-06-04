@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     const storyRoutes: MetadataRoute.Sitemap = publicStories.map((story) => ({
-      url: `${base}/app/public/${story.id}`,
+      url: `${base}/public/${story.id}`,
       lastModified: story.createdAt,
       changeFrequency: "weekly",
       priority: 0.6,
