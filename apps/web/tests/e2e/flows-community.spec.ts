@@ -11,7 +11,8 @@ test.describe("Community flow", () => {
 
     await test.step("create post from write page", async () => {
       await memberPage.goto("/community/write");
-      await memberPage.getByRole("textbox").fill(bodyText);
+      await expect(memberPage).toHaveURL(/\/community\/write/);
+      await memberPage.locator("textarea").first().fill(bodyText);
       await memberPage.getByRole("button", { name: "게시" }).click();
       await memberPage.waitForURL(/\/community\/[^/]+$/, { timeout: 20_000 });
     });

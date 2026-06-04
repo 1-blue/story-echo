@@ -107,8 +107,12 @@ export async function resolveCurrentUser(request: Request) {
 export async function resolveCurrentUserFromHeaders() {
   const headerStore = await headers();
   const deviceId = headerStore.get(DEVICE_ID_HEADER) ?? headerStore.get("X-Device-Id");
+  const cookie = headerStore.get("cookie");
+  const reqHeaders: Record<string, string> = {};
+  if (deviceId) reqHeaders["X-Device-Id"] = deviceId;
+  if (cookie) reqHeaders.cookie = cookie;
   const request = new Request("http://local", {
-    headers: deviceId ? { "X-Device-Id": deviceId } : undefined,
+    headers: Object.keys(reqHeaders).length > 0 ? reqHeaders : undefined,
   });
   return resolveCurrentUser(request);
 }

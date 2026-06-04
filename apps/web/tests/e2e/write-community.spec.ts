@@ -8,6 +8,7 @@ test.describe("Community write", () => {
 
   test("verified member can open write form", async ({ memberPage }) => {
     await memberPage.goto("/community/write");
-    await expect(memberPage.getByRole("textbox")).toBeVisible({ timeout: 20_000 });
+    await expect(memberPage).toHaveURL(/\/community\/write/, { timeout: 20_000 });
+    await expect(memberPage.locator("textarea").first()).toBeVisible({ timeout: 20_000 });
   });
 });
