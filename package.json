@@ -5,31 +5,43 @@
     "dev": "turbo dev",
     "dev:web": "turbo dev --filter=web",
     "dev:mobile": "turbo dev --filter=mobile",
-
     "build": "turbo build",
     "lint": "turbo lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "postinstall": "pnpm generate:api",
-
     "generate:openapi": "tsx scripts/generate-openapi.ts",
     "generate:api": "pnpm generate:openapi && orval",
     "db:generate": "pnpm --filter @storyecho/database db:generate",
     "db:migrate": "pnpm --filter @storyecho/database db:migrate",
     "db:push": "pnpm --filter @storyecho/database db:push",
-    "db:seed": "pnpm --filter @storyecho/database db:seed"
+    "db:seed": "pnpm --filter @storyecho/database db:seed",
+    "db:reset": "pnpm --filter @storyecho/database db:reset",
+    "test": "turbo test",
+    "test:unit": "turbo test:unit",
+    "test:integration": "turbo test:integration",
+    "test:e2e": "pnpm --filter web test:e2e",
+    "test:coverage": "turbo test:coverage"
   },
   "devDependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@playwright/test": "^1.60.0",
     "@storyecho/config": "workspace:*",
     "@storyecho/schemas": "workspace:*",
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitest/coverage-v8": "^4.1.8",
+    "dotenv": "^17.4.2",
+    "happy-dom": "^20.10.1",
     "orval": "^7.9.0",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tsx": "^4.19.4",
     "turbo": "^2.5.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.8"
   },
   "packageManager": "pnpm@10.16.0",
   "engines": {

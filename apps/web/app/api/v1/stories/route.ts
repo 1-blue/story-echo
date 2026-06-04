@@ -2,27 +2,19 @@ import {
   CreateStoryRequestSchema,
   StoryListResponseSchema,
   StoryResponseSchema,
+  TodayStoryExistsErrorSchema,
 } from "@storyecho/schemas";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured, toStoryDto } from "@/lib/story-mapper";
-
-async function getOrCreateDemoUser() {
-  const deviceId = "00000000-0000-4000-8000-000000000001";
-  return prisma.user.upsert({
-    where: { deviceId },
-    update: {},
-    create: { deviceId, role: "guest", nickname: "게스트" },
-  });
-}
+import { getTodayQuestion, getTodayStoryForUser } from "@/lib/today-question";
+import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
+import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function GET() {
   if (!isDatabaseConfigured()) {
     return Response.json(
-      {
-        message: "Database not configured. Set DATABASE_URL in .env.local",
-        code: "DB_UNAVAILABLE",
-      },
-      { status: 503 }
+      apiErrorBody("DB_UNAVAILABLE"),
+      { status: 503 },
     );
   }
 
@@ -31,28 +23,21 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       take: 20,
     });
-
     const body = StoryListResponseSchema.parse({
       data: stories.map(toStoryDto),
     });
 
     return Response.json(body);
   } catch {
-    return Response.json(
-      { message: "Failed to fetch stories", code: "DB_ERROR" },
-      { status: 503 }
-    );
+    return apiErrorResponse(503, "DB_ERROR");
   }
 }
 
 export async function POST(request: Request) {
   if (!isDatabaseConfigured()) {
     return Response.json(
-      {
-        message: "Database not configured. Set DATABASE_URL in .env.local",
-        code: "DB_UNAVAILABLE",
-      },
-      { status: 503 }
+      apiErrorBody("DB_UNAVAILABLE"),
+      { status: 503 },
     );
   }
 
@@ -61,32 +46,57 @@ export async function POST(request: Request) {
     const parsed = CreateStoryRequestSchema.safeParse(json);
 
     if (!parsed.success) {
+      return apiErrorResponse(400, "VALIDATION_ERROR");
+    }
+
+    const user = await resolveCurrentUser(request);
+
+    const isCapsule = parsed.data.isCapsule;
+    if (!isCapsule && parsed.data.questionId) {
+      const todayQuestion = await getTodayQuestion();
+      if (todayQuestion.id && parsed.data.questionId === todayQuestion.id) {
+        const existingId = await getTodayStoryForUser(user.id, todayQuestion.id);
+        if (existingId) {
+          const errorBody = TodayStoryExistsErrorSchema.parse({
+            message: "오늘의 질문에는 이미 이야기를 남겼어요",
+            code: "TODAY_STORY_EXISTS",
+            storyId: existingId,
+          });
+          return Response.json(errorBody, { status: 409 });
+        }
+      }
+    }
+
+    if (parsed.data.visibility === "community" && !user.emailVerified) {
       return Response.json(
-        { message: parsed.error.message, code: "VALIDATION_ERROR" },
-        { status: 400 }
+        {
+          message: "커뮤니티 공개는 이메일 인증 후 이용할 수 있습니다",
+          code: "EMAIL_NOT_VERIFIED",
+        },
+        { status: 400 },
       );
     }
 
-    const user = await getOrCreateDemoUser();
+    const unlockAt = parsed.data.unlockAt ? new Date(parsed.data.unlockAt) : null;
+    const isCapsuleActive = isCapsule && Boolean(unlockAt) && unlockAt! > new Date();
+    const visibility = isCapsule ? "private" : parsed.data.visibility;
 
     const story = await prisma.story.create({
       data: {
         userId: user.id,
+        questionId: parsed.data.questionId ?? null,
         bodyText: parsed.data.bodyText,
         photoUrls: parsed.data.photoUrls,
-        visibility: parsed.data.visibility,
-        isCapsule: parsed.data.isCapsule,
-        unlockAt: parsed.data.unlockAt ? new Date(parsed.data.unlockAt) : null,
-        isCapsuleActive: parsed.data.isCapsule && Boolean(parsed.data.unlockAt),
+        visibility,
+        isCapsule,
+        unlockAt,
+        isCapsuleActive,
       },
     });
 
     const body = StoryResponseSchema.parse({ data: toStoryDto(story) });
     return Response.json(body, { status: 201 });
   } catch {
-    return Response.json(
-      { message: "Failed to create story", code: "DB_ERROR" },
-      { status: 503 }
-    );
+    return apiErrorResponse(503, "DB_ERROR");
   }
 }

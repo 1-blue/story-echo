@@ -4,9 +4,12 @@
 
 StoryEcho is a daily reflection app. Users receive one question per day, optionally write private stories, compare answers after one year (Echo), use time capsules, and share to a community feed.
 
+Public stories (`/app/public/{id}`) are indexable and listed in the sitemap.
+
 ## Links
 
 - Landing: /
+- Sitemap: /sitemap.xml
 - API health: /api/v1/health
 
 ## Tech

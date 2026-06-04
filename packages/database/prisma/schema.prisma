@@ -49,8 +49,8 @@ model User {
   /// Supabase Auth email_verified 연동. 커뮤니티 공개·IAP 시 true 필수.
   emailVerified        Boolean     @default(false) @map("email_verified")
 
-  /// 커뮤니티·프로필 표시 이름 (F12). 게스트 포함.
-  nickname             String?    
+  /// 커뮤니티·프로필 표시 이름 (F12). 게스트 포함. 전역 unique.
+  nickname             String?     @unique
 
   /// 광고 제거 IAP 평생 유지 (F19). 회원 user_id에 저장.
   adFree               Boolean     @default(false) @map("ad_free")
@@ -70,9 +70,16 @@ model User {
   /// 게스트→회원 전환 시각. null이면 미전환.
   upgradedAt           DateTime?   @map("upgraded_at")
 
-  stories      Story[]
-  questionLogs UserQuestionLog[]
-  storyReports StoryReport[]
+  stories               Story[]
+  questionLogs          UserQuestionLog[]
+  storyReports          StoryReport[]
+  communityPosts        CommunityPost[]
+  communityComments     CommunityComment[]
+  storyComments         StoryComment[]
+  communityReactions    CommunityReaction[]
+  notificationsReceived Notification[] @relation("NotificationRecipient")
+  notificationsSent     Notification[] @relation("NotificationActor")
+  communityPostReports  CommunityPostReport[]
 
   @@map("users")
 }
@@ -91,8 +98,9 @@ model Question {
   /// 질문 등록 시각 (UTC).
   createdAt DateTime @default(now()) @map("created_at")
 
-  stories      Story[]
-  questionLogs UserQuestionLog[]
+  stories         Story[]
+  questionLogs    UserQuestionLog[]
+  communityPosts  CommunityPost[]
 
   @@map("questions")
 }
@@ -123,18 +131,23 @@ model Story {
   /// 타임캡슐 해제 시각. null이면 즉시 열람.
   unlockAt        DateTime?  @map("unlock_at")
 
-  /// 봉인 중 여부. Free 타임캡슐 1개 한도는 active만 카운트.
+  /// 봉인 중 여부. unlock_at 도래 전까지 true.
   isCapsuleActive Boolean    @default(false) @map("is_capsule_active")
 
   /// 신고 3건 누적 시 feed 자동 숨김 (moderation).
   hiddenFromFeed  Boolean    @default(false) @map("hidden_from_feed")
 
+  /// 서랍 북마크 여부.
+  isBookmarked    Boolean    @default(false) @map("is_bookmarked")
+
   /// 작성 시각 (UTC).
   createdAt       DateTime   @default(now()) @map("created_at")
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  question Question? @relation(fields: [questionId], references: [id], onDelete: SetNull)
-  reports  StoryReport[]
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question?     @relation(fields: [questionId], references: [id], onDelete: SetNull)
+  reports       StoryReport[]
+  comments      StoryComment[]
+  notifications Notification[]
 
   @@index([userId, createdAt])
   @@index([visibility, hiddenFromFeed, createdAt(sort: Desc)])
@@ -183,4 +196,138 @@ model StoryReport {
 
   @@unique([storyId, reporterUserId])
   @@map("story_reports")
+}
+
+model StoryComment {
+  id               String   @id @default(uuid()) @db.Uuid
+  storyId          String   @map("story_id") @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  parentId         String?  @map("parent_id") @db.Uuid
+  bodyText         String   @map("body_text") @db.Text
+  mentionedUserIds Json     @default("[]") @map("mentioned_user_ids")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  story   Story         @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  StoryComment? @relation("StoryCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies StoryComment[] @relation("StoryCommentReplies")
+
+  @@index([storyId, createdAt])
+  @@index([parentId])
+  @@map("story_comments")
+}
+
+/// 커뮤니티 토론 글 (서랍 Story와 분리).
+enum CommunityReactionTargetType {
+  post
+  comment
+  story
+  story_comment
+}
+
+enum CommunityReactionEmoji {
+  heart
+  sad
+  angry
+  fire
+  clap
+}
+
+enum NotificationType {
+  comment_on_post
+  reply_to_comment
+  mention
+  comment_on_public_story
+  reply_to_story_comment
+  daily_question_reminder
+  capsule_unlocked
+}
+
+model CommunityPost {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  questionId     String?  @map("question_id") @db.Uuid
+  bodyText       String   @map("body_text") @db.Text
+  photoUrls      Json     @default("[]") @map("photo_urls")
+  hiddenFromFeed Boolean  @default(false) @map("hidden_from_feed")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user     User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question?             @relation(fields: [questionId], references: [id], onDelete: SetNull)
+  comments CommunityComment[]
+  reports  CommunityPostReport[]
+
+  @@index([hiddenFromFeed, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("community_posts")
+}
+
+model CommunityComment {
+  id               String   @id @default(uuid()) @db.Uuid
+  postId           String   @map("post_id") @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  parentId         String?  @map("parent_id") @db.Uuid
+  bodyText         String   @map("body_text") @db.Text
+  mentionedUserIds Json     @default("[]") @map("mentioned_user_ids")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  post     CommunityPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent   CommunityComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  CommunityComment[] @relation("CommentReplies")
+
+  @@index([postId, createdAt])
+  @@index([parentId])
+  @@map("community_comments")
+}
+
+model CommunityReaction {
+  id         String                    @id @default(uuid()) @db.Uuid
+  targetType CommunityReactionTargetType @map("target_type")
+  targetId   String                    @map("target_id") @db.Uuid
+  userId     String                    @map("user_id") @db.Uuid
+  emoji      CommunityReactionEmoji
+  createdAt  DateTime                  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([targetType, targetId, userId])
+  @@index([targetType, targetId])
+  @@map("community_reactions")
+}
+
+model Notification {
+  id              String           @id @default(uuid()) @db.Uuid
+  recipientUserId String           @map("recipient_user_id") @db.Uuid
+  actorUserId     String?          @map("actor_user_id") @db.Uuid
+  type            NotificationType
+  postId          String?          @map("post_id") @db.Uuid
+  storyId         String?          @map("story_id") @db.Uuid
+  commentId       String?          @map("comment_id") @db.Uuid
+  readAt          DateTime?        @map("read_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  recipient User   @relation("NotificationRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
+  actor     User?  @relation("NotificationActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  story     Story? @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([recipientUserId, type, storyId], map: "notifications_capsule_once")
+  @@index([recipientUserId, readAt, createdAt(sort: Desc)])
+  @@index([recipientUserId, type, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+model CommunityPostReport {
+  id             String   @id @default(uuid()) @db.Uuid
+  postId         String   @map("post_id") @db.Uuid
+  reporterUserId String   @map("reporter_user_id") @db.Uuid
+  reason         String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  post     CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reporter User          @relation(fields: [reporterUserId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, reporterUserId])
+  @@map("community_post_reports")
 }

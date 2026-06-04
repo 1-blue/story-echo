@@ -1,20 +1,21 @@
-import type { Metadata } from "next";
-import { Lora } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Gowun_Batang } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
 import "./globals.css";
 
-const lora = Lora({
+const gowunBatang = Gowun_Batang({
+  weight: ["400", "700"],
   subsets: ["latin"],
-  variable: "--font-serif",
+  variable: "--font-gowun-batang",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "StoryEcho — 이야기해줘",
-    template: "%s | StoryEcho",
-  },
-  description: "매일 하나의 질문. 오늘의 이야기, 나중에 다시 읽기.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+export const metadata: Metadata = getSharedMetadata();
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -23,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${lora.variable} h-full`}>
+    <html lang="ko" className={`${gowunBatang.variable} h-full`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col antialiased">
         <Providers>{children}</Providers>
       </body>

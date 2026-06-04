@@ -1,0 +1,17 @@
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
+import { LoginForm } from "./_components/login-form";
+
+export const metadata: Metadata = getSharedMetadata({
+  title: "로그인",
+  description: "StoryEcho에 로그인하세요.",
+});
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}

@@ -4,7 +4,10 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
-    "./custom-fetch": "./src/custom-fetch.ts"
+    "./custom-fetch": "./src/custom-fetch.ts",
+    "./generate-uuid": "./src/generate-uuid.ts",
+    "./error-messages": "./src/error-messages.ts",
+    "./api-client-error": "./src/api-client-error.ts"
   },
   "scripts": {
     "lint": "tsc --noEmit"

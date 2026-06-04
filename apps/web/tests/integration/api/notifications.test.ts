@@ -1,0 +1,86 @@
+import { afterAll, describe, expect, it } from "vitest";
+import { hasIntegrationEnv } from "../../setup/env";
+
+const integration = hasIntegrationEnv() ? describe : describe.skip;
+import { prisma } from "@/lib/prisma";
+import { dispatchDailyNotifications } from "@/lib/notifications/dispatch-daily";
+import { getKstDayRangeUtc } from "@/lib/notifications/kst";
+import { apiFetch } from "../../helpers/api";
+import { setupGuestClient } from "../../helpers/auth";
+import { cleanupTestUserByDeviceId, setUserEmailVerified } from "../../helpers/db";
+import { createCommunityPost } from "../../helpers/factories";
+
+integration("notifications API", () => {
+  afterAll(async () => {
+    const { disconnectTestPrisma } = await import("../../helpers/db");
+    await disconnectTestPrisma();
+  });
+
+  it("GET /api/v1/notifications returns list", async () => {
+    const { deviceId } = await setupGuestClient("notify-list");
+    const res = await apiFetch("/api/v1/notifications", {}, { deviceId });
+    expect(res.status).toBe(200);
+    const body = res.json as { data: unknown[]; meta: { unreadCount: number } };
+    expect(Array.isArray(body.data)).toBe(true);
+    await cleanupTestUserByDeviceId(deviceId);
+  });
+
+  it("creates comment_on_post notification", async () => {
+    const author = await setupGuestClient("notify-post-author");
+    const meA = await apiFetch("/api/v1/users/me", {}, { deviceId: author.deviceId });
+    await setUserEmailVerified((meA.json as { data: { id: string } }).data.id, true);
+    const post = await createCommunityPost("notify target", { deviceId: author.deviceId });
+    const postId = post.json.data.id;
+
+    const commenter = await setupGuestClient("notify-post-commenter");
+    const meB = await apiFetch("/api/v1/users/me", {}, { deviceId: commenter.deviceId });
+    await setUserEmailVerified((meB.json as { data: { id: string } }).data.id, true);
+
+    const commentRes = await apiFetch(
+      `/api/v1/community/posts/${postId}/comments`,
+      {
+        method: "POST",
+        body: JSON.stringify({ bodyText: "hello" }),
+      },
+      { deviceId: commenter.deviceId },
+    );
+    expect(commentRes.status).toBe(201);
+
+    const authorId = (meA.json as { data: { id: string } }).data.id;
+    const row = await prisma.notification.findFirst({
+      where: { recipientUserId: authorId, type: "comment_on_post", postId },
+    });
+    expect(row).not.toBeNull();
+
+    await cleanupTestUserByDeviceId(author.deviceId);
+    await cleanupTestUserByDeviceId(commenter.deviceId);
+  });
+
+  it("dispatchDailyNotifications creates daily_question_reminder once per KST day", async () => {
+    const { deviceId } = await setupGuestClient("notify-daily");
+    const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
+    const userId = (me.json as { data: { id: string } }).data.id;
+    await prisma.user.update({
+      where: { id: userId },
+      data: { notificationsEnabled: true, role: "member", email: "daily@test.com" },
+    });
+
+    const first = await dispatchDailyNotifications();
+    expect(first.dailyReminders).toBeGreaterThanOrEqual(1);
+
+    const second = await dispatchDailyNotifications();
+    expect(second.dailyReminders).toBe(0);
+
+    const { start, end } = getKstDayRangeUtc();
+    const count = await prisma.notification.count({
+      where: {
+        recipientUserId: userId,
+        type: "daily_question_reminder",
+        createdAt: { gte: start, lt: end },
+      },
+    });
+    expect(count).toBe(1);
+
+    await cleanupTestUserByDeviceId(deviceId);
+  });
+});

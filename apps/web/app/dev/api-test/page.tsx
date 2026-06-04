@@ -3,6 +3,8 @@
 import { Component, Suspense, type ReactNode } from "react";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { useGetApiV1StoriesSuspense } from "@storyecho/api-client";
+import { ClientOnly } from "@/components/client-only";
+import { getErrorMessage } from "@/lib/get-error-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -71,7 +73,7 @@ export default function ApiTestPage() {
     <main className="mx-auto min-h-screen max-w-lg space-y-6 px-5 py-12">
       <div>
         <Badge variant="secondary">dev</Badge>
-        <h1 className="mt-2 font-serif text-2xl">API 테스트</h1>
+        <h1 className="mt-2 font-display text-2xl">API 테스트</h1>
         <p className="text-sm text-muted-foreground">orval + TanStack Query (Suspense) 연동 확인</p>
       </div>
 
@@ -82,7 +84,7 @@ export default function ApiTestPage() {
             fallback={(error, resetError) => (
               <Card className="border-destructive">
                 <CardContent className="space-y-3 pt-6 text-sm text-destructive">
-                  <p>{error.message}</p>
+                  <p>{getErrorMessage(error)}</p>
                   <Button type="button" variant="outline" size="sm" onClick={resetError}>
                     다시 시도
                   </Button>
@@ -90,9 +92,11 @@ export default function ApiTestPage() {
               </Card>
             )}
           >
-            <Suspense fallback={<p className="text-muted-foreground">로딩 중…</p>}>
-              <StoriesContent />
-            </Suspense>
+            <ClientOnly fallback={<p className="text-muted-foreground">로딩 중…</p>}>
+              <Suspense fallback={<p className="text-muted-foreground">로딩 중…</p>}>
+                <StoriesContent />
+              </Suspense>
+            </ClientOnly>
           </QueryErrorBoundary>
         )}
       </QueryErrorResetBoundary>

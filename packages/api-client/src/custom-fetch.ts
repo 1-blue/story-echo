@@ -7,14 +7,41 @@ export type OrvalRequestConfig = {
   signal?: AbortSignal;
 };
 
+import { generateUuid } from "./generate-uuid";
+import { ApiClientError } from "./api-client-error";
+
+const DEVICE_ID_KEY = "storyecho_device_id";
+const DEVICE_ID_COOKIE = "storyecho_device_id";
+
 function getBaseUrl(): string {
-  if (typeof process !== "undefined" && process.env.EXPO_PUBLIC_API_URL) {
-    return process.env.EXPO_PUBLIC_API_URL;
-  }
   if (typeof window !== "undefined") {
-    return process.env.NEXT_PUBLIC_APP_URL ?? "";
+    return window.location.origin;
   }
-  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  if (typeof process !== "undefined" && process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, "");
+  }
+  return (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+}
+
+function readDeviceIdFromCookie(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${DEVICE_ID_COOKIE}=([^;]*)`));
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
+}
+
+function getDeviceIdHeader(): Record<string, string> {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  let deviceId = window.localStorage.getItem(DEVICE_ID_KEY) ?? readDeviceIdFromCookie();
+  if (!deviceId) {
+    deviceId = generateUuid();
+    window.localStorage.setItem(DEVICE_ID_KEY, deviceId);
+    document.cookie = `${DEVICE_ID_COOKIE}=${encodeURIComponent(deviceId)}; path=/; max-age=31536000; SameSite=Lax`;
+  }
+
+  return { "X-Device-Id": deviceId };
 }
 
 function buildUrl(path: string, params?: OrvalRequestConfig["params"]): string {
@@ -38,9 +65,11 @@ export async function customFetch<T>(config: OrvalRequestConfig): Promise<T> {
   const response = await fetch(resolvedUrl, {
     method,
     signal,
+    credentials: "same-origin",
     body: data !== undefined ? JSON.stringify(data) : undefined,
     headers: {
       "Content-Type": "application/json",
+      ...getDeviceIdHeader(),
       ...headers,
     },
   });
@@ -48,8 +77,9 @@ export async function customFetch<T>(config: OrvalRequestConfig): Promise<T> {
   if (!response.ok) {
     const errorBody = (await response.json().catch(() => ({}))) as {
       message?: string;
+      code?: string;
     };
-    throw new Error(errorBody.message ?? `HTTP ${response.status}`);
+    throw new ApiClientError(response.status, errorBody);
   }
 
   if (response.status === 204) {

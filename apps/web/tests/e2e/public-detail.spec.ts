@@ -1,0 +1,15 @@
+import { test, expect } from "../fixtures/playwright-fixtures";
+import { hasIntegrationEnv } from "../setup/env";
+
+test.describe("Public detail", () => {
+  test.skip(!hasIntegrationEnv(), "requires DB");
+
+  test("public story detail loads when story exists", async ({ guestPage }) => {
+    await guestPage.goto("/app");
+    const card = guestPage.locator('a[href^="/app/public/"]').first();
+    if (await card.isVisible()) {
+      await card.click();
+      await expect(guestPage).toHaveURL(/\/app\/public\//);
+    }
+  });
+});
