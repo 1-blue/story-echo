@@ -1,4 +1,4 @@
-import { QUESTION_SEEDS } from "./questions.data";
+import { QUESTION_SEEDS } from "./questions.data/index";
 import type { SeedFn } from "./types";
 
 export const seedQuestions: SeedFn = async ({ prisma }) => {
@@ -16,11 +16,13 @@ export const seedQuestions: SeedFn = async ({ prisma }) => {
       create: {
         id: question.id,
         text: question.text,
-        annualKey: question.annualKey,
+        month: question.month,
+        day: question.day,
       },
       update: {
         text: question.text,
-        annualKey: question.annualKey,
+        month: question.month,
+        day: question.day,
       },
     });
 

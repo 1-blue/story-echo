@@ -40,7 +40,7 @@ pnpm --filter web build   # CI workflow에서 1회만; vitest global-setup은 BU
 pnpm --filter web test:integration
 # · next start + fetch — 프로덕션과 동일 스택 (의도적으로 무겁음)
 # · 게스트 API: X-Device-Id만 (Supabase getUser 생략)
-# · dev DB에 pnpm db:seed 권장
+# · dev DB: pnpm db:seed (샘플) / prod DB: pnpm db:seed:prod (관리자+365질문만, 수동 1회)
 
 # E2E (CI와 동일: build 1회 → playwright webServer는 pnpm start만)
 pnpm --filter web build
