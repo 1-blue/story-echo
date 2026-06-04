@@ -84,16 +84,19 @@ model User {
   @@map("users")
 }
 
-/// 일일 질문 풀. F1 오늘의 질문·1년 Echo용 annual_key 포함.
+/// 일일 질문 풀. F1 오늘의 질문 — KST 월·일 고정 (평년 365일).
 model Question {
-  /// PK. UUID v4.
+  /// PK. UUID v4. 시드: day-of-year 인코딩 ID.
   id        String   @id @default(uuid()) @db.Uuid
 
   /// 질문 본문 텍스트.
-  text      String  
+  text      String
 
-  /// 1년 Echo 그룹·관리용 키. Echo 트리거는 user_question_log.shown_at 기준.
-  annualKey String?  @map("annual_key")
+  /// KST 기준 월 (1–12).
+  month     Int
+
+  /// KST 기준 일 (1–31). 윤년 2/29는 앱에서 2/28과 동일 질문.
+  day       Int
 
   /// 질문 등록 시각 (UTC).
   createdAt DateTime @default(now()) @map("created_at")
@@ -102,6 +105,7 @@ model Question {
   questionLogs    UserQuestionLog[]
   communityPosts  CommunityPost[]
 
+  @@unique([month, day])
   @@map("questions")
 }
 

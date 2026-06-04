@@ -1,4 +1,8 @@
-import { QUESTION_SEEDS } from "./questions.data";
+import {
+  dayOfYearFromMonthDay,
+  getKstMonthDayDaysAgo,
+  questionIdForDayOfYear,
+} from "../question-calendar";
 import type { SeedFn } from "./types";
 
 const DAYS_BACK = 380;
@@ -41,8 +45,8 @@ function storiesPerDay(dayOffset: number): number {
 }
 
 function pickQuestionId(dayOffset: number, index: number): string {
-  const questionIndex = (dayOffset + index * 7) % QUESTION_SEEDS.length;
-  return QUESTION_SEEDS[questionIndex]!.id;
+  const { month, day } = getKstMonthDayDaysAgo(dayOffset + index);
+  return questionIdForDayOfYear(dayOfYearFromMonthDay(month, day));
 }
 
 function pickBody(dayOffset: number, index: number): string {

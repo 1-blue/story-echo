@@ -1,5 +1,6 @@
-import { prisma } from "@/lib/prisma";
+import { getKstMonthDay, normalizeMonthDay } from "@storyecho/database/question-calendar";
 import { getKstDayRangeUtc } from "@/lib/notifications/kst";
+import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 
 const FALLBACK_QUESTION = {
@@ -7,7 +8,15 @@ const FALLBACK_QUESTION = {
   text: "오늘 가장 기억에 남는 순간은 무엇인가요?",
 };
 
-const KOREAN_WEEKDAYS = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"] as const;
+const KOREAN_WEEKDAYS = [
+  "일요일",
+  "월요일",
+  "화요일",
+  "수요일",
+  "목요일",
+  "금요일",
+  "토요일",
+] as const;
 
 export type TodayQuestion = {
   id: string | null;
@@ -21,27 +30,16 @@ export function formatKoreanDate(date: Date): string {
   return `${month}월 ${day}일 ${weekday}`;
 }
 
-function dayOfYear(date: Date): number {
-  const start = new Date(date.getFullYear(), 0, 0);
-  const diff = date.getTime() - start.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-}
-
 export async function getTodayQuestion(): Promise<TodayQuestion> {
   if (!isDatabaseConfigured()) {
     return FALLBACK_QUESTION;
   }
 
   try {
-    const count = await prisma.question.count();
-    if (count === 0) {
-      return FALLBACK_QUESTION;
-    }
-
-    const index = dayOfYear(new Date()) % count;
-    const question = await prisma.question.findFirst({
-      skip: index,
-      orderBy: { createdAt: "asc" },
+    const kst = getKstMonthDay();
+    const { month, day } = normalizeMonthDay(kst.month, kst.day);
+    const question = await prisma.question.findUnique({
+      where: { month_day: { month, day } },
       select: { id: true, text: true },
     });
 

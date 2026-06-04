@@ -3,14 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./src/client.ts"
+    ".": "./src/client.ts",
+    "./question-calendar": "./src/question-calendar.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:seed": "prisma db seed",
+    "db:seed": "SEED_PROFILE=dev tsx src/seeds/run.ts",
+    "db:seed:prod": "SEED_PROFILE=prod tsx src/seeds/run.ts",
     "db:reset": "prisma db reet",
+    "test": "vitest run",
+    "test:unit": "vitest run",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -20,10 +24,11 @@
     "@supabase/supabase-js": "^2.49.8",
     "prisma": "^6.9.0",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.8"
   },
   "prisma": {
     "schema": "prisma/schema.prisma",
-    "seed": "tsx src/seeds/index.ts"
+    "seed": "SEED_PROFILE=dev tsx src/seeds/run.ts"
   }
 }

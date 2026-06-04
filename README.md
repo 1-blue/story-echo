@@ -35,7 +35,8 @@ cp packages/database/.env.example packages/database/.env
 
 # 4. Database (Supabase URL 필요)
 pnpm db:migrate
-pnpm db:seed
+pnpm db:seed        # dev: 365 질문 + 샘플 데이터
+# pnpm db:seed:prod # prod: 관리자 + 365 질문만
 
 # 5. Run web
 pnpm --filter web dev
@@ -46,7 +47,7 @@ pnpm --filter web dev
 비밀번호는 **Supabase Auth**(`auth.users`)에 저장됩니다. Prisma `users` 테이블에는 password 컬럼이 없습니다.
 
 1. `packages/database/.env`에 `SEED_ADMIN_PASSWORD` 설정 (예: `SEED_ADMIN_EMAIL=admin@storyecho.app`)
-2. `pnpm db:seed` 실행 → `[users] Supabase Auth 관리자 생성/갱신` 로그 확인
+2. `pnpm db:seed` 실행 → `[users] Supabase Auth 관리자 생성/갱신` 로그 확인 (prod DB는 `pnpm db:seed:prod`)
 3. `/app/settings/login`에서 위 이메일·비밀번호로 로그인
 4. `/app/drawer`에서 잔디·이야기 목록 확인
 
@@ -57,7 +58,8 @@ pnpm --filter web dev
 | `pnpm dev`                 | Turbo dev (web + mobile)                                                  |
 | `pnpm generate:api`        | zod → openapi.json → orval                                                |
 | `pnpm db:migrate`          | Prisma migrate dev                                                        |
-| `pnpm db:seed`             | 시드 (관리자·질문 풀)                                                     |
+| `pnpm db:seed`             | dev 시드 (관리자·365 질문·샘플 데이터)                                    |
+| `pnpm db:seed:prod`        | prod 시드 (관리자·365 질문만)                                             |
 | `pnpm --filter web dev`    | Next.js only                                                              |
 | `pnpm --filter mobile dev` | Expo WebView shell (see [apps/mobile/README.md](./apps/mobile/README.md)) |
 | `pnpm test:unit`           | Vitest unit + component                                                   |
