@@ -1,9 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
 import { headers } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 import { prisma } from "@/lib/prisma";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
-import { getOrCreateGuestUser } from "./guest-user";
 import { generateUniqueGuestNickname } from "./generate-guest-nickname";
+import { getOrCreateGuestUser } from "./guest-user";
 
 const DEVICE_ID_HEADER = "x-device-id";
 
@@ -18,9 +18,7 @@ function hasSupabaseAuthCookie(request: Request): boolean {
 }
 
 function isSupabaseConfigured(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
 
 function createSupabaseAdminClient() {

@@ -1,11 +1,16 @@
-import { createClient, type User } from "@supabase/supabase-js";
 import type { PrismaClient } from "@prisma/client";
+import { createClient, type SupabaseClientOptions, type User } from "@supabase/supabase-js";
+import ws from "ws";
 import { seedConfig } from "./config";
 import type { SeedFn } from "./types";
 
 function createSupabaseAdmin() {
   return createClient(seedConfig.supabaseUrl!, seedConfig.supabaseServiceRoleKey!, {
     auth: { autoRefreshToken: false, persistSession: false },
+    // Node.js < 22 (CI 등): Realtime 초기화에 ws transport 필요 (ws ↔ realtime-js 타입 불일치)
+    realtime: {
+      transport: ws as NonNullable<SupabaseClientOptions<"public">["realtime"]>["transport"],
+    },
   });
 }
 
@@ -17,9 +22,7 @@ async function findAuthUserByEmail(email: string): Promise<User | null> {
     const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
     if (error) throw new Error(`Supabase listUsers failed: ${error.message}`);
 
-    const match = data.users.find(
-      (user) => user.email?.toLowerCase() === email.toLowerCase(),
-    );
+    const match = data.users.find((user) => user.email?.toLowerCase() === email.toLowerCase());
     if (match) return match;
 
     if (data.users.length < 1000) break;
