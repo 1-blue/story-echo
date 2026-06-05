@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Linking, Platform, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { Linking, Platform, StyleSheet, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebView, type WebViewMessageEvent, type WebViewNavigation } from "react-native-webview";
 import * as SplashScreen from "expo-splash-screen";
@@ -48,11 +48,10 @@ function isExternalScheme(url: string): boolean {
 export function StoryEchoWebView() {
   const webViewRef = useRef<WebView>(null);
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const appUrl = getWebAppUrl();
   const baseUrl = getWebBaseUrl();
 
-  const [refreshing, setRefreshing] = useState(false);
-  const [refreshEnabled, setRefreshEnabled] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const { setCanGoBack, handleNativeMessage } = useAndroidWebViewBack(webViewRef);
 
@@ -71,17 +70,7 @@ export function StoryEchoWebView() {
     injectSafeArea();
   }, [injectSafeArea]);
 
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
-    webViewRef.current?.injectJavaScript(`
-      document.dispatchEvent(new CustomEvent('storyecho:pull-refresh'));
-      true;
-    `);
-    webViewRef.current?.reload();
-  }, []);
-
   const handleLoadEnd = useCallback(() => {
-    setRefreshing(false);
     setLoadError(null);
     void SplashScreen.hideAsync();
     injectSafeArea();
@@ -107,7 +96,6 @@ export function StoryEchoWebView() {
       try {
         const payload: unknown = JSON.parse(event.nativeEvent.data);
         if (isScrollMessage(payload)) {
-          setRefreshEnabled(payload.atTop);
           return;
         }
         handleNativeMessage(payload);
@@ -165,65 +153,46 @@ export function StoryEchoWebView() {
     );
   }
 
-  const webView = (
-    <WebView
-      ref={webViewRef}
-      source={{ uri: appUrl }}
-      style={styles.webview}
-      injectedJavaScriptBeforeContentLoaded={buildNavigationBridgeScript()}
-      domStorageEnabled
-      sharedCookiesEnabled
-      thirdPartyCookiesEnabled
-      allowsInlineMediaPlayback
-      mediaPlaybackRequiresUserAction={false}
-      allowsBackForwardNavigationGestures
-      pullToRefreshEnabled={Platform.OS === "ios"}
-      startInLoadingState
-      renderLoading={() => (
-        <View style={styles.loadingOverlay}>
-          <BrandedLoading message="이야기를 불러오는 중…" />
-        </View>
-      )}
-      onLoadEnd={handleLoadEnd}
-      onLoadProgress={handleLoadProgress}
-      onNavigationStateChange={handleNavigationStateChange}
-      onMessage={handleMessage}
-      onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
-      onError={() => setLoadError("네트워크 연결을 확인해 주세요.")}
-      onHttpError={(event) => {
-        if (event.nativeEvent.statusCode >= 400) {
-          setLoadError(`HTTP ${event.nativeEvent.statusCode}`);
-        }
-      }}
-      nestedScrollEnabled={Platform.OS === "android"}
-      setSupportMultipleWindows={false}
-      originWhitelist={["*"]}
-      allowFileAccess={Platform.OS === "android"}
-      allowFileAccessFromFileURLs={Platform.OS === "android"}
-      mediaCapturePermissionGrantType="grant"
-    />
+  return (
+    <View style={styles.container}>
+      <WebView
+        ref={webViewRef}
+        source={{ uri: appUrl }}
+        style={[styles.webview, { height: windowHeight }]}
+        injectedJavaScriptBeforeContentLoaded={buildNavigationBridgeScript()}
+        domStorageEnabled
+        sharedCookiesEnabled
+        thirdPartyCookiesEnabled
+        allowsInlineMediaPlayback
+        mediaPlaybackRequiresUserAction={false}
+        allowsBackForwardNavigationGestures
+        pullToRefreshEnabled
+        startInLoadingState
+        renderLoading={() => (
+          <View style={styles.loadingOverlay}>
+            <BrandedLoading message="이야기를 불러오는 중…" />
+          </View>
+        )}
+        onLoadEnd={handleLoadEnd}
+        onLoadProgress={handleLoadProgress}
+        onNavigationStateChange={handleNavigationStateChange}
+        onMessage={handleMessage}
+        onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
+        onError={() => setLoadError("네트워크 연결을 확인해 주세요.")}
+        onHttpError={(event) => {
+          if (event.nativeEvent.statusCode >= 400) {
+            setLoadError(`HTTP ${event.nativeEvent.statusCode}`);
+          }
+        }}
+        nestedScrollEnabled={Platform.OS === "android"}
+        setSupportMultipleWindows={false}
+        originWhitelist={["*"]}
+        allowFileAccess={Platform.OS === "android"}
+        allowFileAccessFromFileURLs={Platform.OS === "android"}
+        mediaCapturePermissionGrantType="grant"
+      />
+    </View>
   );
-
-  if (Platform.OS === "android") {
-    return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.container}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            enabled={refreshEnabled}
-            onRefresh={handleRefresh}
-            colors={[Colors.light.tint]}
-          />
-        }
-      >
-        {webView}
-      </ScrollView>
-    );
-  }
-
-  return <View style={styles.container}>{webView}</View>;
 }
 
 const styles = StyleSheet.create({
@@ -232,7 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.background,
   },
   webview: {
-    flex: 1,
+    flex: 0,
     backgroundColor: Colors.light.background,
   },
   loadingOverlay: {

@@ -8,7 +8,7 @@ import { APP_SHELL_MAX_WIDTH_CLASS } from "@/lib/app-layout";
 import { cn } from "@/lib/utils";
 
 function AppShellFrame({ children }: { children: React.ReactNode }) {
-  const { showAdBanner } = useAdEligibility();
+  const { showAdStrip } = useAdEligibility();
 
   return (
     <div
@@ -18,7 +18,7 @@ function AppShellFrame({ children }: { children: React.ReactNode }) {
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col",
-          showAdBanner
+          showAdStrip
             ? "pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+var(--safe-area-bottom))]"
             : "pb-[calc(var(--shell-tab-height)+var(--safe-area-bottom))]",
         )}

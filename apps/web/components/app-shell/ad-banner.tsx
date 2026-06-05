@@ -5,7 +5,6 @@ import Script from "next/script";
 import { useAdEligibility } from "@/components/app-shell/ad-eligibility-context";
 import { getAdSenseConfig } from "@/lib/ads/adsense-config";
 import { SHELL_FIXED_CHROME_CLASS } from "@/lib/app-layout";
-import { cn } from "@/lib/utils";
 
 declare global {
   interface Window {
@@ -13,16 +12,20 @@ declare global {
   }
 }
 
-const AD_WIDTH_PX = 728;
-const AD_HEIGHT_PX = 90;
+export const AD_MAX_WIDTH_PX = 1024;
+export const AD_HEIGHT_PX = 50;
 
 export function AdBanner() {
-  const { showAdBanner } = useAdEligibility();
+  const { shouldRequestAd } = useAdEligibility();
   const config = getAdSenseConfig();
   const pushedRef = useRef(false);
 
   useEffect(() => {
-    if (!config || !showAdBanner) {
+    pushedRef.current = false;
+  }, [shouldRequestAd, config?.slot]);
+
+  useEffect(() => {
+    if (!config || !shouldRequestAd) {
       pushedRef.current = false;
       return;
     }
@@ -36,9 +39,9 @@ export function AdBanner() {
     } catch {
       // AdSense push can fail during hot reload or blocked requests.
     }
-  }, [config, showAdBanner]);
+  }, [config, shouldRequestAd]);
 
-  if (!config || !showAdBanner) {
+  if (!config || !shouldRequestAd) {
     return null;
   }
 
@@ -53,14 +56,16 @@ export function AdBanner() {
       />
       <aside
         aria-label="광고"
-        className={cn(
-          SHELL_FIXED_CHROME_CLASS,
-          "bottom-[var(--shell-tab-height)] flex h-[var(--ad-strip-height)] min-h-[var(--ad-strip-height)] shrink-0 items-center justify-center overflow-hidden border-t border-hairline bg-ad-banner",
-        )}
+        className={`${SHELL_FIXED_CHROME_CLASS} ad-banner-slot bottom-[var(--shell-tab-height)] flex h-[var(--ad-strip-height)] max-h-[var(--ad-strip-height)] min-h-[var(--ad-strip-height)] shrink-0 items-center justify-center overflow-hidden border-t border-hairline bg-ad-banner px-2`}
       >
         <ins
           className="adsbygoogle"
-          style={{ display: "inline-block", width: AD_WIDTH_PX, height: AD_HEIGHT_PX }}
+          style={{
+            display: "block",
+            width: "100%",
+            maxWidth: AD_MAX_WIDTH_PX,
+            height: AD_HEIGHT_PX,
+          }}
           data-ad-client={config.client}
           data-ad-slot={config.slot}
           {...(config.adTest ? { "data-adtest": "on" } : {})}

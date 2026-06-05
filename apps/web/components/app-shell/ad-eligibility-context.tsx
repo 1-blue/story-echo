@@ -8,7 +8,8 @@ import { normalizePath } from "@/lib/native/navigation-fallback";
 type AdEligibilityContextValue = {
   pageEligible: boolean;
   setPageEligible: (eligible: boolean) => void;
-  showAdBanner: boolean;
+  shouldRequestAd: boolean;
+  showAdStrip: boolean;
 };
 
 const AdEligibilityContext = createContext<AdEligibilityContextValue | null>(null);
@@ -24,19 +25,22 @@ export function AdEligibilityProvider({ children }: { children: React.ReactNode 
     setPageEligible(false);
   }, [pathname]);
 
-  const showAdBanner = useMemo(() => {
+  const shouldRequestAd = useMemo(() => {
     if (!config) return false;
     if (AD_BLOCKED_PATHS.has(normalizePath(pathname))) return false;
     return pageEligible;
   }, [config, pageEligible, pathname]);
 
+  const showAdStrip = shouldRequestAd;
+
   const value = useMemo(
     () => ({
       pageEligible,
       setPageEligible,
-      showAdBanner,
+      shouldRequestAd,
+      showAdStrip,
     }),
-    [pageEligible, showAdBanner],
+    [pageEligible, shouldRequestAd, showAdStrip],
   );
 
   return <AdEligibilityContext.Provider value={value}>{children}</AdEligibilityContext.Provider>;
