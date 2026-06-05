@@ -1,50 +1,87 @@
-import { useCallback, useEffect, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { BackHandler, Platform } from "react-native";
 import type { WebView } from "react-native-webview";
 
-type NavigationBackMessage = {
-  type: "navigation-back";
+type BackResultMessage = {
+  type: "back-result";
+  handled?: boolean;
   allowExit?: boolean;
 };
 
-function isNavigationBackMessage(value: unknown): value is NavigationBackMessage {
+type NavigationMessage = {
+  type: "navigation";
+  pathname?: string;
+  canGoBack?: boolean;
+};
+
+function isBackResultMessage(value: unknown): value is BackResultMessage {
   return (
     typeof value === "object" &&
     value !== null &&
     "type" in value &&
-    value.type === "navigation-back"
+    value.type === "back-result"
+  );
+}
+
+function isNavigationMessage(value: unknown): value is NavigationMessage {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "type" in value &&
+    value.type === "navigation"
   );
 }
 
 export function useAndroidWebViewBack(webViewRef: RefObject<WebView | null>) {
   const [canGoBack, setCanGoBack] = useState(false);
+  const canGoBackRef = useRef(false);
 
-  const handleNativeMessage = useCallback((payload: unknown) => {
-    if (!isNavigationBackMessage(payload) || !payload.allowExit) return;
+  useEffect(() => {
+    canGoBackRef.current = canGoBack;
+  }, [canGoBack]);
 
-    if (Platform.OS === "android") {
-      BackHandler.exitApp();
-    }
-  }, []);
+  const handleNativeMessage = useCallback(
+    (payload: unknown) => {
+      if (isNavigationMessage(payload)) {
+        if (typeof payload.canGoBack === "boolean") {
+          setCanGoBack(payload.canGoBack);
+        }
+        return;
+      }
+
+      if (!isBackResultMessage(payload)) return;
+
+      if (payload.allowExit) {
+        if (Platform.OS === "android") {
+          BackHandler.exitApp();
+        }
+        return;
+      }
+
+      if (!payload.handled && canGoBackRef.current && webViewRef.current) {
+        webViewRef.current.goBack();
+      }
+    },
+    [webViewRef],
+  );
 
   const onAndroidBackPress = useCallback(() => {
-    if (webViewRef.current) {
-      webViewRef.current.injectJavaScript(`
-        (function() {
-          if (typeof window.__storyechoNavigateBack === "function") {
-            window.__storyechoNavigateBack();
-            return;
-          }
-          if (${canGoBack ? "true" : "false"}) {
-            window.history.back();
-          }
-        })();
-        true;
-      `);
-      return true;
-    }
-    return false;
-  }, [canGoBack, webViewRef]);
+    if (!webViewRef.current) return false;
+
+    webViewRef.current.injectJavaScript(`
+      (function() {
+        if (typeof window.__storyechoNavigateBack === "function") {
+          window.__storyechoNavigateBack();
+          return;
+        }
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: "back-result", handled: false }));
+        }
+      })();
+      true;
+    `);
+    return true;
+  }, [webViewRef]);
 
   useEffect(() => {
     if (Platform.OS !== "android") return;

@@ -7,6 +7,7 @@ import { AppScreen, AppScreenButton } from "@/components/AppScreen";
 import { BrandedLoading } from "@/components/BrandedLoading";
 import { useAndroidWebViewBack } from "@/hooks/useAndroidWebViewBack";
 import { getWebAppUrl, getWebBaseUrl } from "@/lib/get-web-url";
+import { buildNavigationBridgeScript } from "@/lib/inject-navigation-bridge";
 import { buildSafeAreaInjectScript } from "@/lib/inject-safe-area";
 import Colors from "@/constants/Colors";
 
@@ -86,6 +87,13 @@ export function StoryEchoWebView() {
     injectSafeArea();
   }, [injectSafeArea]);
 
+  const handleLoadProgress = useCallback(
+    (event: { nativeEvent: { canGoBack: boolean } }) => {
+      setCanGoBack(event.nativeEvent.canGoBack);
+    },
+    [setCanGoBack],
+  );
+
   const handleNavigationStateChange = useCallback(
     (state: WebViewNavigation) => {
       setCanGoBack(state.canGoBack);
@@ -162,6 +170,7 @@ export function StoryEchoWebView() {
       ref={webViewRef}
       source={{ uri: appUrl }}
       style={styles.webview}
+      injectedJavaScriptBeforeContentLoaded={buildNavigationBridgeScript()}
       domStorageEnabled
       sharedCookiesEnabled
       thirdPartyCookiesEnabled
@@ -176,6 +185,7 @@ export function StoryEchoWebView() {
         </View>
       )}
       onLoadEnd={handleLoadEnd}
+      onLoadProgress={handleLoadProgress}
       onNavigationStateChange={handleNavigationStateChange}
       onMessage={handleMessage}
       onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}

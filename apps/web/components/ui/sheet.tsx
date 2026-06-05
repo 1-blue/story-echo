@@ -5,8 +5,35 @@ import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { useAndroidBackOverlay } from "@/lib/native/android-back";
 
-const Sheet = SheetPrimitive.Root;
+type SheetRootProps = React.ComponentPropsWithoutRef<typeof SheetPrimitive.Root>;
+
+function Sheet({ open, defaultOpen, onOpenChange, ...props }: SheetRootProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen ?? false);
+  const isOpen = open ?? uncontrolledOpen;
+
+  const handleOpenChange = React.useCallback(
+    (next: boolean) => {
+      if (open === undefined) {
+        setUncontrolledOpen(next);
+      }
+      onOpenChange?.(next);
+    },
+    [onOpenChange, open],
+  );
+
+  useAndroidBackOverlay(isOpen, () => handleOpenChange(false));
+
+  return (
+    <SheetPrimitive.Root
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={handleOpenChange}
+      {...props}
+    />
+  );
+}
 const SheetTrigger = SheetPrimitive.Trigger;
 const SheetClose = SheetPrimitive.Close;
 const SheetPortal = SheetPrimitive.Portal;

@@ -4,22 +4,18 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { tryCloseAndroidBackOverlays } from "@/lib/native/android-back";
-import { isNativeWebView, postNativeMessage } from "@/lib/native/webview";
-
-const SHELL_ROOTS = new Set(["/", "/drawer", "/community", "/capsule", "/settings"]);
+import {
+  getFallbackRoute,
+  isShellRoot,
+  normalizePath,
+} from "@/lib/native/navigation-fallback";
+import { postNativeMessage } from "@/lib/native/webview";
 
 const ROOT_BACK_EXIT_MS = 2000;
+const NAVIGATION_BACK_FALLBACK_MS = 100;
 
-function normalizePath(pathname: string): string {
-  if (pathname.startsWith("/app")) {
-    const stripped = pathname.slice(4);
-    return stripped.length === 0 ? "/" : stripped;
-  }
-  return pathname;
-}
-
-function isShellRoot(pathname: string): boolean {
-  return SHELL_ROOTS.has(normalizePath(pathname));
+function postBackResult(result: { handled: boolean; allowExit?: boolean }) {
+  postNativeMessage({ type: "back-result", ...result });
 }
 
 export function useNativeAndroidBack() {
@@ -27,13 +23,27 @@ export function useNativeAndroidBack() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isNativeWebView()) return;
+    if (typeof window === "undefined" || !window.ReactNativeWebView) return;
 
     window.__storyechoNavigateBack = () => {
-      if (tryCloseAndroidBackOverlays()) return true;
+      if (tryCloseAndroidBackOverlays()) {
+        postBackResult({ handled: true });
+        return true;
+      }
 
-      if (!isShellRoot(pathname)) {
+      const currentPath = normalizePath(pathname);
+      if (!isShellRoot(currentPath)) {
         router.back();
+
+        window.setTimeout(() => {
+          const nextPath = normalizePath(window.location.pathname);
+          if (nextPath === currentPath) {
+            const fallback = getFallbackRoute(currentPath);
+            if (fallback) router.push(fallback);
+          }
+        }, NAVIGATION_BACK_FALLBACK_MS);
+
+        postBackResult({ handled: true });
         return true;
       }
 
@@ -41,18 +51,20 @@ export function useNativeAndroidBack() {
       const lastRootBack = window.__storyechoLastRootBack ?? 0;
       if (now - lastRootBack < ROOT_BACK_EXIT_MS) {
         window.__storyechoLastRootBack = undefined;
-        postNativeMessage({ type: "navigation-back", allowExit: true });
+        postBackResult({ handled: true, allowExit: true });
         return true;
       }
 
       window.__storyechoLastRootBack = now;
       toast("한 번 더 누르면 종료");
+      postBackResult({ handled: true });
       return true;
     };
 
     postNativeMessage({
       type: "navigation",
-      canGoBack: !isShellRoot(pathname),
+      pathname: normalizePath(pathname),
+      canGoBack: !isShellRoot(normalizePath(pathname)),
     });
 
     return () => {
