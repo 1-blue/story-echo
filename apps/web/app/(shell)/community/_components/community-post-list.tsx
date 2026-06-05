@@ -8,6 +8,7 @@ import {
 import { AnimatedList } from "@/components/magicui/animated-list";
 import { ListLoadMore } from "@/components/list-load-more";
 import { useLoadMoreSentinel } from "@/hooks/use-load-more-sentinel";
+import { useAdEligible } from "@/components/app-shell/ad-eligibility-context";
 import { CommunityEmpty } from "./community-empty";
 import { CommunityPostCard } from "./community-post-card";
 import { CommunityPostListSkeleton } from "./community-post-list-skeleton";
@@ -52,6 +53,8 @@ export function CommunityPostList({ query, debouncedQuery }: CommunityPostListPr
   const posts = (data?.pages ?? []).flatMap((page) => page.data ?? []);
   const hasActiveQuery = query.trim().length > 0;
   const isSearchPending = query !== debouncedQuery || (isFetching && !isFetchingNextPage);
+
+  useAdEligible(!isLoading && !isSearchPending && posts.length > 0);
 
   if (isLoading || isSearchPending) {
     return <CommunityPostListSkeleton />;

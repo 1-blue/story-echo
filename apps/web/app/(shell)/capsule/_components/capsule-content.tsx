@@ -8,6 +8,7 @@ import {
 import { AnimatedList } from "@/components/magicui/animated-list";
 import { ListLoadMore } from "@/components/list-load-more";
 import { useLoadMoreSentinel } from "@/hooks/use-load-more-sentinel";
+import { useAdEligible } from "@/components/app-shell/ad-eligibility-context";
 import { CapsuleEmpty } from "./capsule-empty";
 import { CapsuleFab } from "./capsule-fab";
 import { CapsuleOpenedCard } from "./capsule-opened-card";
@@ -40,6 +41,8 @@ export function CapsuleContent() {
   const sealed = (data?.pages ?? []).flatMap((page) => page.data?.sealed ?? []);
   const opened = (data?.pages ?? []).flatMap((page) => page.data?.opened ?? []);
   const isEmpty = !isLoading && sealed.length === 0 && opened.length === 0;
+
+  useAdEligible(!isLoading && !isEmpty);
 
   if (isLoading) {
     return (

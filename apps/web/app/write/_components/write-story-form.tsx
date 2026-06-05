@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import type { WriteStoryFormValues } from "@/features/stories/types";
+import { getErrorMessage } from "@/lib/get-error-message";
 import type { TodayQuestion } from "@/lib/today-question";
-import type { WriteCapabilities } from "@/lib/write-capabilities";
-import { getCommunityBlockedMessage } from "@/lib/write-capabilities";
+import { getCommunityBlockedMessage, type WriteCapabilities } from "@/lib/write-capabilities";
 import { useCreateStory } from "../_hooks/use-create-story";
 import { usePhotoUpload } from "../_hooks/use-photo-upload";
 import { useUpdateStory } from "../_hooks/use-update-story";
@@ -17,7 +17,6 @@ import { PhotoUploadGrid } from "./photo-upload-grid";
 import { QuestionBar } from "./question-bar";
 import { VisibilityToggle } from "./visibility-toggle";
 import { WriteHeader } from "./write-header";
-import { getErrorMessage } from "@/lib/get-error-message";
 
 const FORM_ID = "write-story-form";
 
@@ -119,7 +118,7 @@ export function WriteStoryForm(props: WriteStoryFormProps) {
                       {...field}
                       autoFocus
                       placeholder="마음속 깊은 곳의 이야기를 천천히 꺼내보세요..."
-                      className="h-full min-h-0 flex-1 resize-none border-none bg-transparent p-0 text-lg text-ink shadow-none placeholder:text-stone focus-visible:ring-0"
+                      className="h-full min-h-0 flex-1 resize-none rounded-none border-none bg-transparent p-0 text-lg text-ink shadow-none placeholder:text-stone focus-visible:ring-0"
                     />
                   </FormControl>
                   <div className="mt-2 flex shrink-0 justify-end">

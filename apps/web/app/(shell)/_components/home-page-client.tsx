@@ -2,6 +2,7 @@
 
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { QuestionCard } from "@/components/question-card";
+import { useAdEligible } from "@/components/app-shell/ad-eligibility-context";
 import { PublicStoriesFeed } from "./public-stories-feed";
 
 type HomePageClientProps = {
@@ -15,6 +16,8 @@ export function HomePageClient({
   dateLabel,
   todayStoryId = null,
 }: HomePageClientProps) {
+  useAdEligible(true);
+
   return (
     <main className="flex flex-1 flex-col overflow-y-auto px-5 pt-6 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]">
       <div className="mx-auto flex w-full max-w-md flex-col items-center">

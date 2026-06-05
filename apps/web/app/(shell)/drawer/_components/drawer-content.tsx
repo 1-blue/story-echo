@@ -9,6 +9,7 @@ import { ListLoadMore } from "@/components/list-load-more";
 import type { DrawerStoryItem, DrawerStoryListMeta } from "@/features/stories/types";
 import { formatDrawerStats } from "@/lib/format-story-date";
 import { useLoadMoreSentinel } from "@/hooks/use-load-more-sentinel";
+import { useAdEligible } from "@/components/app-shell/ad-eligibility-context";
 import { useDrawerFilters } from "../_hooks/use-drawer-filters";
 import { useDrawerGroups } from "../_hooks/use-drawer-groups";
 import { useDrawerRevisit } from "../_hooks/use-drawer-revisit";
@@ -81,6 +82,8 @@ export function DrawerContent({ writeHref = "/write" }: DrawerContentProps) {
   const groups = useDrawerGroups(filteredStories);
   const revisitStory = useDrawerRevisit(stories);
   const statsLabel = formatDrawerStats(meta.totalCount, meta.oldestStoryAt);
+
+  useAdEligible(!isLoading && stories.length > 0);
 
   if (isLoading) {
     return (
