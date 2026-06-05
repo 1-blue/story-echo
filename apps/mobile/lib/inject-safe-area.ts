@@ -9,12 +9,8 @@ export function buildNativeFlagScript(): string {
   return `document.documentElement.dataset.native='1'; true;`;
 }
 
-export function buildSafeAreaInjectScript(
-  insets: SafeAreaInsets,
-  options?: { zeroBottom?: boolean },
-): string {
-  const { top, right, left } = insets;
-  const bottom = options?.zeroBottom ? 0 : insets.bottom;
+export function buildSafeAreaInjectScript(insets: SafeAreaInsets): string {
+  const { top, right, bottom, left } = insets;
   return `
     (function() {
       var root = document.documentElement;

@@ -88,7 +88,7 @@ export function CapsuleWriteForm({ photoUploadEnabled }: CapsuleWriteFormProps) 
         isSubmitting={createStory.isPending || photoUpload.isUploading}
       />
 
-      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-5 pt-6 pb-8">
+      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-5 pt-6 pb-[calc(2rem+var(--safe-area-bottom))]">
         <section className="flex flex-col gap-3">
           <h2 className="text-charcoal text-lg font-semibold">편지</h2>
           <Textarea

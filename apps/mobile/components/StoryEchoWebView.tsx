@@ -53,20 +53,16 @@ export function StoryEchoWebView() {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshEnabled, setRefreshEnabled] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const { setCanGoBack } = useAndroidWebViewBack(webViewRef);
+  const { setCanGoBack, handleNativeMessage } = useAndroidWebViewBack(webViewRef);
 
   const injectSafeArea = useCallback(() => {
     webViewRef.current?.injectJavaScript(
-      buildSafeAreaInjectScript(
-        {
-          top: insets.top,
-          right: insets.right,
-          bottom: insets.bottom,
-          left: insets.left,
-        },
-        // Android WebView 뷰포트가 이미 시스템 네비 아래까지 채우지 않음 → 하단 이중 여백 방지
-        { zeroBottom: Platform.OS === "android" },
-      ),
+      buildSafeAreaInjectScript({
+        top: insets.top,
+        right: insets.right,
+        bottom: insets.bottom,
+        left: insets.left,
+      }),
     );
   }, [insets.bottom, insets.left, insets.right, insets.top]);
 
@@ -98,16 +94,21 @@ export function StoryEchoWebView() {
     [setCanGoBack, injectSafeArea],
   );
 
-  const handleMessage = useCallback((event: WebViewMessageEvent) => {
-    try {
-      const payload: unknown = JSON.parse(event.nativeEvent.data);
-      if (isScrollMessage(payload)) {
-        setRefreshEnabled(payload.atTop);
+  const handleMessage = useCallback(
+    (event: WebViewMessageEvent) => {
+      try {
+        const payload: unknown = JSON.parse(event.nativeEvent.data);
+        if (isScrollMessage(payload)) {
+          setRefreshEnabled(payload.atTop);
+          return;
+        }
+        handleNativeMessage(payload);
+      } catch {
+        // ignore non-JSON messages
       }
-    } catch {
-      // ignore non-JSON messages
-    }
-  }, []);
+    },
+    [handleNativeMessage],
+  );
 
   const handleShouldStartLoadWithRequest = useCallback(
     (request: { url: string }) => {

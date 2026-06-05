@@ -16,7 +16,7 @@ export function AppHeader() {
   return (
     <header className="border-hairline bg-canvas flex h-[calc(4rem+var(--safe-area-top))] shrink-0 items-center justify-between border-b px-5 pt-[var(--safe-area-top)] shadow-[0_1px_0_0_hsl(var(--border))]">
       <div className="flex flex-1 items-center justify-start">
-        <BookOpen className="text-primary size-6" strokeWidth={1.75} />
+        <BookOpen className="text-primary size-6" strokeWidth={1.75} aria-hidden />
       </div>
       <h1 className="text-primary font-display flex-1 text-center text-xl leading-none whitespace-nowrap">
         이야기해줘
@@ -29,10 +29,10 @@ export function AppHeader() {
               type="button"
               variant="ghost"
               size="icon"
-              className="text-primary size-11"
+              className="text-primary size-10"
               aria-label="알림"
             >
-              <Bell className="size-7" strokeWidth={1.75} />
+              <Bell className="size-6" strokeWidth={1.75} />
             </Button>
           }
         />

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DeviceIdBootstrap } from "./providers/device-id-bootstrap";
+import { NativeAndroidBackBootstrap } from "./providers/native-android-back-bootstrap";
 import { NativeWebViewBootstrap } from "./providers/native-webview-bootstrap";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -22,6 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <DeviceIdBootstrap />
       <NativeWebViewBootstrap />
+      <NativeAndroidBackBootstrap />
       {children}
     </QueryClientProvider>
   );
