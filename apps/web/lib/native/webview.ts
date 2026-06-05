@@ -3,6 +3,8 @@ declare global {
     ReactNativeWebView?: {
       postMessage: (message: string) => void;
     };
+    __storyechoNavigateBack?: () => boolean;
+    __storyechoLastRootBack?: number;
   }
 }
 

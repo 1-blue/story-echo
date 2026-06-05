@@ -157,7 +157,7 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
         isSubmitting={isSubmitting}
       />
 
-      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-5 pt-6 pb-8">
+      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-5 pt-6 pb-[calc(2rem+var(--safe-area-bottom))]">
         {!isEdit && (
           <section className="flex flex-col gap-3">
             <h2 className="text-charcoal text-lg font-semibold">어떤 질문에 대한 이야기인가요?</h2>

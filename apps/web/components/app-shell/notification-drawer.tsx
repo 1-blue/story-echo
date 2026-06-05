@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { NotificationList } from "@/components/notifications/notification-list";
+import { registerAndroidBackHandler } from "@/lib/native/android-back";
 
 type NotificationDrawerProps = {
   trigger: React.ReactNode;
@@ -24,6 +25,15 @@ export function NotificationDrawer({ trigger }: NotificationDrawerProps) {
     document.addEventListener("storyecho:pull-refresh", closeOnPullRefresh);
     return () => document.removeEventListener("storyecho:pull-refresh", closeOnPullRefresh);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    return registerAndroidBackHandler(() => {
+      setOpen(false);
+      return true;
+    });
+  }, [open]);
 
   const handleOpenChange = (next: boolean) => {
     if (next) {
