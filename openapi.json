@@ -1283,6 +1283,85 @@
           "data"
         ]
       },
+      "PushPlatform": {
+        "type": "string",
+        "enum": [
+          "android",
+          "ios"
+        ]
+      },
+      "UpsertPushTokenRequest": {
+        "type": "object",
+        "properties": {
+          "expoPushToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "platform": {
+            "$ref": "#/components/schemas/PushPlatform"
+          }
+        },
+        "required": [
+          "expoPushToken",
+          "platform"
+        ]
+      },
+      "PushTokenOkResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "ok": {
+                "type": "boolean",
+                "enum": [
+                  true
+                ]
+              }
+            },
+            "required": [
+              "ok"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "CronNotificationsResult": {
+        "type": "object",
+        "properties": {
+          "dailyReminders": {
+            "type": "integer"
+          },
+          "capsuleUnlocked": {
+            "type": "integer"
+          },
+          "pushSent": {
+            "type": "integer"
+          },
+          "pushFailed": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dailyReminders",
+          "capsuleUnlocked",
+          "pushSent",
+          "pushFailed"
+        ]
+      },
+      "CronNotificationsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CronNotificationsResult"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
       "CreateGuestRequest": {
         "type": "object",
         "properties": {
@@ -3615,6 +3694,141 @@
           },
           "503": {
             "description": "Database unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/me/push-token": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertPushTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Push token registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushTokenOkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Device id required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "Push token removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushTokenOkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Device id required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cron/notifications": {
+      "post": {
+        "tags": [
+          "Cron"
+        ],
+        "parameters": [
+          {
+            "name": "force",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Skip same-day deduplication for manual testing"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daily notifications dispatched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CronNotificationsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Cron or database error",
             "content": {
               "application/json": {
                 "schema": {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "134057989132",
+    "project_id": "story-echo-e109f",
+    "storage_bucket": "story-echo-e109f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134057989132:android:08c2ddb7923b6e8b74ca29",
+        "android_client_info": {
+          "package_name": "com.storyecho.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxjTMHkStZn0qa-446yJVdrMWWNnL5Kvk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

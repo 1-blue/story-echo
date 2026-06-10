@@ -1,3 +1,4 @@
+import { CronNotificationsResponseSchema } from "@storyecho/schemas";
 import { apiErrorResponse } from "@/lib/api/errors";
 import { dispatchDailyNotifications } from "@/lib/notifications/dispatch-daily";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
@@ -18,9 +19,13 @@ export async function POST(request: Request) {
     return apiErrorResponse(503, "DB_UNAVAILABLE");
   }
 
+  const url = new URL(request.url);
+  const force = url.searchParams.get("force") === "true";
+
   try {
-    const result = await dispatchDailyNotifications();
-    return Response.json({ data: result });
+    const result = await dispatchDailyNotifications({ force });
+    const body = CronNotificationsResponseSchema.parse({ data: result });
+    return Response.json(body);
   } catch {
     return apiErrorResponse(503, "CRON_ERROR");
   }

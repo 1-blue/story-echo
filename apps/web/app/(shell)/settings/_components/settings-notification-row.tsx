@@ -6,6 +6,11 @@ import { getGetApiV1UsersMeQueryKey, usePatchApiV1UsersMe } from "@storyecho/api
 import type { UserMe } from "@storyecho/schemas";
 import { Switch } from "@/components/ui/switch";
 import { getErrorMessage } from "@/lib/get-error-message";
+import {
+  isNativeWebView,
+  requestNativeNotificationPermission,
+  unregisterNativePush,
+} from "@/lib/native-bridge";
 import { SettingsRow, SettingsSection } from "./settings-section";
 
 type SettingsNotificationRowProps = {
@@ -17,8 +22,21 @@ export function SettingsNotificationRow({ user }: SettingsNotificationRowProps) 
   const patchUser = usePatchApiV1UsersMe();
 
   const handleToggle = async (checked: boolean) => {
-    if (checked && typeof Notification !== "undefined" && Notification.permission === "default") {
-      await Notification.requestPermission();
+    if (checked) {
+      if (isNativeWebView()) {
+        const granted = await requestNativeNotificationPermission();
+        if (!granted) {
+          toast.error("알림 권한이 필요해요. 기기 설정에서 허용해 주세요.");
+          return;
+        }
+      } else if (
+        typeof Notification !== "undefined" &&
+        Notification.permission === "default"
+      ) {
+        await Notification.requestPermission();
+      }
+    } else if (isNativeWebView()) {
+      await unregisterNativePush();
     }
 
     try {
