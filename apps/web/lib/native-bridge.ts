@@ -1,9 +1,19 @@
+import { getDeviceId } from "@/lib/device-id";
+
 const NATIVE_PERMISSION_EVENT = "storyecho-notification-permission";
 const NATIVE_UNREGISTER_EVENT = "storyecho-push-unregistered";
+
+export type NativeNotificationFailureReason =
+  | "permission_denied"
+  | "token_failed"
+  | "no_device_id";
 
 export type NativeNotificationPermissionResult = {
   granted: boolean;
   needsSettings: boolean;
+  reason?: NativeNotificationFailureReason;
+  expoPushToken?: string;
+  platform?: "ios" | "android";
 };
 
 export function isNativeWebView(): boolean {
@@ -21,6 +31,17 @@ function postNativeMessage(payload: Record<string, unknown>): void {
   ).ReactNativeWebView;
 
   bridge?.postMessage(JSON.stringify(payload));
+}
+
+/** WebView 앱에 localStorage deviceId를 즉시 전달 */
+export function postNativeDeviceId(): void {
+  if (!isNativeWebView()) {
+    return;
+  }
+  const deviceId = getDeviceId();
+  if (deviceId) {
+    postNativeMessage({ type: "device-id", deviceId });
+  }
 }
 
 export function requestNativeNotificationPermission(): Promise<NativeNotificationPermissionResult> {
@@ -42,11 +63,18 @@ export function requestNativeNotificationPermission(): Promise<NativeNotificatio
       resolve({
         granted: Boolean(detail?.granted),
         needsSettings: Boolean(detail?.needsSettings),
+        reason: detail?.reason,
+        expoPushToken: detail?.expoPushToken,
+        platform: detail?.platform,
       });
     }
 
     window.addEventListener(NATIVE_PERMISSION_EVENT, onResult as EventListener);
-    postNativeMessage({ type: "request-notification-permission" });
+    const deviceId = getDeviceId();
+    postNativeMessage({
+      type: "request-notification-permission",
+      ...(deviceId ? { deviceId } : {}),
+    });
   });
 }
 

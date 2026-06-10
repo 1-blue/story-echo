@@ -14,12 +14,21 @@ export type DeviceIdMessage = {
 
 export type RequestNotificationPermissionMessage = {
   type: typeof PUSH_MESSAGE_TYPES.requestNotificationPermission;
+  deviceId?: string;
 };
+
+export type NotificationPermissionFailureReason =
+  | "permission_denied"
+  | "token_failed"
+  | "no_device_id";
 
 export type NotificationPermissionResultMessage = {
   type: typeof PUSH_MESSAGE_TYPES.notificationPermissionResult;
   granted: boolean;
   needsSettings: boolean;
+  reason?: NotificationPermissionFailureReason;
+  expoPushToken?: string;
+  platform?: "ios" | "android";
 };
 
 export type OpenAppSettingsMessage = {

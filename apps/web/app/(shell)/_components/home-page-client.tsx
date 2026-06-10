@@ -2,7 +2,7 @@
 
 import { useAdEligible } from "@/components/app-shell/ad-eligibility-context";
 import { BlurFade } from "@/components/magicui/blur-fade";
-import { QuestionCard } from "@/components/question-card";
+import { QuestionCard, QuestionExploreLinks } from "@/components/question-card";
 import { PublicStoriesFeed } from "./public-stories-feed";
 
 type HomePageClientProps = {
@@ -30,6 +30,10 @@ export function HomePageClient({
 
         <BlurFade delay={0.08} className="w-full">
           <QuestionCard question={questionText} todayStoryId={todayStoryId} />
+        </BlurFade>
+
+        <BlurFade delay={0.12} className="mt-6 w-full">
+          <QuestionExploreLinks />
         </BlurFade>
 
         <BlurFade delay={0.16} className="w-full">

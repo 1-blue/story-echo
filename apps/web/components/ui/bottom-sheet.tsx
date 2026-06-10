@@ -40,7 +40,7 @@ const BottomSheetContent = React.forwardRef<
       side="bottom"
       showClose={showClose}
       className={cn(
-        "mx-auto max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl border-b-0 border-hairline p-0",
+        "mx-auto max-h-[min(90dvh,calc(100dvh-var(--keyboard-inset-bottom,0px)-var(--sheet-bottom-inset)-2rem))] w-full max-w-lg overflow-y-auto rounded-t-2xl border-b-0 border-hairline p-0",
         className,
       )}
       {...props}
@@ -50,7 +50,7 @@ const BottomSheetContent = React.forwardRef<
           <div className="h-1.5 w-12 rounded-full bg-hairline-strong" aria-hidden="true" />
         </div>
       )}
-      {unpadded ? children : <div className="px-6 pb-8">{children}</div>}
+      {unpadded ? children : <div className="px-6 pb-[calc(1.5rem+var(--sheet-bottom-inset))]">{children}</div>}
     </SheetContent>
   ),
 );

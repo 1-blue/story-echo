@@ -22,6 +22,7 @@ import {
   requestNativeNotificationPermission,
   unregisterNativePush,
 } from "@/lib/native-bridge";
+import { registerPushTokenFromWeb, unregisterPushTokenFromWeb } from "@/lib/register-push-token";
 import { SettingsRow, SettingsSection } from "./settings-section";
 
 type SettingsNotificationRowProps = {
@@ -40,10 +41,21 @@ export function SettingsNotificationRow({ user }: SettingsNotificationRowProps) 
         if (!outcome.granted) {
           if (outcome.needsSettings) {
             setSettingsDialogOpen(true);
+          } else if (outcome.reason === "token_failed") {
+            toast.message("푸시 알림 등록에 실패했어요. 잠시 후 다시 시도해 주세요.");
           } else {
             toast.message("알림 권한이 필요해요.");
           }
           return;
+        }
+
+        if (outcome.expoPushToken && outcome.platform) {
+          try {
+            await registerPushTokenFromWeb(outcome.expoPushToken, outcome.platform);
+          } catch (error) {
+            toast.error(getErrorMessage(error));
+            return;
+          }
         }
       } else if (
         typeof Notification !== "undefined" &&
@@ -53,6 +65,11 @@ export function SettingsNotificationRow({ user }: SettingsNotificationRowProps) 
       }
     } else if (isNativeWebView()) {
       await unregisterNativePush();
+      try {
+        await unregisterPushTokenFromWeb();
+      } catch {
+        // WebView 브리지에서 이미 시도했을 수 있음
+      }
     }
 
     try {
