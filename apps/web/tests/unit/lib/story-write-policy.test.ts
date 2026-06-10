@@ -52,7 +52,9 @@ describe("validateStoryCreate", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error.code).toBe("TODAY_STORY_EXISTS");
-      expect(result.error.storyId).toBe("story-uuid");
+      if (result.error.code === "TODAY_STORY_EXISTS") {
+        expect(result.error.storyId).toBe("story-uuid");
+      }
     }
   });
 
