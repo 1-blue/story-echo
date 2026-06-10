@@ -9,6 +9,7 @@ import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured, toStoryDto } from "@/lib/story-mapper";
 import { validateStoryCreate } from "@/lib/story-write-policy";
+import { notifyContentEvent } from "@/lib/slack/notify-content-event";
 import { getTodayQuestion, getTodayStoryForUser } from "@/lib/today-question";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
 
@@ -106,6 +107,15 @@ export async function POST(request: Request) {
         isCapsuleActive,
       },
     });
+
+    if (!isCapsule && todayQuestion.id && parsed.data.questionId === todayQuestion.id) {
+      void notifyContentEvent({
+        kind: "today_story",
+        nickname: user.nickname,
+        resourceId: story.id,
+        preview: parsed.data.bodyText,
+      });
+    }
 
     const body = StoryResponseSchema.parse({ data: toStoryDto(story) });
     return Response.json(body, { status: 201 });

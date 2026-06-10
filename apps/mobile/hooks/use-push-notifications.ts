@@ -12,6 +12,11 @@ import {
 
 const PROMPTED_KEY = "@storyecho/notification_prompted";
 
+export type NotificationPermissionOutcome = {
+  granted: boolean;
+  needsSettings: boolean;
+};
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -71,21 +76,27 @@ export function usePushNotifications(deviceId: string | null) {
     return true;
   }, []);
 
-  const requestPermissionAndRegister = useCallback(async (): Promise<boolean> => {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
+  const requestPermissionAndRegister =
+    useCallback(async (): Promise<NotificationPermissionOutcome> => {
+      const existing = await Notifications.getPermissionsAsync();
+      let finalStatus = existing.status;
+      let canAskAgain = existing.canAskAgain ?? true;
 
-    if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
+      if (existing.status !== "granted") {
+        const requested = await Notifications.requestPermissionsAsync();
+        finalStatus = requested.status;
+        canAskAgain = requested.canAskAgain ?? canAskAgain;
+      }
 
-    if (finalStatus !== "granted") {
-      return false;
-    }
+      if (finalStatus !== "granted") {
+        const needsSettings =
+          finalStatus === "denied" && (Platform.OS === "android" || canAskAgain === false);
+        return { granted: false, needsSettings };
+      }
 
-    return registerTokenForDevice();
-  }, [registerTokenForDevice]);
+      const registered = await registerTokenForDevice();
+      return { granted: registered, needsSettings: false };
+    }, [registerTokenForDevice]);
 
   useEffect(() => {
     if (!deviceId) {
@@ -101,8 +112,8 @@ export function usePushNotifications(deviceId: string | null) {
       }
 
       await AsyncStorage.setItem(PROMPTED_KEY, "1");
-      const granted = await requestPermissionAndRegister();
-      if (granted && !cancelled) {
+      const outcome = await requestPermissionAndRegister();
+      if (outcome.granted && !cancelled) {
         await setNotificationsEnabled(deviceId, true);
       }
     })();
@@ -134,14 +145,13 @@ export function usePushNotifications(deviceId: string | null) {
 
 export async function handleNotificationPermissionRequest(
   deviceId: string | null,
-  register: () => Promise<boolean>,
-): Promise<boolean> {
+  register: () => Promise<NotificationPermissionOutcome>,
+): Promise<NotificationPermissionOutcome> {
   if (!deviceId) {
-    return false;
+    return { granted: false, needsSettings: false };
   }
 
-  const granted = await register();
-  return granted;
+  return register();
 }
 
 export async function handleUnregisterPush(

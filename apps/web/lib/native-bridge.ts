@@ -1,6 +1,11 @@
 const NATIVE_PERMISSION_EVENT = "storyecho-notification-permission";
 const NATIVE_UNREGISTER_EVENT = "storyecho-push-unregistered";
 
+export type NativeNotificationPermissionResult = {
+  granted: boolean;
+  needsSettings: boolean;
+};
+
 export function isNativeWebView(): boolean {
   if (typeof document === "undefined") {
     return false;
@@ -18,28 +23,38 @@ function postNativeMessage(payload: Record<string, unknown>): void {
   bridge?.postMessage(JSON.stringify(payload));
 }
 
-export function requestNativeNotificationPermission(): Promise<boolean> {
+export function requestNativeNotificationPermission(): Promise<NativeNotificationPermissionResult> {
   return new Promise((resolve) => {
     if (!isNativeWebView()) {
-      resolve(false);
+      resolve({ granted: false, needsSettings: false });
       return;
     }
 
     const timeout = window.setTimeout(() => {
       window.removeEventListener(NATIVE_PERMISSION_EVENT, onResult as EventListener);
-      resolve(false);
+      resolve({ granted: false, needsSettings: false });
     }, 30_000);
 
     function onResult(event: Event) {
       window.clearTimeout(timeout);
       window.removeEventListener(NATIVE_PERMISSION_EVENT, onResult as EventListener);
-      const detail = (event as CustomEvent<{ granted?: boolean }>).detail;
-      resolve(Boolean(detail?.granted));
+      const detail = (event as CustomEvent<NativeNotificationPermissionResult>).detail;
+      resolve({
+        granted: Boolean(detail?.granted),
+        needsSettings: Boolean(detail?.needsSettings),
+      });
     }
 
     window.addEventListener(NATIVE_PERMISSION_EVENT, onResult as EventListener);
     postNativeMessage({ type: "request-notification-permission" });
   });
+}
+
+export function openNativeAppSettings(): void {
+  if (!isNativeWebView()) {
+    return;
+  }
+  postNativeMessage({ type: "open-app-settings" });
 }
 
 export function unregisterNativePush(): Promise<void> {

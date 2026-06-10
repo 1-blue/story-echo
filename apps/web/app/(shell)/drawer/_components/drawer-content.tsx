@@ -103,7 +103,7 @@ export function DrawerContent({ todayStoryId = null }: DrawerContentProps) {
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]">
+      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]" data-shell-scroll>
         <DrawerPageHeader statsLabel={statsLabel} />
 
         <DrawerActivityGrass

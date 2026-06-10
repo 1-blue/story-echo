@@ -1,5 +1,6 @@
 import { LoginRequestSchema, UserMeResponseSchema } from "@storyecho/schemas";
 import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
+import { notifyUnexpectedError } from "@/lib/slack/notify-unexpected-error";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
 import { mergeGuestToMember } from "@/lib/user/merge-guest-to-member";
@@ -43,7 +44,16 @@ export async function POST(request: Request) {
     const member = await ensureMemberUser(data.user.id, data.user.email ?? "");
     const deviceId = getDeviceIdFromRequest(request);
     if (deviceId) {
-      await mergeGuestToMember(deviceId, member.id);
+      try {
+        await mergeGuestToMember(deviceId, member.id);
+      } catch (mergeError) {
+        console.error("[auth/login] mergeGuestToMember failed:", mergeError);
+        void notifyUnexpectedError({
+          context: "auth/login mergeGuestToMember",
+          error: mergeError,
+          extra: { deviceId, memberId: member.id },
+        });
+      }
     }
 
     const refreshed = await supabase.auth.getUser();
@@ -52,7 +62,9 @@ export async function POST(request: Request) {
 
     const body = UserMeResponseSchema.parse({ data: toUserMeDto(finalUser) });
     return Response.json(body);
-  } catch {
+  } catch (error) {
+    console.error("[auth/login] unexpected error:", error);
+    void notifyUnexpectedError({ context: "auth/login", error });
     return apiErrorResponse(503, "AUTH_ERROR");
   }
 }

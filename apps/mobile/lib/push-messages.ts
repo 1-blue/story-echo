@@ -4,6 +4,7 @@ export const PUSH_MESSAGE_TYPES = {
   notificationPermissionResult: "notification-permission-result",
   unregisterPush: "unregister-push",
   pushUnregistered: "push-unregistered",
+  openAppSettings: "open-app-settings",
 } as const;
 
 export type DeviceIdMessage = {
@@ -18,6 +19,11 @@ export type RequestNotificationPermissionMessage = {
 export type NotificationPermissionResultMessage = {
   type: typeof PUSH_MESSAGE_TYPES.notificationPermissionResult;
   granted: boolean;
+  needsSettings: boolean;
+};
+
+export type OpenAppSettingsMessage = {
+  type: typeof PUSH_MESSAGE_TYPES.openAppSettings;
 };
 
 export type UnregisterPushMessage = {
@@ -33,7 +39,8 @@ export type PushBridgeMessage =
   | RequestNotificationPermissionMessage
   | NotificationPermissionResultMessage
   | UnregisterPushMessage
-  | PushUnregisteredMessage;
+  | PushUnregisteredMessage
+  | OpenAppSettingsMessage;
 
 export function parsePushBridgeMessage(value: unknown): PushBridgeMessage | null {
   if (typeof value !== "object" || value === null || !("type" in value)) {
@@ -51,6 +58,8 @@ export function parsePushBridgeMessage(value: unknown): PushBridgeMessage | null
       return message as RequestNotificationPermissionMessage;
     case PUSH_MESSAGE_TYPES.unregisterPush:
       return message as UnregisterPushMessage;
+    case PUSH_MESSAGE_TYPES.openAppSettings:
+      return message as OpenAppSettingsMessage;
     default:
       return null;
   }

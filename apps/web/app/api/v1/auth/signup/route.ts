@@ -2,6 +2,7 @@ import { SignupRequestSchema, UserMeResponseSchema } from "@storyecho/schemas";
 import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { signupWithoutEmailVerification } from "@/lib/auth/signup-without-email-verification";
 import { prisma } from "@/lib/prisma";
+import { notifyUnexpectedError } from "@/lib/slack/notify-unexpected-error";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { mergeGuestToMember } from "@/lib/user/merge-guest-to-member";
 import {
@@ -52,12 +53,23 @@ export async function POST(request: Request) {
 
     const deviceId = getDeviceIdFromRequest(request);
     if (deviceId) {
-      await mergeGuestToMember(deviceId, member.id);
+      try {
+        await mergeGuestToMember(deviceId, member.id);
+      } catch (mergeError) {
+        console.error("[auth/signup] mergeGuestToMember failed:", mergeError);
+        void notifyUnexpectedError({
+          context: "auth/signup mergeGuestToMember",
+          error: mergeError,
+          extra: { deviceId, memberId: member.id },
+        });
+      }
     }
 
     const body = UserMeResponseSchema.parse({ data: toUserMeDto(member) });
     return Response.json(body, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("[auth/signup] unexpected error:", error);
+    void notifyUnexpectedError({ context: "auth/signup", error });
     return apiErrorResponse(503, "AUTH_ERROR");
   }
 }

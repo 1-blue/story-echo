@@ -15,7 +15,65 @@ export async function mergeGuestToMember(
   await db.$transaction(async (tx) => {
     const guestId = guest.id;
 
+    // Remove guest rows that would violate unique constraints after userId reassignment.
+    const guestReactions = await tx.communityReaction.findMany({ where: { userId: guestId } });
+    for (const reaction of guestReactions) {
+      const memberHas = await tx.communityReaction.findFirst({
+        where: {
+          targetType: reaction.targetType,
+          targetId: reaction.targetId,
+          userId: memberId,
+        },
+      });
+      if (memberHas) {
+        await tx.communityReaction.delete({ where: { id: reaction.id } });
+      }
+    }
+
+    const guestQuestionLogs = await tx.userQuestionLog.findMany({ where: { userId: guestId } });
+    for (const log of guestQuestionLogs) {
+      const memberHas = await tx.userQuestionLog.findFirst({
+        where: {
+          userId: memberId,
+          questionId: log.questionId,
+          shownAt: log.shownAt,
+        },
+      });
+      if (memberHas) {
+        await tx.userQuestionLog.delete({ where: { id: log.id } });
+      }
+    }
+
+    const guestReports = await tx.storyReport.findMany({ where: { reporterUserId: guestId } });
+    for (const report of guestReports) {
+      const memberHas = await tx.storyReport.findFirst({
+        where: {
+          storyId: report.storyId,
+          reporterUserId: memberId,
+        },
+      });
+      if (memberHas) {
+        await tx.storyReport.delete({ where: { id: report.id } });
+      }
+    }
+
+    const guestPostReports = await tx.communityPostReport.findMany({
+      where: { reporterUserId: guestId },
+    });
+    for (const report of guestPostReports) {
+      const memberHas = await tx.communityPostReport.findFirst({
+        where: {
+          postId: report.postId,
+          reporterUserId: memberId,
+        },
+      });
+      if (memberHas) {
+        await tx.communityPostReport.delete({ where: { id: report.id } });
+      }
+    }
+
     await tx.story.updateMany({ where: { userId: guestId }, data: { userId: memberId } });
+    await tx.storyComment.updateMany({ where: { userId: guestId }, data: { userId: memberId } });
     await tx.userQuestionLog.updateMany({
       where: { userId: guestId },
       data: { userId: memberId },
@@ -47,6 +105,10 @@ export async function mergeGuestToMember(
     await tx.communityPostReport.updateMany({
       where: { reporterUserId: guestId },
       data: { reporterUserId: memberId },
+    });
+    await tx.pushToken.updateMany({
+      where: { userId: guestId },
+      data: { userId: memberId },
     });
 
     await tx.user.update({
