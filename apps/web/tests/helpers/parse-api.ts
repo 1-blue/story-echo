@@ -10,6 +10,9 @@ import {
   NotificationListResponseSchema,
   PublicStoryDetailResponseSchema,
   PublicStoryFeedListResponseSchema,
+  QuestionArchiveListResponseSchema,
+  QuestionNotTodayErrorSchema,
+  QuestionResponseSchema,
   StoryResponseSchema,
   TodayQuestionResponseSchema,
   TodayStoryExistsErrorSchema,
@@ -29,6 +32,9 @@ export const parseStory = (json: unknown) => parseApiJson(StoryResponseSchema, j
 export const parseUserMe = (json: unknown) => parseApiJson(UserMeResponseSchema, json);
 export const parseTodayQuestion = (json: unknown) =>
   parseApiJson(TodayQuestionResponseSchema, json);
+export const parseQuestionArchiveList = (json: unknown) =>
+  parseApiJson(QuestionArchiveListResponseSchema, json);
+export const parseQuestion = (json: unknown) => parseApiJson(QuestionResponseSchema, json);
 export const parseDrawerList = (json: unknown) => parseApiJson(DrawerStoryListResponseSchema, json);
 export const parseCapsuleList = (json: unknown) =>
   parseApiJson(CapsuleStoryListResponseSchema, json);
@@ -46,6 +52,8 @@ export const parsePublicStoryDetail = (json: unknown) =>
   parseApiJson(PublicStoryDetailResponseSchema, json);
 export const parseTodayStoryExistsError = (json: unknown) =>
   parseApiJson(TodayStoryExistsErrorSchema, json);
+export const parseQuestionNotTodayError = (json: unknown) =>
+  parseApiJson(QuestionNotTodayErrorSchema, json);
 export const parseEmailNotVerifiedError = (json: unknown) =>
   parseApiJson(EmailNotVerifiedErrorSchema, json);
 export const parseErrorResponse = (json: unknown) => parseApiJson(ErrorResponseSchema, json);

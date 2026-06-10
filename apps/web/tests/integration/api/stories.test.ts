@@ -7,11 +7,12 @@ import {
   getFirstQuestionId,
   setUserEmailVerified,
 } from "../../helpers/db";
-import { createPrivateStory, createCommunityStory } from "../../helpers/factories";
+import { createCommunityStory, createPrivateStory } from "../../helpers/factories";
 import {
   parseDrawerList,
   parseEmailNotVerifiedError,
   parseErrorResponse,
+  parseQuestionNotTodayError,
   parseStory,
   parseTodayQuestion,
   parseTodayStoryExistsError,
@@ -64,6 +65,27 @@ integration("Questions · Stories API", () => {
 
     const todayAgain = await apiFetch("/api/v1/questions/today", {}, { deviceId });
     expect(parseTodayQuestion(todayAgain.json).data.todayStoryId).toBe(firstStoryId);
+
+    await cleanupTestUserByDeviceId(deviceId);
+  });
+
+  it("POST /stories returns 409 when questionId is not today's question", async () => {
+    const { deviceId } = await setupGuestClient("story-not-today");
+    const pastQuestionId = await getFirstQuestionId();
+    expect(pastQuestionId).toBeTruthy();
+
+    const todayRes = await apiFetch("/api/v1/questions/today", {}, { deviceId });
+    const todayQuestionId = parseTodayQuestion(todayRes.json).data.id;
+    expect(todayQuestionId).toBeTruthy();
+    expect(pastQuestionId).not.toBe(todayQuestionId);
+
+    const res = await createPrivateStory("wrong day question", {
+      deviceId,
+      questionId: pastQuestionId ?? undefined,
+    });
+    expect(res.status).toBe(409);
+    const error = parseQuestionNotTodayError(res.json);
+    expect(error.code).toBe("QUESTION_NOT_TODAY");
 
     await cleanupTestUserByDeviceId(deviceId);
   });
@@ -135,11 +157,9 @@ integration("Questions · Stories API", () => {
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
     const userId = parseUserMe(me.json).data.id;
     await setUserEmailVerified(userId, true);
-    const questionId = await getFirstQuestionId();
 
     const res = await createCommunityStory("verified community story", {
       deviceId,
-      questionId: questionId ?? undefined,
     });
     expect(res.status).toBe(201);
     await cleanupTestUserByDeviceId(deviceId);

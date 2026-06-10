@@ -2,14 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { NotificationList } from "@/components/notifications/notification-list";
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 type NotificationDrawerProps = {
   trigger: React.ReactNode;
@@ -41,12 +35,12 @@ export function NotificationDrawer({ trigger }: NotificationDrawerProps) {
         fullScreen
         dismissOnOutside={false}
         showClose={false}
-        className="bg-canvas flex flex-col gap-0 p-0 pb-[var(--safe-area-bottom)]"
+        className="flex flex-col gap-0 bg-canvas p-0 pb-[var(--safe-area-bottom)]"
       >
-        <header className="border-hairline flex shrink-0 items-center justify-between border-b px-5 pb-4 pt-[var(--safe-area-top)]">
-          <SheetTitle className="text-ink text-xl font-semibold">알림</SheetTitle>
+        <header className="flex shrink-0 items-center justify-between border-b border-hairline px-5 pt-[var(--safe-area-top)] pb-4">
+          <SheetTitle className="text-xl font-semibold text-ink">알림</SheetTitle>
           <SheetClose
-            className="text-charcoal hover:text-ink -mr-1 rounded-sm p-2 opacity-80 transition-opacity hover:opacity-100"
+            className="-mr-1 rounded-sm p-2 text-charcoal opacity-80 transition-opacity hover:text-ink hover:opacity-100"
             aria-label="알림 닫기"
           >
             <X className="size-5" />

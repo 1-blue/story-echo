@@ -1,4 +1,4 @@
-import { test, expect } from "../fixtures/playwright-fixtures";
+import { expect, test } from "../fixtures/playwright-fixtures";
 import { createCapsuleStory } from "../helpers/factories";
 import { parseStory } from "../helpers/parse-api";
 import { hasIntegrationEnv } from "../setup/env";

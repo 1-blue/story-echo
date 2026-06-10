@@ -14,7 +14,7 @@ type PageProps = {
 export default async function CapsuleDetailPage({ params }: PageProps) {
   const { id } = await params;
   return (
-    <div className="bg-canvas flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col bg-canvas">
       <CapsuleDetailPageClient capsuleId={id} />
     </div>
   );

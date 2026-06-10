@@ -22,6 +22,7 @@ import { ReactionPills } from "@/components/community/reaction-pills";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { formatRelativeTime } from "@/lib/community-mapper";
 import { formatStoryDayLong } from "@/lib/format-story-date";
+import { getErrorMessage } from "@/lib/get-error-message";
 import { CommentComposer } from "./comment-composer";
 import { CommentList } from "./comment-list";
 import { MentionSheet } from "./mention-sheet";
@@ -29,7 +30,6 @@ import { PostActionSheet } from "./post-action-sheet";
 import { PostDeleteSheet } from "./post-delete-sheet";
 import { PostDetailHeader } from "./post-detail-header";
 import { ReportSheet } from "./report-sheet";
-import { getErrorMessage } from "@/lib/get-error-message";
 
 type PostDetailContentProps = {
   postId: string;
@@ -160,7 +160,7 @@ export function PostDetailContent({ postId }: PostDetailContentProps) {
         <hr className="mb-6 border-hairline" />
 
         <article className="mb-6 text-base leading-relaxed text-ink">
-          <MentionText text={post.bodyText} />
+          <MentionText text={post.bodyText} className="whitespace-pre-wrap" />
         </article>
 
         {post.photoUrls && post.photoUrls.length > 0 && (

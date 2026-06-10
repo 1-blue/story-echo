@@ -2,25 +2,19 @@ import {
   CommunityCommentResponseSchema,
   CreateCommunityCommentRequestSchema,
 } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { resolveMentionedUserIds } from "@/lib/community-mapper";
+import { createNotification, createStoryMentionNotifications } from "@/lib/notifications/create";
+import { prisma } from "@/lib/prisma";
 import { toStoryCommentTree } from "@/lib/story-comment-mapper";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
-import {
-  createNotification,
-  createStoryMentionNotifications,
-} from "@/lib/notifications/create";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, context: RouteContext) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

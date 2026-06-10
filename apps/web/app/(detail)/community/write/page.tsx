@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { prisma } from "@/lib/prisma";
 import { isAwsConfigured } from "@/lib/env/aws";
-import { isDatabaseConfigured } from "@/lib/story-mapper";
-import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
-import { getTodayQuestion } from "@/lib/today-question";
 import { getWriteCapabilities } from "@/lib/get-write-capabilities";
+import { prisma } from "@/lib/prisma";
+import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
+import { isDatabaseConfigured } from "@/lib/story-mapper";
+import { getTodayQuestion } from "@/lib/today-question";
 import { requireMemberUser } from "@/lib/user/require-member-user";
 import { CommunityWriteForm } from "./_components/community-write-form";
 

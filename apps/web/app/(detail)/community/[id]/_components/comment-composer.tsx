@@ -30,12 +30,12 @@ export function CommentComposer({
   };
 
   return (
-    <div className="border-hairline bg-canvas fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t px-4 py-3 pb-[calc(0.75rem+var(--safe-area-bottom))] shadow-[0_-4px_20px_-10px_rgba(144,72,36,0.1)]">
+    <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-hairline bg-canvas px-4 py-3 pb-[calc(0.75rem+var(--safe-area-bottom))] shadow-[0_-4px_20px_-10px_rgba(144,72,36,0.1)]">
       <button
         type="button"
         aria-label="멘션"
         onClick={onMentionClick}
-        className="text-slate hover:text-primary hover:bg-surface-cream/60 rounded-full p-2 transition-colors"
+        className="rounded-full p-2 text-slate transition-colors hover:bg-surface-cream/60 hover:text-primary"
       >
         <AtSign className="size-5" strokeWidth={1.75} />
       </button>
@@ -43,7 +43,7 @@ export function CommentComposer({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="border-hairline-strong bg-white flex-1 rounded-full"
+        className="flex-1 rounded-full border-hairline-strong bg-white"
         onCompositionStart={() => {
           isComposingRef.current = true;
         }}

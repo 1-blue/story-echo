@@ -42,3 +42,31 @@ export const PublicQuestionAnswerListResponseSchema = z
 export type PublicQuestionAnswerListResponse = z.infer<
   typeof PublicQuestionAnswerListResponseSchema
 >;
+
+export const QuestionArchiveItemSchema = z
+  .object({
+    id: z.string().uuid(),
+    text: z.string(),
+    month: z.number().int().min(1).max(12),
+    day: z.number().int().min(1).max(31),
+    publicStoryCount: z.number().int().min(0),
+  })
+  .openapi("QuestionArchiveItem");
+
+export type QuestionArchiveItem = z.infer<typeof QuestionArchiveItemSchema>;
+
+export const QuestionArchiveListResponseSchema = z
+  .object({
+    data: z.array(QuestionArchiveItemSchema),
+  })
+  .openapi("QuestionArchiveListResponse");
+
+export type QuestionArchiveListResponse = z.infer<typeof QuestionArchiveListResponseSchema>;
+
+export const QuestionResponseSchema = z
+  .object({
+    data: QuestionArchiveItemSchema,
+  })
+  .openapi("QuestionResponse");
+
+export type QuestionResponse = z.infer<typeof QuestionResponseSchema>;

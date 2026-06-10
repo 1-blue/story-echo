@@ -1,7 +1,8 @@
 import { SignupRequestSchema, UserMeResponseSchema } from "@storyecho/schemas";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
+import { signupWithoutEmailVerification } from "@/lib/auth/signup-without-email-verification";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
-import { signupWithoutEmailVerification } from "@/lib/auth/signup-without-email-verification";
 import { mergeGuestToMember } from "@/lib/user/merge-guest-to-member";
 import {
   ensureMemberUser,
@@ -9,14 +10,10 @@ import {
   isSupabaseConfigured,
 } from "@/lib/user/resolve-current-user";
 import { toUserMeDto } from "@/lib/user/user-mapper";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function POST(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   if (!isSupabaseConfigured()) {
@@ -44,10 +41,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const auth = await signupWithoutEmailVerification(
-      parsed.data.email,
-      parsed.data.password,
-    );
+    const auth = await signupWithoutEmailVerification(parsed.data.email, parsed.data.password);
 
     if (!auth.ok) {
       const status = auth.code === "AUTH_UNAVAILABLE" ? 503 : 400;

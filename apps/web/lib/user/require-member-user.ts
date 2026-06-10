@@ -1,5 +1,4 @@
 import "server-only";
-
 import { redirect } from "next/navigation";
 import { resolveCurrentUserFromHeaders } from "./resolve-current-user";
 

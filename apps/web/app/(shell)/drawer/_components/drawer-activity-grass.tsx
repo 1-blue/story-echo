@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import type { DrawerStoryItem } from "@/features/stories/types";
-import { cn } from "@/lib/utils";
 import { parseLocalDateKey, toLocalDateKey } from "@/lib/story-date-key";
+import { cn } from "@/lib/utils";
 
 type DayActivity = {
   dateKey: string;
@@ -150,15 +150,15 @@ export function DrawerActivityGrass({
   return (
     <section aria-label="작성 활동" className="mb-5">
       <div className="mb-2 flex items-end justify-between gap-3">
-        <p className="text-charcoal text-sm font-medium">작성 기록</p>
-        <p className="text-stone text-xs">
+        <p className="text-sm font-medium text-charcoal">작성 기록</p>
+        <p className="text-xs text-stone">
           {rangeStart.getFullYear()}년 {rangeStart.getMonth() + 1}월 – {rangeEnd.getFullYear()}년{" "}
           {rangeEnd.getMonth() + 1}월
         </p>
       </div>
 
       <div className="flex gap-2">
-        <div className="text-stone flex shrink-0 flex-col justify-between py-5 text-[10px] leading-none">
+        <div className="flex shrink-0 flex-col justify-between py-5 text-[10px] leading-none text-stone">
           {WEEKDAY_LABELS.map((label, index) => (
             <span
               key={label}
@@ -176,7 +176,7 @@ export function DrawerActivityGrass({
                 <div
                   key={`month-${index}`}
                   className={cn(
-                    "text-stone shrink-0 text-[10px] leading-none",
+                    "shrink-0 text-[10px] leading-none text-stone",
                     label ? "whitespace-nowrap" : "min-w-3",
                   )}
                 >

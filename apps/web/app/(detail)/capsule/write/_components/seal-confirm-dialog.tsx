@@ -1,7 +1,6 @@
 "use client";
 
 import { Lock } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   BottomSheet,
   BottomSheetContent,
@@ -10,6 +9,7 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
 } from "@/components/ui/bottom-sheet";
+import { Button } from "@/components/ui/button";
 import { formatUnlockPreview } from "@/lib/capsule-utils";
 
 type SealConfirmDialogProps = {
@@ -42,8 +42,8 @@ export function SealConfirmDialog({
     <BottomSheet open={open} onOpenChange={onOpenChange}>
       <BottomSheetContent>
         <BottomSheetHeader className="items-center text-center">
-          <div className="bg-capsule-soft mb-2 flex size-16 items-center justify-center rounded-full">
-            <Lock className="text-capsule size-8" strokeWidth={1.75} />
+          <div className="mb-2 flex size-16 items-center justify-center rounded-full bg-capsule-soft">
+            <Lock className="size-8 text-capsule" strokeWidth={1.75} />
           </div>
           <BottomSheetTitle>이 편지를 봉인할까요?</BottomSheetTitle>
           <BottomSheetDescription className="text-left leading-relaxed">
@@ -55,12 +55,12 @@ export function SealConfirmDialog({
         </BottomSheetHeader>
 
         {unlockAt && (
-          <div className="border-hairline bg-surface-cream/50 rounded-xl border p-4 text-sm">
-            <p className="text-stone mb-1">해제일</p>
-            <p className="text-ink font-medium">{formatUnlockPreview(unlockAt)}</p>
-            <p className="text-stone mt-3 mb-1">편지 미리보기</p>
-            <p className="text-ink font-display leading-relaxed">{truncatePreview(bodyPreview)}</p>
-            <p className="text-stone mt-3">받는 사람: 나에게</p>
+          <div className="rounded-xl border border-hairline bg-surface-cream/50 p-4 text-sm">
+            <p className="mb-1 text-stone">해제일</p>
+            <p className="font-medium text-ink">{formatUnlockPreview(unlockAt)}</p>
+            <p className="mt-3 mb-1 text-stone">편지 미리보기</p>
+            <p className="font-display leading-relaxed text-ink">{truncatePreview(bodyPreview)}</p>
+            <p className="mt-3 text-stone">받는 사람: 나에게</p>
           </div>
         )}
 
@@ -69,16 +69,16 @@ export function SealConfirmDialog({
             type="checkbox"
             checked={agreed}
             onChange={(event) => onAgreedChange(event.target.checked)}
-            className="border-hairline-strong text-capsule mt-0.5 size-4 rounded"
+            className="mt-0.5 size-4 rounded border-hairline-strong text-capsule"
           />
-          <span className="text-charcoal text-sm leading-relaxed">
+          <span className="text-sm leading-relaxed text-charcoal">
             수정이 불가능함을 이해했어요
           </span>
         </label>
 
         <BottomSheetFooter className="mt-4 flex-col gap-2 sm:flex-col">
           <Button
-            className="bg-capsule hover:bg-capsule/90 w-full rounded-full"
+            className="w-full rounded-full bg-capsule hover:bg-capsule/90"
             disabled={!agreed || isSubmitting}
             onClick={onConfirm}
           >

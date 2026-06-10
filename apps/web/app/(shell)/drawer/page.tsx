@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTodayWriteHref } from "@/lib/get-today-write-href";
+import { getTodayStoryStatus } from "@/lib/get-today-story-status";
 import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
 import { DrawerPageClient } from "./_components/drawer-page-client";
 
@@ -9,6 +9,6 @@ export const metadata: Metadata = getSharedMetadata({
 });
 
 export default async function DrawerPage() {
-  const writeHref = await getTodayWriteHref();
-  return <DrawerPageClient writeHref={writeHref} />;
+  const { todayStoryId } = await getTodayStoryStatus();
+  return <DrawerPageClient todayStoryId={todayStoryId} />;
 }

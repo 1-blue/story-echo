@@ -14,7 +14,7 @@ type PageProps = {
 export default async function CommunityPostDetailPage({ params }: PageProps) {
   const { id } = await params;
   return (
-    <div className="bg-canvas flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col bg-canvas">
       <PostDetailPageClient postId={id} />
     </div>
   );

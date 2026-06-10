@@ -3,33 +3,26 @@
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  AtSign,
-  Bell,
-  Lock,
-  MessageCircle,
-  NotebookPen,
-  Reply,
-} from "lucide-react";
+import { AtSign, Bell, Lock, MessageCircle, NotebookPen, Reply } from "lucide-react";
 import {
   getApiV1Notifications,
   getGetApiV1NotificationsQueryKey,
   usePatchApiV1Notifications,
 } from "@storyecho/api-client";
+import type { Notification } from "@storyecho/schemas";
 import { AuthorAvatar } from "@/components/community/author-avatar";
+import { ListLoadMore } from "@/components/list-load-more";
 import { AnimatedList } from "@/components/magicui/animated-list";
 import { BlurFade } from "@/components/magicui/blur-fade";
-import { ListLoadMore } from "@/components/list-load-more";
+import { useLoadMoreSentinel } from "@/hooks/use-load-more-sentinel";
 import { formatRelativeTime } from "@/lib/community-mapper";
 import { getNotificationHref } from "@/lib/notifications/notification-mapper";
-import { useLoadMoreSentinel } from "@/hooks/use-load-more-sentinel";
-import type { Notification } from "@storyecho/schemas";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 20;
 
 function notificationMessage(notification: Notification): string {
-  const name = notification.actor?.nickname ?? "StoryEcho";
+  const name = notification.actor?.nickname ?? "이야기해줘";
   switch (notification.type) {
     case "comment_on_post":
       return `${name}님이 회원님의 토론에 댓글을 남겼어요`;
@@ -90,9 +83,7 @@ export function NotificationList({ enabled = true, onNavigate }: NotificationLis
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) =>
-      last.meta?.pagination?.hasMore
-        ? (last.meta.pagination.nextCursor ?? undefined)
-        : undefined,
+      last.meta?.pagination?.hasMore ? (last.meta.pagination.nextCursor ?? undefined) : undefined,
     enabled,
     staleTime: 30_000,
   });
@@ -128,7 +119,7 @@ export function NotificationList({ enabled = true, onNavigate }: NotificationLis
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center py-16">
-        <p className="text-stone text-sm">불러오는 중…</p>
+        <p className="text-sm text-stone">불러오는 중…</p>
       </div>
     );
   }
@@ -136,53 +127,51 @@ export function NotificationList({ enabled = true, onNavigate }: NotificationLis
   if (notifications.length === 0) {
     return (
       <BlurFade className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-        <p className="text-charcoal font-medium">알림이 없어요</p>
-        <p className="text-stone mt-2 text-sm">활동이 생기면 여기에 표시됩니다.</p>
+        <p className="font-medium text-charcoal">알림이 없어요</p>
+        <p className="mt-2 text-sm text-stone">활동이 생기면 여기에 표시됩니다.</p>
       </BlurFade>
     );
   }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="border-hairline flex shrink-0 items-center justify-end border-b px-4 py-3">
+      <div className="flex shrink-0 items-center justify-end border-b border-hairline px-4 py-3">
         <button
           type="button"
           onClick={() => void handleMarkAllRead()}
           disabled={markRead.isPending || unreadCount === 0}
-          className="text-primary text-xs font-medium disabled:opacity-40"
+          className="text-xs font-medium text-primary disabled:opacity-40"
         >
           모두 읽음
         </button>
       </div>
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
-        <AnimatedList className="divide-hairline divide-y overflow-hidden rounded-xl border border-hairline bg-white">
+        <AnimatedList className="divide-y divide-hairline overflow-hidden rounded-xl border border-hairline bg-white">
           {notifications.map((notification) => (
             <div key={notification.id}>
               <button
                 type="button"
                 onClick={() => void handleClick(notification)}
-                className="hover:bg-surface-cream/40 relative flex w-full items-start gap-3 px-4 py-4 text-left transition-colors"
+                className="relative flex w-full items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-surface-cream/40"
               >
                 {!notification.readAt && (
                   <span
                     aria-label="읽지 않은 알림"
-                    className="bg-primary absolute top-4 right-4 size-2 rounded-full"
+                    className="absolute top-4 right-4 size-2 rounded-full bg-primary"
                   />
                 )}
-                <div className="bg-community-soft flex size-12 shrink-0 items-center justify-center rounded-full">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-community-soft">
                   <NotificationIcon type={notification.type} />
                 </div>
                 <div className="min-w-0 flex-1 pr-4">
-                  <p className="text-charcoal text-sm leading-relaxed">
+                  <p className="text-sm leading-relaxed text-charcoal">
                     {notificationMessage(notification)}
                   </p>
-                  <p className="text-stone mt-1 text-xs">
+                  <p className="mt-1 text-xs text-stone">
                     {formatRelativeTime(notification.createdAt)}
                   </p>
                 </div>
-                {notification.actor && (
-                  <AuthorAvatar nickname={notification.actor.nickname} />
-                )}
+                {notification.actor && <AuthorAvatar nickname={notification.actor.nickname} />}
               </button>
             </div>
           ))}

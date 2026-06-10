@@ -1,28 +1,35 @@
 "use client";
 
-import { toast } from "sonner";
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { openRoute, SETTINGS_INFO_ROUTES } from "@/lib/routes/routes";
 import { SettingsRow, SettingsSection } from "./settings-section";
 
-const INFO_LINKS = [
-  { label: "개인정보처리방침" },
-  { label: "서비스 이용약관" },
-  { label: "오픈카톡방" },
-  { label: "문의하기" },
-] as const;
+function isExternalRoute(
+  route: (typeof SETTINGS_INFO_ROUTES)[number],
+): route is (typeof SETTINGS_INFO_ROUTES)[number] & { external: true } {
+  return "external" in route && !!route.external;
+}
 
 export function SettingsInfoLinks() {
   return (
     <SettingsSection title="정보">
-      {INFO_LINKS.map((link) => (
-        <SettingsRow
-          key={link.label}
-          label={link.label}
-          onClick={() => toast.message("TODO: 링크넣기")}
-        >
-          <ChevronRight className="text-stone size-4" strokeWidth={1.75} />
-        </SettingsRow>
-      ))}
+      {SETTINGS_INFO_ROUTES.map((route) =>
+        isExternalRoute(route) ? (
+          <SettingsRow key={route.url} label={route.label} onClick={() => openRoute(route.url)}>
+            <ChevronRight className="size-4 text-stone" strokeWidth={1.75} />
+          </SettingsRow>
+        ) : (
+          <Link
+            key={route.url}
+            href={route.url}
+            className="flex min-h-14 w-full items-center justify-between gap-3 border-b border-hairline px-4 py-3 text-left last:border-b-0"
+          >
+            <span className="text-sm text-charcoal">{route.label}</span>
+            <ChevronRight className="size-4 text-stone" strokeWidth={1.75} />
+          </Link>
+        ),
+      )}
     </SettingsSection>
   );
 }

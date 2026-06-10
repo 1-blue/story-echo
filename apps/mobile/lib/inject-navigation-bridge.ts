@@ -11,7 +11,7 @@ export function buildNavigationBridgeScript(): string {
         window.ReactNativeWebView.postMessage(JSON.stringify({
           type: 'navigation',
           pathname: window.location.pathname,
-          canGoBack: window.history.length > 1
+          canGoBack: false
         }));
       }
 
@@ -27,15 +27,17 @@ export function buildNavigationBridgeScript(): string {
       history.replaceState = wrap(history.replaceState);
       window.addEventListener('popstate', postNavigation);
 
-      window.__storyechoNavigateBack = function() {
-        if (window.ReactNativeWebView) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'back-result',
-            handled: false
-          }));
-        }
-        return false;
-      };
+      if (typeof window.__storyechoNavigateBack !== 'function') {
+        window.__storyechoNavigateBack = function() {
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'back-result',
+              handled: false
+            }));
+          }
+          return false;
+        };
+      }
 
       postNavigation();
     })();

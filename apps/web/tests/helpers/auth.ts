@@ -1,6 +1,6 @@
+import { createTestDeviceId } from "../setup/env";
 import { apiFetch } from "./api";
 import { createGuestUser } from "./db";
-import { createTestDeviceId } from "../setup/env";
 
 export async function registerGuest(deviceId: string) {
   return apiFetch("/api/v1/users/guest", {
@@ -14,7 +14,8 @@ export async function loginMember(
   password: string,
   deviceId?: string,
 ): Promise<{ cookie: string; status: number; data: unknown }> {
-  const baseUrl = process.env.TEST_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://127.0.0.1:3000";
+  const baseUrl =
+    process.env.TEST_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://127.0.0.1:3000";
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (deviceId) headers["X-Device-Id"] = deviceId;
 

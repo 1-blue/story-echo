@@ -12,11 +12,11 @@ type CapsuleDetailPageClientProps = {
 
 function CapsuleDetailFallback() {
   return (
-    <div className="bg-canvas flex min-h-dvh flex-col">
-      <div className="border-hairline h-16 border-b" />
+    <div className="flex min-h-dvh flex-col bg-canvas">
+      <div className="h-16 border-b border-hairline" />
       <div className="space-y-4 px-5 py-6">
-        <div className="bg-capsule-soft/40 mx-auto size-20 animate-pulse rounded-full" />
-        <div className="bg-surface-cream/60 h-32 animate-pulse rounded-xl" />
+        <div className="mx-auto size-20 animate-pulse rounded-full bg-capsule-soft/40" />
+        <div className="h-32 animate-pulse rounded-xl bg-surface-cream/60" />
       </div>
     </div>
   );
@@ -52,9 +52,9 @@ function CapsuleDetailPageInner({ capsuleId }: CapsuleDetailPageClientProps) {
         <CapsuleDetailErrorBoundary
           onReset={reset}
           fallback={(error) => (
-            <div className="bg-canvas flex min-h-dvh flex-col items-center justify-center px-5 py-16 text-center">
-              <p className="text-charcoal text-base font-medium">타임캡슐을 불러오지 못했어요</p>
-              <p className="text-stone mt-2 text-sm">{getErrorMessage(error)}</p>
+            <div className="flex min-h-dvh flex-col items-center justify-center bg-canvas px-5 py-16 text-center">
+              <p className="text-base font-medium text-charcoal">타임캡슐을 불러오지 못했어요</p>
+              <p className="mt-2 text-sm text-stone">{getErrorMessage(error)}</p>
             </div>
           )}
         >

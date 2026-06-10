@@ -35,8 +35,8 @@ cp packages/database/.env.example packages/database/.env
 
 # 4. Database (Supabase URL 필요)
 pnpm db:migrate
-pnpm db:seed        # dev: 365 질문 + 샘플 데이터
-# pnpm db:seed:prod # prod: 관리자 + 365 질문만
+pnpm db:seed        # dev 프로필 시드
+# pnpm db:seed:prod # prod 프로필 시드 (대상 DB는 .env DATABASE_URL)
 
 # 5. Run web
 pnpm --filter web dev
@@ -47,7 +47,7 @@ pnpm --filter web dev
 비밀번호는 **Supabase Auth**(`auth.users`)에 저장됩니다. Prisma `users` 테이블에는 password 컬럼이 없습니다.
 
 1. `packages/database/.env`에 `SEED_ADMIN_PASSWORD` 설정 (예: `SEED_ADMIN_EMAIL=admin@storyecho.app`)
-2. `pnpm db:seed` 실행 → `[users] Supabase Auth 관리자 생성/갱신` 로그 확인 (prod DB는 `pnpm db:seed:prod`)
+2. `pnpm db:seed` 실행 → `[users] Supabase Auth 관리자 생성/갱신` 로그 확인 (prod 프로필은 `pnpm db:seed:prod`)
 3. `/app/settings/login`에서 위 이메일·비밀번호로 로그인
 4. `/app/drawer`에서 잔디·이야기 목록 확인
 
@@ -58,8 +58,9 @@ pnpm --filter web dev
 | `pnpm dev`                 | Turbo dev (web + mobile)                                                  |
 | `pnpm generate:api`        | zod → openapi.json → orval                                                |
 | `pnpm db:migrate`          | Prisma migrate dev                                                        |
-| `pnpm db:seed`             | dev 시드 (관리자·365 질문·샘플 데이터)                                    |
-| `pnpm db:seed:prod`        | prod 시드 (관리자·365 질문만)                                             |
+| `pnpm db:seed`             | dev 프로필 시드 (관리자·365 질문·환영 커뮤니티 글)                        |
+| `pnpm db:seed:prod`        | prod 프로필 시드                                                          |
+| `pnpm db:reset`            | migrate reset — `.env`의 `DATABASE_URL` 대상 DB 초기화 + seed 훅 실행     |
 | `pnpm --filter web dev`    | Next.js only                                                              |
 | `pnpm --filter mobile dev` | Expo WebView shell (see [apps/mobile/README.md](./apps/mobile/README.md)) |
 | `pnpm test:unit`           | Vitest unit + component                                                   |
@@ -91,10 +92,5 @@ CI Secrets 설정: [`.github/workflows/README.md`](.github/workflows/README.md)
 
 - [기획.md](./.md/기획.md)
 - [개발.md](./.md/개발.md)
-- [DESIGN.md](./DESIGN.md)
-
-##
-
-1. 개발자에게 커피
-2. 구글 에드센스 넣기
-3. 모바일 스플래쉬 화면, 404 화면 등 필수적인 요소들 물어보기
+- [정책.md](./.md/정책.md)
+- [DESIGN.md](./.md/DESIGN.md)

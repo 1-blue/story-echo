@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { generateGuestNicknameSuffix, generateUniqueGuestNickname } from "@/lib/user/generate-guest-nickname";
+import {
+  generateGuestNicknameSuffix,
+  generateUniqueGuestNickname,
+} from "@/lib/user/generate-guest-nickname";
 
 describe("generate-guest-nickname", () => {
   it("generateGuestNicknameSuffix is 5-6 digits", () => {

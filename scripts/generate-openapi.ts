@@ -3,33 +3,7 @@ import { resolve } from "node:path";
 import { OpenApiGeneratorV3, OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 import {
-  CapsuleStoryDetailResponseSchema,
-  CapsuleStoryListResponseSchema,
-  CreateStoryRequestSchema,
-  TodayStoryExistsErrorSchema,
-  DrawerStoryListResponseSchema,
-  EmailNotVerifiedErrorSchema,
-  ErrorResponseSchema,
-  HealthResponseSchema,
-  PresignUploadRequestSchema,
-  PresignUploadResponseSchema,
-  StoryDetailResponseSchema,
-  StoryListResponseSchema,
-  StoryResponseSchema,
-  PublicStoryFeedListResponseSchema,
-  PublicStoryDetailResponseSchema,
-  TodayQuestionResponseSchema,
-  PublicQuestionAnswerListResponseSchema,
-  UpdateStoryRequestSchema,
-} from "../packages/schemas/src/index.ts";
-import {
-  CreateGuestRequestSchema,
-  LoginRequestSchema,
-  SignupRequestSchema,
-  UpdateUserRequestSchema,
-  UserMeResponseSchema,
-} from "../packages/schemas/src/user.ts";
-import {
+  CommunityCommentItemResponseSchema,
   CommunityCommentResponseSchema,
   CommunityPostDetailResponseSchema,
   CommunityPostListResponseSchema,
@@ -42,13 +16,42 @@ import {
   ToggleCommunityReactionResponseSchema,
   UpdateCommunityCommentRequestSchema,
   UpdateCommunityPostRequestSchema,
-  CommunityCommentItemResponseSchema,
 } from "../packages/schemas/src/community.ts";
+import {
+  CapsuleStoryDetailResponseSchema,
+  CapsuleStoryListResponseSchema,
+  CreateStoryRequestSchema,
+  DrawerStoryListResponseSchema,
+  EmailNotVerifiedErrorSchema,
+  ErrorResponseSchema,
+  HealthResponseSchema,
+  PresignUploadRequestSchema,
+  PresignUploadResponseSchema,
+  PublicQuestionAnswerListResponseSchema,
+  PublicStoryDetailResponseSchema,
+  PublicStoryFeedListResponseSchema,
+  QuestionArchiveListResponseSchema,
+  QuestionResponseSchema,
+  StoryCreateConflictErrorSchema,
+  StoryDetailResponseSchema,
+  StoryListResponseSchema,
+  StoryResponseSchema,
+  TodayQuestionResponseSchema,
+  TodayStoryExistsErrorSchema,
+  UpdateStoryRequestSchema,
+} from "../packages/schemas/src/index.ts";
 import {
   MarkNotificationsReadRequestSchema,
   NotificationListResponseSchema,
 } from "../packages/schemas/src/notification.ts";
 import { PaginationQuerySchema } from "../packages/schemas/src/pagination.ts";
+import {
+  CreateGuestRequestSchema,
+  LoginRequestSchema,
+  SignupRequestSchema,
+  UpdateUserRequestSchema,
+  UserMeResponseSchema,
+} from "../packages/schemas/src/user.ts";
 
 const listPaginationQuery = PaginationQuerySchema.extend({});
 
@@ -66,6 +69,8 @@ registry.register("CapsuleStoryDetailResponse", CapsuleStoryDetailResponseSchema
 registry.register("CreateStoryRequest", CreateStoryRequestSchema);
 registry.register("UpdateStoryRequest", UpdateStoryRequestSchema);
 registry.register("TodayQuestionResponse", TodayQuestionResponseSchema);
+registry.register("QuestionArchiveListResponse", QuestionArchiveListResponseSchema);
+registry.register("QuestionResponse", QuestionResponseSchema);
 registry.register("PublicQuestionAnswerListResponse", PublicQuestionAnswerListResponseSchema);
 registry.register("PresignUploadRequest", PresignUploadRequestSchema);
 registry.register("PresignUploadResponse", PresignUploadResponseSchema);
@@ -118,6 +123,63 @@ registry.registerPath({
       content: {
         "application/json": {
           schema: TodayQuestionResponseSchema,
+        },
+      },
+    },
+    503: {
+      description: "Database unavailable",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/questions",
+  tags: ["Questions"],
+  responses: {
+    200: {
+      description: "365-day question archive",
+      content: {
+        "application/json": {
+          schema: QuestionArchiveListResponseSchema,
+        },
+      },
+    },
+    503: {
+      description: "Database unavailable",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/questions/{id}",
+  tags: ["Questions"],
+  request: { params: z.object({ id: z.string().uuid() }) },
+  responses: {
+    200: {
+      description: "Question detail with public story count",
+      content: {
+        "application/json": {
+          schema: QuestionResponseSchema,
+        },
+      },
+    },
+    404: {
+      description: "Not found",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
         },
       },
     },
@@ -229,7 +291,9 @@ registry.registerPath({
   path: "/api/v1/stories/public",
   tags: ["Stories"],
   request: {
-    query: listPaginationQuery,
+    query: listPaginationQuery.extend({
+      questionId: z.string().uuid().optional(),
+    }),
   },
   responses: {
     200: {
@@ -640,10 +704,10 @@ registry.registerPath({
       },
     },
     409: {
-      description: "Today's question story already exists",
+      description: "Story create conflict (not today's question or duplicate today story)",
       content: {
         "application/json": {
-          schema: TodayStoryExistsErrorSchema,
+          schema: StoryCreateConflictErrorSchema,
         },
       },
     },

@@ -19,7 +19,7 @@ export function EmailVerificationDialog({ open, onOpenChange }: EmailVerificatio
     <BottomSheet open={open} onOpenChange={onOpenChange}>
       <BottomSheetContent>
         <BottomSheetHeader className="items-center text-center">
-          <div className="bg-destructive/10 text-destructive mb-2 flex size-16 items-center justify-center rounded-full">
+          <div className="mb-2 flex size-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
             <Mail className="size-8" strokeWidth={1.75} />
           </div>
           <BottomSheetTitle>이메일 인증이 필요해요</BottomSheetTitle>

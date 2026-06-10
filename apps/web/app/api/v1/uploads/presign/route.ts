@@ -1,9 +1,9 @@
 import { PresignUploadRequestSchema, PresignUploadResponseSchema } from "@storyecho/schemas";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { isAwsConfigured } from "@/lib/env/aws";
 import { createPresignedUpload } from "@/lib/s3/presign";
-import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
+import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
 
 export async function POST(request: Request) {
   if (!isAwsConfigured()) {
@@ -14,10 +14,7 @@ export async function POST(request: Request) {
   }
 
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

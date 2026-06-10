@@ -9,6 +9,7 @@ import {
   type MotionProps,
   type Variants,
 } from "motion/react";
+
 const STORY_ECHO_EASE = [0.16, 1, 0.3, 1] as const;
 
 type BlurFadeProps = MotionProps & {

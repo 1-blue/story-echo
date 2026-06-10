@@ -3,6 +3,7 @@
     "version": ">= 18.4.0",
     "appVersionSource": "remote"
   },
+  "metadataPath": "./store.config.json",
   "build": {
     "development": {
       "developmentClient": true,

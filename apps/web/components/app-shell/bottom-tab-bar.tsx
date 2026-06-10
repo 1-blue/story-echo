@@ -33,7 +33,7 @@ export function BottomTabBar() {
     <nav
       className={cn(
         SHELL_FIXED_CHROME_CLASS,
-        "border-hairline bottom-0 z-50 flex min-h-[calc(var(--shell-tab-height)+var(--safe-area-bottom))] items-center justify-around border-t bg-white pt-2 pb-[var(--safe-area-bottom)]",
+        "bottom-0 z-50 flex min-h-[calc(var(--shell-tab-height)+var(--safe-area-bottom))] items-center justify-around border-t border-hairline bg-white pt-2 pb-[var(--safe-area-bottom)]",
       )}
     >
       {tabs.map(({ href, label, icon: Icon, exact }) => {
@@ -45,11 +45,13 @@ export function BottomTabBar() {
             href={href}
             className={cn(
               "flex h-full w-1/5 flex-col items-center justify-center transition-all duration-200 active:scale-90",
-              active ? "text-primary font-bold" : "text-slate hover:text-primary/80",
+              active ? "font-bold text-primary" : "text-slate hover:text-primary/80",
             )}
           >
             <Icon className="size-6" strokeWidth={active ? 2.25 : 1.75} />
-            <span className="mt-1 text-[11px] leading-tight font-medium tracking-wide">{label}</span>
+            <span className="mt-1 text-[11px] leading-tight font-medium tracking-wide">
+              {label}
+            </span>
           </Link>
         );
       })}

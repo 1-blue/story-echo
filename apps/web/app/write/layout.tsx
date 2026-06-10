@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default function WriteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`bg-canvas text-foreground min-h-dvh ${APP_SHELL_MAX_WIDTH_CLASS}`}>
+    <div className={`min-h-dvh bg-canvas text-foreground ${APP_SHELL_MAX_WIDTH_CLASS}`}>
       {children}
       <Toaster />
     </div>

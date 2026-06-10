@@ -1,4 +1,5 @@
 import { LoginRequestSchema, UserMeResponseSchema } from "@storyecho/schemas";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
 import { mergeGuestToMember } from "@/lib/user/merge-guest-to-member";
@@ -8,14 +9,10 @@ import {
   isSupabaseConfigured,
 } from "@/lib/user/resolve-current-user";
 import { toUserMeDto } from "@/lib/user/user-mapper";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function POST(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   if (!isSupabaseConfigured()) {

@@ -10,9 +10,7 @@ declare global {
 
 export function isNativeWebView(): boolean {
   if (typeof window === "undefined") return false;
-  return (
-    Boolean(window.ReactNativeWebView) || document.documentElement.dataset.native === "1"
-  );
+  return Boolean(window.ReactNativeWebView) || document.documentElement.dataset.native === "1";
 }
 
 export function postNativeMessage(payload: unknown): void {

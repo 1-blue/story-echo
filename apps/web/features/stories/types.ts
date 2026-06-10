@@ -1,6 +1,5 @@
-import type { CreateStoryRequest, Story } from "@storyecho/schemas";
-import { VisibilitySchema } from "@storyecho/schemas";
 import { z } from "zod";
+import { VisibilitySchema, type CreateStoryRequest, type Story } from "@storyecho/schemas";
 
 export const WriteStoryFormSchema = z.object({
   bodyText: z.string().min(1, "이야기를 입력해 주세요").max(5000),
@@ -17,11 +16,10 @@ export type WriteStoryPayload = CreateStoryRequest;
 
 export type StoryListItem = Pick<Story, "id" | "bodyText" | "createdAt">;
 
-export interface DrawerStoryItem
-  extends Pick<
-    Story,
-    "id" | "bodyText" | "createdAt" | "isCapsule" | "isCapsuleActive" | "photoUrls"
-  > {
+export interface DrawerStoryItem extends Pick<
+  Story,
+  "id" | "bodyText" | "createdAt" | "isCapsule" | "isCapsuleActive" | "photoUrls"
+> {
   questionText: string | null;
   isEchoStory: boolean;
   isBookmarked: boolean;

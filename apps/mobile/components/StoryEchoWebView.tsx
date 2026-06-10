@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Linking, Platform, StyleSheet, View, useWindowDimensions } from "react-native";
+import { Linking, Platform, StyleSheet, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebView, type WebViewMessageEvent, type WebViewNavigation } from "react-native-webview";
 import * as SplashScreen from "expo-splash-screen";
 import { AppScreen, AppScreenButton } from "@/components/AppScreen";
 import { BrandedLoading } from "@/components/BrandedLoading";
+import Colors from "@/constants/Colors";
 import { useAndroidWebViewBack } from "@/hooks/useAndroidWebViewBack";
 import { getWebAppUrl, getWebBaseUrl } from "@/lib/get-web-url";
 import { buildNavigationBridgeScript } from "@/lib/inject-navigation-bridge";
 import { buildSafeAreaInjectScript } from "@/lib/inject-safe-area";
-import Colors from "@/constants/Colors";
 
 type ScrollMessage = {
   type: "scroll";

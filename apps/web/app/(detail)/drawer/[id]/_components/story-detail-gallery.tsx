@@ -7,8 +7,20 @@ type StoryDetailGalleryProps = {
 
 function GalleryImage({ url, className }: { url: string; className?: string }) {
   return (
-    <div className={cn("border-hairline relative overflow-hidden rounded-xl border bg-stone/10", className)}>
-      <Image src={url} alt="" fill className="object-cover" sizes="(max-width: 480px) 100vw, 480px" unoptimized />
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-xl border border-hairline bg-stone/10",
+        className,
+      )}
+    >
+      <Image
+        src={url}
+        alt=""
+        fill
+        className="object-cover"
+        sizes="(max-width: 480px) 100vw, 480px"
+        unoptimized
+      />
     </div>
   );
 }

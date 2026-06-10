@@ -45,8 +45,8 @@ function EditStoryFormLoader({
 function EditStoryFallback() {
   return (
     <div className="mx-auto flex h-dvh w-full max-w-lg flex-col bg-canvas px-5 py-6">
-      <div className="bg-surface-cream/60 mb-4 h-10 animate-pulse rounded" />
-      <div className="bg-surface-cream/60 h-full animate-pulse rounded-2xl" />
+      <div className="mb-4 h-10 animate-pulse rounded bg-surface-cream/60" />
+      <div className="h-full animate-pulse rounded-2xl bg-surface-cream/60" />
     </div>
   );
 }

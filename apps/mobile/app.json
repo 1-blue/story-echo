@@ -18,6 +18,7 @@
       "package": "com.storyecho.app",
       "adaptiveIcon": {
         "backgroundColor": "#FAF7F2",
+        "backgroundImage": "./assets/images/android-icon-background.png",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },

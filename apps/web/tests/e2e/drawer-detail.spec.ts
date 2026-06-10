@@ -1,4 +1,4 @@
-import { test, expect } from "../fixtures/playwright-fixtures";
+import { expect, test } from "../fixtures/playwright-fixtures";
 
 test.describe("Drawer detail", () => {
   test("shows story body after navigating from drawer list", async ({ guestPage }) => {

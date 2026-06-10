@@ -1,16 +1,7 @@
-import { seedCommunity } from "./community.seed";
-import { seedQuestions } from "./questions.seed";
-import { seedStories } from "./stories.seed";
-import { seedStoryReports } from "./story-reports.seed";
-import type { SeedContext } from "./types";
-import { seedUserQuestionLogs } from "./user-question-log.seed";
-import { seedUsers } from "./users.seed";
+import { runProdSeed } from "./prod";
 
-export async function runDevSeed(ctx: SeedContext) {
-  await seedUsers(ctx);
-  await seedQuestions(ctx);
-  await seedStories(ctx);
-  await seedUserQuestionLogs(ctx);
-  await seedStoryReports(ctx);
-  await seedCommunity(ctx);
+/** dev = prod와 동일한 깨끗한 초기 데이터 (샘플 Story 제외) */
+export async function runDevSeed(ctx: Parameters<typeof runProdSeed>[0]) {
+  console.warn("[seed] dev 프로필: prod와 동일 (관리자 + 365 질문 + 환영 글)\n");
+  await runProdSeed(ctx);
 }

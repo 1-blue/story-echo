@@ -1,5 +1,5 @@
-import { createSupabaseAdminClient } from "@/lib/user/resolve-current-user";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/user/resolve-current-user";
 
 export type SignupAuthResult =
   | { ok: true; userId: string }

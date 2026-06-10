@@ -1,21 +1,20 @@
 import {
   CreateStoryRequestSchema,
+  QuestionNotTodayErrorSchema,
   StoryListResponseSchema,
   StoryResponseSchema,
   TodayStoryExistsErrorSchema,
 } from "@storyecho/schemas";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured, toStoryDto } from "@/lib/story-mapper";
+import { validateStoryCreate } from "@/lib/story-write-policy";
 import { getTodayQuestion, getTodayStoryForUser } from "@/lib/today-question";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function GET() {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -35,10 +34,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -52,19 +48,36 @@ export async function POST(request: Request) {
     const user = await resolveCurrentUser(request);
 
     const isCapsule = parsed.data.isCapsule;
-    if (!isCapsule && parsed.data.questionId) {
-      const todayQuestion = await getTodayQuestion();
-      if (todayQuestion.id && parsed.data.questionId === todayQuestion.id) {
-        const existingId = await getTodayStoryForUser(user.id, todayQuestion.id);
-        if (existingId) {
-          const errorBody = TodayStoryExistsErrorSchema.parse({
-            message: "오늘의 질문에는 이미 이야기를 남겼어요",
-            code: "TODAY_STORY_EXISTS",
-            storyId: existingId,
-          });
-          return Response.json(errorBody, { status: 409 });
-        }
+    const todayQuestion = await getTodayQuestion();
+    const questionId = parsed.data.questionId ?? null;
+
+    let existingTodayStoryId: string | null = null;
+    if (!isCapsule && todayQuestion.id && questionId === todayQuestion.id) {
+      existingTodayStoryId = await getTodayStoryForUser(user.id, todayQuestion.id);
+    }
+
+    const validation = validateStoryCreate({
+      isCapsule,
+      questionId,
+      todayQuestionId: todayQuestion.id,
+      existingTodayStoryId,
+    });
+
+    if (!validation.ok) {
+      if (validation.error.code === "TODAY_STORY_EXISTS") {
+        const errorBody = TodayStoryExistsErrorSchema.parse({
+          message: validation.error.message,
+          code: validation.error.code,
+          storyId: validation.error.storyId,
+        });
+        return Response.json(errorBody, { status: 409 });
       }
+
+      const errorBody = QuestionNotTodayErrorSchema.parse({
+        message: validation.error.message,
+        code: validation.error.code,
+      });
+      return Response.json(errorBody, { status: 409 });
     }
 
     if (parsed.data.visibility === "community" && !user.emailVerified) {

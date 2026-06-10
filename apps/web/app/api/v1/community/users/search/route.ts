@@ -1,15 +1,12 @@
 import { CommunityUserSearchResponseSchema } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { toCommunityAuthor } from "@/lib/community-mapper";
+import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function GET(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

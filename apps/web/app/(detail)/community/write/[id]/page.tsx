@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { isAwsConfigured } from "@/lib/env/aws";
-import { isDatabaseConfigured } from "@/lib/story-mapper";
-import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
 import { getWriteCapabilities } from "@/lib/get-write-capabilities";
+import { prisma } from "@/lib/prisma";
+import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
+import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { requireMemberUser } from "@/lib/user/require-member-user";
 import { EditCommunityPostPageClient } from "./_components/edit-community-post-page-client";
 

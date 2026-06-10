@@ -7,8 +7,8 @@ import { Bookmark, ChevronRight } from "lucide-react";
 import { StoryMetaBadges } from "@/components/story/story-meta-badges";
 import type { DrawerStoryItem } from "@/features/stories/types";
 import { formatStoryDay } from "@/lib/format-story-date";
-import { cn } from "@/lib/utils";
 import { useToggleStoryBookmark } from "@/lib/stories/use-toggle-story-bookmark";
+import { cn } from "@/lib/utils";
 
 type DrawerStoryCardProps = {
   story: DrawerStoryItem;
@@ -56,10 +56,10 @@ export function DrawerStoryCard({ story }: DrawerStoryCardProps) {
   return (
     <Link
       href={`/drawer/${story.id}`}
-      className="border-hairline hover:border-hairline-strong group block cursor-pointer rounded-2xl border bg-white p-4 shadow-sm transition-colors hover:shadow"
+      className="group block cursor-pointer rounded-2xl border border-hairline bg-white p-4 shadow-sm transition-colors hover:border-hairline-strong hover:shadow"
     >
       <div className="mb-2 flex items-start justify-between">
-        <span className="bg-surface-dim text-charcoal rounded-full px-2.5 py-1 text-xs font-semibold">
+        <span className="rounded-full bg-surface-dim px-2.5 py-1 text-xs font-semibold text-charcoal">
           {formatStoryDay(story.createdAt)}
         </span>
         <button
@@ -80,16 +80,16 @@ export function DrawerStoryCard({ story }: DrawerStoryCardProps) {
         </button>
       </div>
 
-      <h3 className="text-ink mb-1 line-clamp-1 text-base font-semibold">
+      <h3 className="mb-1 line-clamp-1 text-base font-semibold text-ink">
         {story.questionText ?? "오늘의 질문"}
       </h3>
-      <p className="text-slate mb-4 line-clamp-2 text-sm leading-relaxed">{story.bodyText}</p>
+      <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-slate">{story.bodyText}</p>
 
       <div className="flex items-end justify-between gap-3">
         <PhotoStrip photoUrls={story.photoUrls} />
         <div className="ml-auto flex items-center gap-2">
           <StoryMetaBadges story={story} />
-          <ChevronRight className="text-stone size-5 shrink-0" strokeWidth={1.75} />
+          <ChevronRight className="size-5 shrink-0 text-stone" strokeWidth={1.75} />
         </div>
       </div>
     </Link>

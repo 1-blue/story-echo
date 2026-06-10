@@ -1,6 +1,6 @@
 import { TodayQuestionResponseSchema } from "@storyecho/schemas";
-import { getTodayQuestion, getTodayStoryForUser } from "@/lib/today-question";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
+import { getTodayQuestion, getTodayStoryForUser } from "@/lib/today-question";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
 
 export async function GET(request: Request) {

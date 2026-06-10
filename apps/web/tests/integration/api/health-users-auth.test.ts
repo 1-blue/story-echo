@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { apiFetch } from "../../helpers/api";
-import { setupGuestClient, loginAsAdmin } from "../../helpers/auth";
+import { loginAsAdmin, setupGuestClient } from "../../helpers/auth";
 import { cleanupTestUserByDeviceId, disconnectTestPrisma } from "../../helpers/db";
 import { parseUserMe } from "../../helpers/parse-api";
 import { hasIntegrationEnv } from "../../setup/env";

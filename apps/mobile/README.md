@@ -14,8 +14,8 @@
 cp apps/mobile/.env.example apps/mobile/.env
 ```
 
-| Variable | Description |
-| -------- | ----------- |
+| Variable              | Description                                         |
+| --------------------- | --------------------------------------------------- |
 | `EXPO_PUBLIC_WEB_URL` | 웹 앱 origin (필수). 예: `http://192.168.0.10:3000` |
 
 **주의:** 실기기/에뮬레이터에서는 `localhost`가 PC를 가리키지 않습니다. PC의 **LAN IP**를 사용하세요.
@@ -43,7 +43,7 @@ pnpm --filter mobile dev
 
 - **스플래시 / 로딩 / 오류 / 404**: `expo-splash-screen`, `BrandedLoading`, `AppScreen`, `RootErrorBoundary`
 - **Play target API 35**: `expo-build-properties` in `app.json`
-- **스토어 제출 체크리스트**: [STORE_PREP.md](./STORE_PREP.md) (개인정보처리방침·스크린샷 등은 추후)
+- **스토어 제출 체크리스트**: [`.md/개발.md`](../../.md/개발.md) §10 (개인정보처리방침·스크린샷 등)
 
 ## EAS preview build
 
@@ -58,22 +58,22 @@ eas build --profile preview --platform android   # APK (internal)
 ## Features
 
 - **Pull-to-refresh**: iOS `pullToRefreshEnabled`, Android scroll-top 게이트 + `RefreshControl`
-- **Android 뒤로가기**: WebView history → 앱 종료
+- **Android 뒤로가기**: SPA `router.back()` + overlay 닫기 + **루트 2-tap 종료** (`ToastAndroid`)
 - **iOS 스와이프 뒤로가기**: `allowsBackForwardNavigationGestures`
 - **Safe area**: RN inset inject + 웹 `viewport-fit: cover` / CSS variables
 - **외부 링크**: `mailto:`, `tel:`, 다른 origin → 시스템 브라우저
 
 ## Scripts
 
-| Command | Description |
-| ------- | ----------- |
-| `pnpm --filter mobile dev` | Expo Go로 Metro 시작 (기본) |
-| `pnpm --filter mobile android` | Android 에뮬레이터 + Expo Go |
-| `pnpm --filter mobile ios` | iOS 시뮬레이터 + Expo Go |
-| `pnpm --filter mobile dev:client` | 커스텀 dev client로 Metro 시작 |
+| Command                            | Description                                       |
+| ---------------------------------- | ------------------------------------------------- |
+| `pnpm --filter mobile dev`         | Expo Go로 Metro 시작 (기본)                       |
+| `pnpm --filter mobile android`     | Android 에뮬레이터 + Expo Go                      |
+| `pnpm --filter mobile ios`         | iOS 시뮬레이터 + Expo Go                          |
+| `pnpm --filter mobile dev:client`  | 커스텀 dev client로 Metro 시작                    |
 | `pnpm --filter mobile android:run` | dev client 네이티브 빌드·설치 (Android, 최초 1회) |
-| `pnpm --filter mobile ios:run` | dev client 네이티브 빌드·설치 (iOS, 최초 1회) |
-| `pnpm --filter mobile lint` | TypeScript check |
+| `pnpm --filter mobile ios:run`     | dev client 네이티브 빌드·설치 (iOS, 최초 1회)     |
+| `pnpm --filter mobile lint`        | TypeScript check                                  |
 
 **Expo Go vs dev client**
 
@@ -82,11 +82,11 @@ eas build --profile preview --platform android   # APK (internal)
 
 ## Troubleshooting
 
-| Issue | Fix |
-| ----- | --- |
+| Issue                                                   | Fix                                                                                                                                                                                                   |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `No development build (com.storyecho.app) is installed` | `expo start`가 dev client 모드입니다. Metro에서 `s`로 Expo Go 전환하거나, `pnpm --filter mobile dev`로 다시 시작하세요. dev client가 필요하면 `pnpm --filter mobile android:run` 후 `dev:client` 사용 |
-| 빈 화면 / 연결 실패 | `EXPO_PUBLIC_WEB_URL`이 기기에서 ping 가능한지 확인 |
-| 하단 탭바 겹침 | 웹 최신 빌드 + 앱 재시작 (safe-area inject) |
-| Android 새로고침 안 됨 | 페이지 최상단에서만 당기기 (scroll-at-top) |
+| 빈 화면 / 연결 실패                                     | `EXPO_PUBLIC_WEB_URL`이 기기에서 ping 가능한지 확인                                                                                                                                                   |
+| 하단 탭바 겹침                                          | 웹 최신 빌드 + 앱 재시작 (safe-area inject)                                                                                                                                                           |
+| Android 새로고침 안 됨                                  | 페이지 최상단에서만 당기기 (scroll-at-top)                                                                                                                                                            |
 
-Production 빌드·제출: [STORE_PREP.md](./STORE_PREP.md), `.md/개발.md` 로드맵 참고.
+Production 빌드·제출: [`.md/개발.md`](../../.md/개발.md) §10, [`.md/정책.md`](../../.md/정책.md) 참고.

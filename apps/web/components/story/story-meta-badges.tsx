@@ -7,7 +7,7 @@ type StoryMetaBadgesProps = {
 export function StoryMetaBadges({ story }: StoryMetaBadgesProps) {
   if (story.isEchoStory) {
     return (
-      <span className="bg-echo-soft text-echo inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold">
+      <span className="inline-flex items-center rounded-full bg-echo-soft px-2.5 py-1 text-xs font-semibold text-echo">
         1년 Echo
       </span>
     );
@@ -15,7 +15,7 @@ export function StoryMetaBadges({ story }: StoryMetaBadgesProps) {
 
   if (story.isCapsule && !story.isCapsuleActive) {
     return (
-      <span className="bg-capsule-soft text-capsule inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold">
+      <span className="inline-flex items-center rounded-full bg-capsule-soft px-2.5 py-1 text-xs font-semibold text-capsule">
         타임캡슐 해제됨
       </span>
     );

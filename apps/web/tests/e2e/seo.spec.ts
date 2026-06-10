@@ -1,9 +1,9 @@
-import { test, expect } from "../fixtures/playwright-fixtures";
+import { expect, test } from "../fixtures/playwright-fixtures";
 
 test.describe("SEO", () => {
   test("landing page has title", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/StoryEcho/i);
+    await expect(page).toHaveTitle(/이야기해줘/);
   });
 
   test("drawer is not indexed in robots meta", async ({ guestPage }) => {

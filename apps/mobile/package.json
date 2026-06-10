@@ -11,7 +11,8 @@
     "ios": "expo start --go --ios",
     "android:run": "expo run:android",
     "ios:run": "expo run:ios",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:listing": "vitest run store/validate-listing.test.ts"
   },
   "dependencies": {
     "@storyecho/api-client": "workspace:*",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@storyecho/config": "workspace:*",
     "@types/react": "~19.2.2",
-    "typescript": "~5.8.3"
+    "typescript": "~5.8.3",
+    "vitest": "^4.1.8"
   }
 }

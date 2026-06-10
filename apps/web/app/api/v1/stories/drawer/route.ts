@@ -1,11 +1,12 @@
 import { DrawerStoryListResponseSchema } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import {
   buildCursorResponse,
   cursorWhereClause,
   parsePagination,
   resolveCursorRow,
 } from "@/lib/api/pagination";
+import { prisma } from "@/lib/prisma";
 import {
   fetchEchoCountsForUser,
   isDatabaseConfigured,
@@ -13,14 +14,10 @@ import {
   toDrawerStoryDto,
 } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function GET(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

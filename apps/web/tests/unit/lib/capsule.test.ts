@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { toCapsuleStoryDetail, toCapsuleStorySummary } from "@/lib/capsule-mapper";
 import {
   addMonths,
   computeDaysUntilUnlock,
   formatUnlockDateKo,
   formatUnlockPreview,
 } from "@/lib/capsule-utils";
-import { toCapsuleStoryDetail, toCapsuleStorySummary } from "@/lib/capsule-mapper";
 
 describe("capsule-utils", () => {
   it("addMonths advances calendar month", () => {

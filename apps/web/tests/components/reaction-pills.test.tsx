@@ -16,11 +16,7 @@ describe("ReactionPills", () => {
   });
 
   it("shows reaction counts in read-only mode", () => {
-    render(
-      <ReactionPills
-        reactions={[{ emoji: "heart", count: 3, reactedByMe: false }]}
-      />,
-    );
+    render(<ReactionPills reactions={[{ emoji: "heart", count: 3, reactedByMe: false }]} />);
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 });

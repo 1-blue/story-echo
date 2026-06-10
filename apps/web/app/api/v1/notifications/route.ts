@@ -2,24 +2,21 @@ import {
   MarkNotificationsReadRequestSchema,
   NotificationListResponseSchema,
 } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
-import { toNotificationDto } from "@/lib/notifications/notification-mapper";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import {
   buildCursorResponse,
   cursorWhereClause,
   parsePagination,
   resolveCursorRow,
 } from "@/lib/api/pagination";
+import { toNotificationDto } from "@/lib/notifications/notification-mapper";
+import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function GET(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -53,10 +50,7 @@ export async function GET(request: Request) {
       }),
     ]);
 
-    const { items: pageNotifications, pagination } = buildCursorResponse(
-      notifications,
-      limit,
-    );
+    const { items: pageNotifications, pagination } = buildCursorResponse(notifications, limit);
 
     const body = NotificationListResponseSchema.parse({
       data: pageNotifications.map(toNotificationDto),
@@ -71,10 +65,7 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

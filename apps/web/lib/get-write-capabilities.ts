@@ -1,7 +1,6 @@
 import "server-only";
-
-import { resolveCurrentUserFromHeaders } from "@/lib/user/resolve-current-user";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
+import { resolveCurrentUserFromHeaders } from "@/lib/user/resolve-current-user";
 import type { WriteCapabilities } from "@/lib/write-capabilities";
 
 export async function getWriteCapabilities(): Promise<WriteCapabilities> {

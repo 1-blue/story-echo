@@ -1,25 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Info, Quote } from "lucide-react";
+import { toast } from "sonner";
 import {
   getGetApiV1CommunityPostsIdQueryKey,
   getGetApiV1CommunityPostsQueryKey,
   usePatchApiV1CommunityPostsId,
   usePostApiV1CommunityPosts,
 } from "@storyecho/api-client";
-import { useQueryClient } from "@tanstack/react-query";
+import { usePhotoUpload } from "@/app/write/_hooks/use-photo-upload";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { getErrorMessage } from "@/lib/get-error-message";
 import type { TodayQuestion } from "@/lib/today-question";
-import type { WriteCapabilities } from "@/lib/write-capabilities";
-import { getCommunityBlockedMessage } from "@/lib/write-capabilities";
-import { usePhotoUpload } from "@/app/write/_hooks/use-photo-upload";
+import { getCommunityBlockedMessage, type WriteCapabilities } from "@/lib/write-capabilities";
 import { CommunityWriteHeader } from "./community-write-header";
 import { EmailVerificationDialog } from "./email-verification-dialog";
-import { getErrorMessage } from "@/lib/get-error-message";
 
 type QuestionOption = {
   id: string | null;
@@ -78,25 +77,23 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
   const todayQuestion = !isEdit ? props.todayQuestion : null;
   const previousQuestions = !isEdit ? props.previousQuestions : [];
 
-  const selectedQuestion =
-    isEdit
-      ? {
-          id: null,
-          text: props.initialQuestionText ?? "자유 주제",
-          label: props.initialQuestionText ? "질문" : "자유 주제",
-        }
-      : mode === "today"
-        ? todayQuestion!
-        : mode === "previous"
-          ? (previousQuestions.find((q) => q.id === selectedPreviousId) ?? {
-              id: null,
-              text: "질문을 선택해주세요",
-              label: "이전 질문",
-            })
-          : { id: null, text: "자유 주제", label: "자유 주제" };
+  const selectedQuestion = isEdit
+    ? {
+        id: null,
+        text: props.initialQuestionText ?? "자유 주제",
+        label: props.initialQuestionText ? "질문" : "자유 주제",
+      }
+    : mode === "today"
+      ? todayQuestion!
+      : mode === "previous"
+        ? (previousQuestions.find((q) => q.id === selectedPreviousId) ?? {
+            id: null,
+            text: "질문을 선택해주세요",
+            label: "이전 질문",
+          })
+        : { id: null, text: "자유 주제", label: "자유 주제" };
 
-  const isSubmitting =
-    createPost.isPending || updatePost.isPending || photoUpload.isUploading;
+  const isSubmitting = createPost.isPending || updatePost.isPending || photoUpload.isUploading;
 
   const handleSubmit = async () => {
     if (!bodyText.trim()) {
@@ -149,7 +146,7 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
   };
 
   return (
-    <div className="bg-canvas flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col bg-canvas">
       <CommunityWriteHeader
         mode={props.mode}
         onCancel={() => router.back()}
@@ -160,7 +157,7 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
       <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-5 pt-6 pb-[calc(2rem+var(--safe-area-bottom))]">
         {!isEdit && (
           <section className="flex flex-col gap-3">
-            <h2 className="text-charcoal text-lg font-semibold">어떤 질문에 대한 이야기인가요?</h2>
+            <h2 className="text-lg font-semibold text-charcoal">어떤 질문에 대한 이야기인가요?</h2>
             <div className="flex gap-2 overflow-x-auto pb-1">
               <QuestionChip
                 active={mode === "today"}
@@ -172,7 +169,11 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
                 onClick={() => setMode("previous")}
                 label="이전 질문"
               />
-              <QuestionChip active={mode === "free"} onClick={() => setMode("free")} label="자유 주제" />
+              <QuestionChip
+                active={mode === "free"}
+                onClick={() => setMode("free")}
+                label="자유 주제"
+              />
             </div>
 
             {mode === "previous" && previousQuestions.length > 0 && (
@@ -182,7 +183,7 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
                     key={question.id}
                     type="button"
                     onClick={() => setSelectedPreviousId(question.id)}
-                    className={`border-hairline rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                    className={`rounded-lg border border-hairline px-3 py-2 text-left text-sm transition-colors ${
                       selectedPreviousId === question.id
                         ? "border-primary bg-terracotta-soft/40"
                         : "bg-white hover:bg-surface-cream/60"
@@ -197,9 +198,9 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
         )}
 
         {mode !== "free" && selectedQuestion.text !== "자유 주제" && (
-          <div className="border-hairline flex items-start gap-3 rounded-xl border bg-white p-4 shadow-sm">
-            <Quote className="text-primary mt-0.5 size-6 shrink-0 opacity-70" strokeWidth={1.75} />
-            <p className="text-ink font-display text-lg leading-snug">{selectedQuestion.text}</p>
+          <div className="flex items-start gap-3 rounded-xl border border-hairline bg-white p-4 shadow-sm">
+            <Quote className="mt-0.5 size-6 shrink-0 text-primary opacity-70" strokeWidth={1.75} />
+            <p className="font-display text-lg leading-snug text-ink">{selectedQuestion.text}</p>
           </div>
         )}
 
@@ -210,7 +211,7 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
             value={bodyText}
             onChange={(event) => setBodyText(event.target.value)}
             placeholder="오늘의 질문에 대해 어떻게 생각하세요? 자유롭게 적어주세요."
-            className="text-ink placeholder:text-stone min-h-[300px] flex-1 resize-none border-none bg-transparent p-0 text-lg shadow-none focus-visible:ring-0"
+            className="min-h-[300px] flex-1 resize-none border-none bg-transparent p-0 text-lg text-ink shadow-none placeholder:text-stone focus-visible:ring-0"
           />
 
           {props.photoUploadEnabled && (
@@ -229,7 +230,7 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
                 </div>
               ))}
               {photoUpload.canAddMore && (
-                <label className="border-hairline-strong text-slate hover:bg-surface-cream/60 flex size-20 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed">
+                <label className="flex size-20 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-hairline-strong text-slate hover:bg-surface-cream/60">
                   <span className="text-2xl">+</span>
                   <input
                     type="file"
@@ -246,12 +247,12 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
         </section>
 
         {!isEdit && (
-          <section className="bg-community-soft border-community-green/20 flex flex-col gap-2 rounded-xl border p-4">
-            <div className="text-community-green flex items-center gap-2 text-xs font-semibold">
+          <section className="flex flex-col gap-2 rounded-xl border border-community-green/20 bg-community-soft p-4">
+            <div className="flex items-center gap-2 text-xs font-semibold text-community-green">
               <Info className="size-4" strokeWidth={1.75} />
               커뮤니티 안내
             </div>
-            <ul className="text-slate list-disc space-y-1 pl-5 text-xs leading-relaxed">
+            <ul className="list-disc space-y-1 pl-5 text-xs leading-relaxed text-slate">
               <li>커뮤니티에 올라가요. 서랍·오늘 공개 페이지와는 별개예요.</li>
               <li>닉네임과 함께 표시됩니다.</li>
             </ul>

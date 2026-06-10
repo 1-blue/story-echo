@@ -132,9 +132,7 @@ export const CreateCommunityCommentRequestSchema = z
   })
   .openapi("CreateCommunityCommentRequest");
 
-export type CreateCommunityCommentRequest = z.infer<
-  typeof CreateCommunityCommentRequestSchema
->;
+export type CreateCommunityCommentRequest = z.infer<typeof CreateCommunityCommentRequestSchema>;
 
 export const UpdateCommunityCommentRequestSchema = z
   .object({
@@ -142,9 +140,7 @@ export const UpdateCommunityCommentRequestSchema = z
   })
   .openapi("UpdateCommunityCommentRequest");
 
-export type UpdateCommunityCommentRequest = z.infer<
-  typeof UpdateCommunityCommentRequestSchema
->;
+export type UpdateCommunityCommentRequest = z.infer<typeof UpdateCommunityCommentRequestSchema>;
 
 export const CommunityCommentItemSchema = z
   .object({
@@ -180,9 +176,7 @@ export const ToggleCommunityReactionRequestSchema = z
   })
   .openapi("ToggleCommunityReactionRequest");
 
-export type ToggleCommunityReactionRequest = z.infer<
-  typeof ToggleCommunityReactionRequestSchema
->;
+export type ToggleCommunityReactionRequest = z.infer<typeof ToggleCommunityReactionRequestSchema>;
 
 export const ToggleCommunityReactionResponseSchema = z
   .object({
@@ -190,9 +184,7 @@ export const ToggleCommunityReactionResponseSchema = z
   })
   .openapi("ToggleCommunityReactionResponse");
 
-export type ToggleCommunityReactionResponse = z.infer<
-  typeof ToggleCommunityReactionResponseSchema
->;
+export type ToggleCommunityReactionResponse = z.infer<typeof ToggleCommunityReactionResponseSchema>;
 
 export const CommunityUserSearchResultSchema = z
   .object({
