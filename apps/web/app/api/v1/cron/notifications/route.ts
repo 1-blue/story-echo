@@ -3,6 +3,8 @@ import { apiErrorResponse } from "@/lib/api/errors";
 import { dispatchDailyNotifications } from "@/lib/notifications/dispatch-daily";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 
+export const dynamic = "force-dynamic";
+
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) return false;
@@ -10,7 +12,7 @@ function isAuthorized(request: Request): boolean {
   return auth === `Bearer ${secret}`;
 }
 
-export async function POST(request: Request) {
+async function handleCron(request: Request) {
   if (!isAuthorized(request)) {
     return apiErrorResponse(401, "UNAUTHORIZED");
   }
@@ -29,4 +31,13 @@ export async function POST(request: Request) {
   } catch {
     return apiErrorResponse(503, "CRON_ERROR");
   }
+}
+
+export async function POST(request: Request) {
+  return handleCron(request);
+}
+
+/** Vercel Cron invokes scheduled jobs via GET. */
+export async function GET(request: Request) {
+  return handleCron(request);
 }
