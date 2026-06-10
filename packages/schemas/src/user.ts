@@ -60,3 +60,35 @@ export const SignupRequestSchema = z
 
 export type SignupRequest = z.infer<typeof SignupRequestSchema>;
 export type UpdateUserRequest = z.infer<typeof UpdateUserRequestSchema>;
+
+export const PushPlatformSchema = z.enum(["android", "ios"]).openapi("PushPlatform");
+
+export const UpsertPushTokenRequestSchema = z
+  .object({
+    expoPushToken: z.string().min(1),
+    platform: PushPlatformSchema,
+  })
+  .openapi("UpsertPushTokenRequest");
+
+export type UpsertPushTokenRequest = z.infer<typeof UpsertPushTokenRequestSchema>;
+
+export const PushTokenOkResponseSchema = z
+  .object({
+    data: z.object({ ok: z.literal(true) }),
+  })
+  .openapi("PushTokenOkResponse");
+
+export const CronNotificationsResultSchema = z
+  .object({
+    dailyReminders: z.number().int(),
+    capsuleUnlocked: z.number().int(),
+    pushSent: z.number().int(),
+    pushFailed: z.number().int(),
+  })
+  .openapi("CronNotificationsResult");
+
+export const CronNotificationsResponseSchema = z
+  .object({
+    data: CronNotificationsResultSchema,
+  })
+  .openapi("CronNotificationsResponse");

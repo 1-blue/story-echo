@@ -7,6 +7,7 @@ import { AppScreen, AppScreenButton } from "@/components/AppScreen";
 import { BrandedLoading } from "@/components/BrandedLoading";
 import Colors from "@/constants/Colors";
 import { useAndroidWebViewBack } from "@/hooks/useAndroidWebViewBack";
+import { useNotificationBridge } from "@/hooks/use-notification-bridge";
 import { getWebAppUrl, getWebBaseUrl } from "@/lib/get-web-url";
 import { buildNavigationBridgeScript } from "@/lib/inject-navigation-bridge";
 import { buildSafeAreaInjectScript } from "@/lib/inject-safe-area";
@@ -54,6 +55,7 @@ export function StoryEchoWebView() {
 
   const [loadError, setLoadError] = useState<string | null>(null);
   const { setCanGoBack, handleNativeMessage } = useAndroidWebViewBack(webViewRef);
+  const { handleBridgeMessage } = useNotificationBridge(webViewRef);
 
   const injectSafeArea = useCallback(() => {
     webViewRef.current?.injectJavaScript(
@@ -98,12 +100,13 @@ export function StoryEchoWebView() {
         if (isScrollMessage(payload)) {
           return;
         }
+        void handleBridgeMessage(payload);
         handleNativeMessage(payload);
       } catch {
         // ignore non-JSON messages
       }
     },
-    [handleNativeMessage],
+    [handleBridgeMessage, handleNativeMessage],
   );
 
   const handleShouldStartLoadWithRequest = useCallback(

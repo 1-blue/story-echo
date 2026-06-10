@@ -80,8 +80,27 @@ model User {
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
   communityPostReports  CommunityPostReport[]
+  pushTokens            PushToken[]
 
   @@map("users")
+}
+
+/// Expo Push 토큰 (모바일 FCM/APNs).
+enum PushPlatform {
+  android
+  ios
+}
+
+model PushToken {
+  id            String       @id @default(uuid()) @db.Uuid
+  userId        String       @map("user_id") @db.Uuid
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expoPushToken String       @unique @map("expo_push_token")
+  platform      PushPlatform
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("push_tokens")
 }
 
 /// 일일 질문 풀. F1 오늘의 질문 — KST 월·일 고정 (평년 365일).

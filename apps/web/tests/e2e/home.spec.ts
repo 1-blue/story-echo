@@ -15,7 +15,7 @@ test.describe("Home", () => {
     await guestPage.waitForURL(/\/drawer/, { timeout: 20_000 });
 
     await guestPage.goto("/");
-    await expect(guestPage.getByRole("link", { name: /이야기 수정/ })).toBeVisible({
+    await expect(guestPage.getByRole("link", { name: "서랍에서 보기" })).toBeVisible({
       timeout: 20_000,
     });
   });

@@ -47,9 +47,12 @@ import {
 import { PaginationQuerySchema } from "../packages/schemas/src/pagination.ts";
 import {
   CreateGuestRequestSchema,
+  CronNotificationsResponseSchema,
   LoginRequestSchema,
+  PushTokenOkResponseSchema,
   SignupRequestSchema,
   UpdateUserRequestSchema,
+  UpsertPushTokenRequestSchema,
   UserMeResponseSchema,
 } from "../packages/schemas/src/user.ts";
 
@@ -85,6 +88,9 @@ registry.register("UpdateCommunityPostRequest", UpdateCommunityPostRequestSchema
 registry.register("UpdateCommunityCommentRequest", UpdateCommunityCommentRequestSchema);
 registry.register("CommunityCommentItemResponse", CommunityCommentItemResponseSchema);
 registry.register("UserMeResponse", UserMeResponseSchema);
+registry.register("UpsertPushTokenRequest", UpsertPushTokenRequestSchema);
+registry.register("PushTokenOkResponse", PushTokenOkResponseSchema);
+registry.register("CronNotificationsResponse", CronNotificationsResponseSchema);
 registry.register("CreateGuestRequest", CreateGuestRequestSchema);
 registry.register("UpdateUserRequest", UpdateUserRequestSchema);
 registry.register("LoginRequest", LoginRequestSchema);
@@ -1156,6 +1162,78 @@ registry.registerPath({
     },
     503: {
       description: "Database unavailable",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "put",
+  path: "/api/v1/users/me/push-token",
+  tags: ["Users"],
+  request: {
+    body: { content: { "application/json": { schema: UpsertPushTokenRequestSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Push token registered",
+      content: { "application/json": { schema: PushTokenOkResponseSchema } },
+    },
+    401: {
+      description: "Device id required",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+    503: {
+      description: "Database unavailable",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "delete",
+  path: "/api/v1/users/me/push-token",
+  tags: ["Users"],
+  responses: {
+    200: {
+      description: "Push token removed",
+      content: { "application/json": { schema: PushTokenOkResponseSchema } },
+    },
+    401: {
+      description: "Device id required",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+    503: {
+      description: "Database unavailable",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/cron/notifications",
+  tags: ["Cron"],
+  parameters: [
+    {
+      name: "force",
+      in: "query",
+      required: false,
+      schema: { type: "boolean" },
+      description: "Skip same-day deduplication for manual testing",
+    },
+  ],
+  responses: {
+    200: {
+      description: "Daily notifications dispatched",
+      content: { "application/json": { schema: CronNotificationsResponseSchema } },
+    },
+    401: {
+      description: "Unauthorized",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+    503: {
+      description: "Cron or database error",
       content: { "application/json": { schema: ErrorResponseSchema } },
     },
   },

@@ -40,6 +40,20 @@ export function buildNavigationBridgeScript(): string {
       }
 
       postNavigation();
+
+      function postDeviceId() {
+        if (!window.ReactNativeWebView) return;
+        var deviceId = window.localStorage.getItem('storyecho_device_id');
+        if (!deviceId) return;
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'device-id',
+          deviceId: deviceId
+        }));
+      }
+
+      postDeviceId();
+      window.addEventListener('storage', postDeviceId);
+      setInterval(postDeviceId, 2000);
     })();
     true;
   `;

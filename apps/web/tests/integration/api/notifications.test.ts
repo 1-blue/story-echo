@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { dispatchDailyNotifications } from "@/lib/notifications/dispatch-daily";
 import { getKstDayRangeUtc } from "@/lib/notifications/kst";
 import { prisma } from "@/lib/prisma";
@@ -57,20 +57,69 @@ integration("notifications API", () => {
     await cleanupTestUserByDeviceId(commenter.deviceId);
   });
 
+  it("PUT/DELETE /users/me/push-token registers and removes token", async () => {
+    const { deviceId } = await setupGuestClient("notify-push-token");
+    const putRes = await apiFetch(
+      "/api/v1/users/me/push-token",
+      {
+        method: "PUT",
+        json: { expoPushToken: "ExponentPushToken[api-test]", platform: "android" },
+      },
+      { deviceId },
+    );
+    expect(putRes.status).toBe(200);
+
+    const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
+    const userId = parseUserMe(me.json).data.id;
+    const row = await prisma.pushToken.findFirst({ where: { userId } });
+    expect(row?.expoPushToken).toBe("ExponentPushToken[api-test]");
+
+    const deleteRes = await apiFetch(
+      "/api/v1/users/me/push-token",
+      { method: "DELETE" },
+      { deviceId },
+    );
+    expect(deleteRes.status).toBe(200);
+
+    const afterDelete = await prisma.pushToken.findFirst({ where: { userId } });
+    expect(afterDelete).toBeNull();
+
+    await cleanupTestUserByDeviceId(deviceId);
+  });
+
   it("dispatchDailyNotifications creates daily_question_reminder once per KST day", async () => {
     const { deviceId } = await setupGuestClient("notify-daily");
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
     const userId = parseUserMe(me.json).data.id;
     await prisma.user.update({
       where: { id: userId },
-      data: { notificationsEnabled: true, role: "member", email: "daily@test.com" },
+      data: { notificationsEnabled: true },
     });
+    await prisma.pushToken.create({
+      data: {
+        userId,
+        expoPushToken: "ExponentPushToken[integration-test]",
+        platform: "android",
+      },
+    });
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: [{ status: "ok" }] }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
 
     const first = await dispatchDailyNotifications();
     expect(first.dailyReminders).toBeGreaterThanOrEqual(1);
+    expect(first.pushSent).toBeGreaterThanOrEqual(1);
 
     const second = await dispatchDailyNotifications();
     expect(second.dailyReminders).toBe(0);
+    expect(second.pushSent).toBe(0);
+
+    const forced = await dispatchDailyNotifications({ force: true });
+    expect(forced.dailyReminders).toBeGreaterThanOrEqual(1);
+    expect(forced.pushSent).toBeGreaterThanOrEqual(1);
 
     const { start, end } = getKstDayRangeUtc();
     const count = await prisma.notification.count({
@@ -80,8 +129,9 @@ integration("notifications API", () => {
         createdAt: { gte: start, lt: end },
       },
     });
-    expect(count).toBe(1);
+    expect(count).toBeGreaterThanOrEqual(2);
 
+    vi.unstubAllGlobals();
     await cleanupTestUserByDeviceId(deviceId);
   });
 });
