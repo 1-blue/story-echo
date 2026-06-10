@@ -3,24 +3,21 @@ import {
   CommunityPostResponseSchema,
   UpdateCommunityPostRequestSchema,
 } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import {
   aggregateReactions,
   toCommunityCommentTree,
   toCommunityPostSummary,
 } from "@/lib/community-mapper";
+import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, context: RouteContext) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -78,10 +75,7 @@ export async function GET(request: Request, context: RouteContext) {
 
 export async function PATCH(request: Request, context: RouteContext) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -138,11 +132,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     });
 
     const body = CommunityPostResponseSchema.parse({
-      data: toCommunityPostSummary(
-        updated,
-        aggregateReactions(reactions, user.id),
-        commentCount,
-      ),
+      data: toCommunityPostSummary(updated, aggregateReactions(reactions, user.id), commentCount),
     });
 
     return Response.json(body);
@@ -153,10 +143,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(request: Request, context: RouteContext) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

@@ -1,12 +1,9 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
+import { BottomSheet, BottomSheetContent } from "@/components/ui/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  BottomSheet,
-  BottomSheetContent,
-} from "@/components/ui/bottom-sheet";
 
 type CommentEditSheetProps = {
   open: boolean;
@@ -28,7 +25,7 @@ export function CommentEditSheet({
   return (
     <BottomSheet open={open} onOpenChange={(next) => !next && onClose()}>
       <BottomSheetContent>
-        <h3 className="text-ink mb-4 text-lg font-semibold">댓글 수정</h3>
+        <h3 className="mb-4 text-lg font-semibold text-ink">댓글 수정</h3>
         <Textarea
           value={value}
           onChange={(event) => onChange(event.target.value)}
@@ -65,11 +62,11 @@ export function CommentDeleteSheet({
     <BottomSheet open={open} onOpenChange={(next) => !next && onClose()}>
       <BottomSheetContent>
         <div className="text-center">
-          <div className="bg-surface-cream text-charcoal mx-auto mb-4 flex size-12 items-center justify-center rounded-full">
+          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-surface-cream text-charcoal">
             <Trash2 className="size-6" strokeWidth={1.75} />
           </div>
-          <h3 className="text-ink mb-2 text-xl font-semibold">댓글을 삭제할까요?</h3>
-          <p className="text-slate mb-6 text-sm leading-relaxed">삭제하면 복구할 수 없어요.</p>
+          <h3 className="mb-2 text-xl font-semibold text-ink">댓글을 삭제할까요?</h3>
+          <p className="mb-6 text-sm leading-relaxed text-slate">삭제하면 복구할 수 없어요.</p>
           <div className="flex flex-col gap-2">
             <Button
               variant="destructive"

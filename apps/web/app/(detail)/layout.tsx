@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default function DetailLayout({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className={`bg-canvas text-foreground min-h-dvh pb-[var(--safe-area-bottom)] ${APP_SHELL_MAX_WIDTH_CLASS}`}
+      className={`min-h-dvh bg-canvas pb-[var(--safe-area-bottom)] text-foreground ${APP_SHELL_MAX_WIDTH_CLASS}`}
     >
       {children}
       <Toaster />

@@ -25,9 +25,7 @@ describe("question-calendar", () => {
   it("questionId encodes day of year", () => {
     expect(questionIdForDayOfYear(1)).toBe("10000000-0000-4000-8000-000000000001");
     expect(questionIdForDayOfYear(365)).toBe("10000000-0000-4000-8000-00000000016d");
-    expect(questionIdForMonthDay(6, 4)).toBe(
-      questionIdForDayOfYear(dayOfYearFromMonthDay(6, 4)),
-    );
+    expect(questionIdForMonthDay(6, 4)).toBe(questionIdForDayOfYear(dayOfYearFromMonthDay(6, 4)));
   });
 
   it("getKstMonthDay uses KST calendar date", () => {

@@ -1,4 +1,5 @@
 import { PublicStoryDetailResponseSchema } from "@storyecho/schemas";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { prisma } from "@/lib/prisma";
 import {
   aggregateReactions,
@@ -7,16 +8,12 @@ import {
 } from "@/lib/story-comment-mapper";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, context: RouteContext) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

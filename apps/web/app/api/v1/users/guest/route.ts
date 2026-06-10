@@ -1,15 +1,12 @@
 import { CreateGuestRequestSchema, UserMeResponseSchema } from "@storyecho/schemas";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { getOrCreateGuestUser } from "@/lib/user/guest-user";
 import { toUserMeDto } from "@/lib/user/user-mapper";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function POST(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

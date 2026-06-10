@@ -1,9 +1,27 @@
 import { apiFetch, type ApiClientOptions } from "./api";
+import { parseTodayQuestion } from "./parse-api";
+
+async function resolveStoryQuestionId(
+  options: ApiClientOptions & { questionId?: string | null },
+): Promise<string | null> {
+  if (options.questionId !== undefined && options.questionId !== null) {
+    return options.questionId;
+  }
+
+  const todayRes = await apiFetch("/api/v1/questions/today", {}, options);
+  if (todayRes.status !== 200) {
+    return null;
+  }
+
+  return parseTodayQuestion(todayRes.json).data.id;
+}
 
 export async function createPrivateStory(
   bodyText: string,
   options: ApiClientOptions & { questionId?: string | null } = {},
 ) {
+  const questionId = await resolveStoryQuestionId(options);
+
   return apiFetch(
     "/api/v1/stories",
     {
@@ -12,7 +30,7 @@ export async function createPrivateStory(
         bodyText,
         visibility: "private",
         photoUrls: [],
-        questionId: options.questionId ?? null,
+        questionId,
       },
     },
     options,
@@ -23,6 +41,8 @@ export async function createCommunityStory(
   bodyText: string,
   options: ApiClientOptions & { questionId?: string | null } = {},
 ) {
+  const questionId = await resolveStoryQuestionId(options);
+
   return apiFetch(
     "/api/v1/stories",
     {
@@ -31,7 +51,7 @@ export async function createCommunityStory(
         bodyText,
         visibility: "community",
         photoUrls: [],
-        questionId: options.questionId ?? null,
+        questionId,
       },
     },
     options,
@@ -79,7 +99,10 @@ export async function postStoryComment(
     `/api/v1/stories/public/${storyId}/comments`,
     {
       method: "POST",
-      json: { bodyText, parentId: options.parentId ?? null },
+      json: {
+        bodyText,
+        parentId: options.parentId ?? null,
+      },
     },
     options,
   );
@@ -94,28 +117,48 @@ export async function postCommunityComment(
     `/api/v1/community/posts/${postId}/comments`,
     {
       method: "POST",
-      json: { bodyText, parentId: options.parentId ?? null },
+      json: {
+        bodyText,
+        parentId: options.parentId ?? null,
+      },
     },
     options,
   );
 }
 
-export async function reportStory(storyId: string, options: ApiClientOptions) {
-  return apiFetch(`/api/v1/stories/public/${storyId}/report`, { method: "POST", json: {} }, options);
-}
-
-export async function reportCommunityPost(postId: string, options: ApiClientOptions) {
-  return apiFetch(`/api/v1/community/posts/${postId}/report`, { method: "POST", json: {} }, options);
-}
-
 export async function toggleStoryReaction(
   storyId: string,
   emoji: "heart" | "sad" | "angry" | "fire" | "clap",
-  options: ApiClientOptions,
+  options: ApiClientOptions = {},
 ) {
   return apiFetch(
     `/api/v1/stories/public/${storyId}/reactions`,
-    { method: "POST", json: { emoji } },
+    {
+      method: "POST",
+      json: { emoji },
+    },
+    options,
+  );
+}
+
+export async function reportStory(storyId: string, options: ApiClientOptions = {}) {
+  return apiFetch(
+    `/api/v1/stories/public/${storyId}/report`,
+    {
+      method: "POST",
+      json: {},
+    },
+    options,
+  );
+}
+
+export async function reportCommunityPost(postId: string, options: ApiClientOptions = {}) {
+  return apiFetch(
+    `/api/v1/community/posts/${postId}/report`,
+    {
+      method: "POST",
+      json: {},
+    },
     options,
   );
 }

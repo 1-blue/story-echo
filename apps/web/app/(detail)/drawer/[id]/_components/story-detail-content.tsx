@@ -1,8 +1,8 @@
 "use client";
 
 import { useGetApiV1StoriesIdSuspense } from "@storyecho/api-client";
-import type { StoryDetailItem } from "@/features/stories/types";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import type { StoryDetailItem } from "@/features/stories/types";
 import { formatStoryDayLong } from "@/lib/format-story-date";
 import type { FontSizePreference } from "../_hooks/use-font-size";
 import { StoryDetailBody } from "./story-detail-body";
@@ -31,7 +31,7 @@ export function StoryDetailContent({ storyId, fontSize }: StoryDetailContentProp
       <StoryDetailBody bodyText={story.bodyText} fontSize={fontSize} />
       <StoryDetailGallery photoUrls={story.photoUrls} />
       <footer className="border-hairline pt-6 text-center">
-        <p className="text-stone text-xs">{formatStoryDayLong(story.createdAt)}에 작성</p>
+        <p className="text-xs text-stone">{formatStoryDayLong(story.createdAt)}에 작성</p>
       </footer>
     </main>
   );

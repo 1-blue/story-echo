@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ALargeSmall, ArrowLeft, Bookmark, Pencil } from "lucide-react";
 import { useGetApiV1StoriesIdSuspense } from "@storyecho/api-client";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useToggleStoryBookmark } from "@/lib/stories/use-toggle-story-bookmark";
+import { cn } from "@/lib/utils";
 
 type StoryDetailHeaderProps = {
   storyId: string;
@@ -28,24 +28,24 @@ export function StoryDetailHeader({ storyId, onFontSizeClick }: StoryDetailHeade
   };
 
   return (
-    <header className="border-hairline bg-canvas/90 sticky top-0 z-50 flex h-[calc(4rem+var(--safe-area-top))] items-center justify-between border-b px-3 pt-[var(--safe-area-top)] backdrop-blur-sm">
+    <header className="sticky top-0 z-50 flex h-[calc(4rem+var(--safe-area-top))] items-center justify-between border-b border-hairline bg-canvas/90 px-3 pt-[var(--safe-area-top)] backdrop-blur-sm">
       <Button
         type="button"
         variant="ghost"
         size="icon"
-        className="text-slate size-10"
+        className="size-10 text-slate"
         aria-label="뒤로 가기"
         onClick={() => router.back()}
       >
         <ArrowLeft className="size-5" strokeWidth={1.75} />
       </Button>
-      <h1 className="text-ink text-lg font-semibold">이야기</h1>
+      <h1 className="text-lg font-semibold text-ink">이야기</h1>
       <div className="flex items-center gap-0.5">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="text-slate size-10"
+          className="size-10 text-slate"
           aria-label="수정"
           asChild
         >
@@ -72,7 +72,7 @@ export function StoryDetailHeader({ storyId, onFontSizeClick }: StoryDetailHeade
           type="button"
           variant="ghost"
           size="icon"
-          className="text-slate size-10"
+          className="size-10 text-slate"
           aria-label="글자 크기"
           onClick={onFontSizeClick}
         >

@@ -1,3 +1,6 @@
+import { ApiClientError } from "./api-client-error";
+import { generateUuid } from "./generate-uuid";
+
 export type OrvalRequestConfig = {
   url: string;
   method: string;
@@ -6,9 +9,6 @@ export type OrvalRequestConfig = {
   headers?: Record<string, string>;
   signal?: AbortSignal;
 };
-
-import { generateUuid } from "./generate-uuid";
-import { ApiClientError } from "./api-client-error";
 
 const DEVICE_ID_KEY = "storyecho_device_id";
 const DEVICE_ID_COOKIE = "storyecho_device_id";

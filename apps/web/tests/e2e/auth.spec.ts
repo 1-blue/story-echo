@@ -1,4 +1,4 @@
-import { test, expect } from "../fixtures/playwright-fixtures";
+import { expect, test } from "../fixtures/playwright-fixtures";
 import { hasIntegrationEnv } from "../setup/env";
 
 test.describe("Auth", () => {

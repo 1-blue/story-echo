@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma";
 import { syncExpiredCapsules } from "@/lib/capsule-utils";
 import { createNotification } from "@/lib/notifications/create";
 import { getKstDayRangeUtc, isUnlockDateKstToday } from "@/lib/notifications/kst";
+import { prisma } from "@/lib/prisma";
 
 export type DispatchDailyResult = {
   dailyReminders: number;

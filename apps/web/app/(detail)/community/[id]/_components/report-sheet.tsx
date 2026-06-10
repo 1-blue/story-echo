@@ -1,11 +1,8 @@
 "use client";
 
 import { Flag } from "lucide-react";
+import { BottomSheet, BottomSheetContent } from "@/components/ui/bottom-sheet";
 import { Button } from "@/components/ui/button";
-import {
-  BottomSheet,
-  BottomSheetContent,
-} from "@/components/ui/bottom-sheet";
 
 type ReportSheetProps = {
   open: boolean;
@@ -19,11 +16,11 @@ export function ReportSheet({ open, onClose, onConfirm, isSubmitting }: ReportSh
     <BottomSheet open={open} onOpenChange={(next) => !next && onClose()}>
       <BottomSheetContent>
         <div className="text-center">
-          <div className="bg-surface-cream text-charcoal mx-auto mb-4 flex size-12 items-center justify-center rounded-full">
+          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-surface-cream text-charcoal">
             <Flag className="size-6" strokeWidth={1.75} />
           </div>
-          <h3 className="text-ink mb-2 text-xl font-semibold">이 토론을 신고할까요?</h3>
-          <p className="text-slate mb-6 text-sm leading-relaxed">
+          <h3 className="mb-2 text-xl font-semibold text-ink">이 토론을 신고할까요?</h3>
+          <p className="mb-6 text-sm leading-relaxed text-slate">
             신고된 내용은 관리자 검토 후 조치됩니다.
             <br />
             건강한 커뮤니티를 위해 신중하게 결정해주세요.

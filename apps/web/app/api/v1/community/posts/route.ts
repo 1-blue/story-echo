@@ -1,29 +1,23 @@
 import {
   CommunityPostListResponseSchema,
-  CreateCommunityPostRequestSchema,
   CommunityPostResponseSchema,
+  CreateCommunityPostRequestSchema,
 } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
-import {
-  aggregateReactions,
-  toCommunityPostSummary,
-} from "@/lib/community-mapper";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import {
   buildCursorResponse,
   cursorWhereClause,
   parsePagination,
   resolveCursorRow,
 } from "@/lib/api/pagination";
+import { aggregateReactions, toCommunityPostSummary } from "@/lib/community-mapper";
+import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function GET(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -76,9 +70,7 @@ export async function GET(request: Request) {
       }),
     ]);
 
-    const commentCountMap = new Map(
-      commentCounts.map((row) => [row.postId, row._count._all]),
-    );
+    const commentCountMap = new Map(commentCounts.map((row) => [row.postId, row._count._all]));
 
     const reactionsByPost = new Map<string, typeof reactions>();
     for (const id of postIds) reactionsByPost.set(id, []);
@@ -105,10 +97,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

@@ -1,14 +1,11 @@
 "use client";
 
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
-import {
-  getApiV1CommunityPosts,
-  getGetApiV1CommunityPostsQueryKey,
-} from "@storyecho/api-client";
-import { AnimatedList } from "@/components/magicui/animated-list";
-import { ListLoadMore } from "@/components/list-load-more";
-import { useLoadMoreSentinel } from "@/hooks/use-load-more-sentinel";
+import { getApiV1CommunityPosts, getGetApiV1CommunityPostsQueryKey } from "@storyecho/api-client";
 import { useAdEligible } from "@/components/app-shell/ad-eligibility-context";
+import { ListLoadMore } from "@/components/list-load-more";
+import { AnimatedList } from "@/components/magicui/animated-list";
+import { useLoadMoreSentinel } from "@/hooks/use-load-more-sentinel";
 import { CommunityEmpty } from "./community-empty";
 import { CommunityPostCard } from "./community-post-card";
 import { CommunityPostListSkeleton } from "./community-post-list-skeleton";
@@ -37,9 +34,7 @@ export function CommunityPostList({ query, debouncedQuery }: CommunityPostListPr
         }),
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (last) =>
-        last.meta?.pagination?.hasMore
-          ? (last.meta.pagination.nextCursor ?? undefined)
-          : undefined,
+        last.meta?.pagination?.hasMore ? (last.meta.pagination.nextCursor ?? undefined) : undefined,
       placeholderData: keepPreviousData,
     });
 
@@ -66,14 +61,12 @@ export function CommunityPostList({ query, debouncedQuery }: CommunityPostListPr
 
   return (
     <>
-      {hasActiveQuery && (
-        <p className="text-stone mb-4 text-xs">검색 결과 {posts.length}개</p>
-      )}
+      {hasActiveQuery && <p className="mb-4 text-xs text-stone">검색 결과 {posts.length}개</p>}
 
       {posts.length === 0 ? (
         <div className="flex flex-col items-center py-12 text-center">
-          <p className="text-charcoal text-base font-medium">검색 결과가 없어요</p>
-          <p className="text-stone mt-2 text-sm">다른 검색어로 시도해 보세요.</p>
+          <p className="text-base font-medium text-charcoal">검색 결과가 없어요</p>
+          <p className="mt-2 text-sm text-stone">다른 검색어로 시도해 보세요.</p>
         </div>
       ) : (
         <AnimatedList key={trimmedDebounced || "all"} className="mt-4 gap-4">

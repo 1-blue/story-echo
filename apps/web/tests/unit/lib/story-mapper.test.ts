@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildQuestionEchoCounts,
-  isEchoStoryFromCounts,
-  toStoryDto,
-} from "@/lib/story-mapper";
+import { buildQuestionEchoCounts, isEchoStoryFromCounts, toStoryDto } from "@/lib/story-mapper";
 
 describe("story-mapper", () => {
   it("buildQuestionEchoCounts counts duplicate question ids", () => {

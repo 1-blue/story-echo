@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { isAwsConfigured } from "@/lib/env/aws";
-import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
 import { getWriteCapabilities } from "@/lib/get-write-capabilities";
+import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
 import { EditStoryPageClient } from "./_components/edit-story-page-client";
 
 export const metadata: Metadata = getSharedMetadata({

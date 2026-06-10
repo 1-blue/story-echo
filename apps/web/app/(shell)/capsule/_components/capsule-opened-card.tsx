@@ -10,23 +10,23 @@ export function CapsuleOpenedCard({ capsule }: CapsuleOpenedCardProps) {
   return (
     <Link
       href={`/capsule/${capsule.id}`}
-      className="border-hairline hover:shadow-md flex flex-col gap-3 rounded-xl border bg-white p-4 shadow-sm transition-shadow"
+      className="flex flex-col gap-3 rounded-xl border border-hairline bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="bg-capsule-soft text-capsule inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold">
+        <span className="inline-flex items-center rounded-full bg-capsule-soft px-2.5 py-1 text-xs font-semibold text-capsule">
           열림
         </span>
-        <span className="text-stone text-xs">{formatStoryDayLong(capsule.unlockAt)}</span>
+        <span className="text-xs text-stone">{formatStoryDayLong(capsule.unlockAt)}</span>
       </div>
 
       {capsule.questionText && (
-        <h3 className="text-ink font-display line-clamp-2 text-lg leading-snug">
+        <h3 className="line-clamp-2 font-display text-lg leading-snug text-ink">
           {capsule.questionText}
         </h3>
       )}
 
       {capsule.bodyPreview && (
-        <p className="text-charcoal line-clamp-3 text-sm leading-relaxed">{capsule.bodyPreview}</p>
+        <p className="line-clamp-3 text-sm leading-relaxed text-charcoal">{capsule.bodyPreview}</p>
       )}
     </Link>
   );

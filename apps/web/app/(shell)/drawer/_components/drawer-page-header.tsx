@@ -5,8 +5,8 @@ type DrawerPageHeaderProps = {
 export function DrawerPageHeader({ statsLabel }: DrawerPageHeaderProps) {
   return (
     <header className="mb-6 text-center">
-      <h2 className="text-ink mb-1 text-2xl font-semibold tracking-tight">서랍</h2>
-      <p className="text-stone text-xs">{statsLabel}</p>
+      <h2 className="mb-1 text-2xl font-semibold tracking-tight text-ink">서랍</h2>
+      <p className="text-xs text-stone">{statsLabel}</p>
     </header>
   );
 }

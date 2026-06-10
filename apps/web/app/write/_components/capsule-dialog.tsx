@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { Hourglass } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   BottomSheet,
   BottomSheetClose,
@@ -13,6 +12,7 @@ import {
   BottomSheetTitle,
   BottomSheetTrigger,
 } from "@/components/ui/bottom-sheet";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
@@ -108,7 +108,7 @@ export function CapsuleDialog({ unlockAt, isCapsule, onApply }: CapsuleDialogPro
               type="date"
               min={minDate}
               defaultValue={toDateInputValue(unlockAt)}
-              className="border-hairline-strong h-11 w-full rounded-xl border bg-white px-3 text-sm"
+              className="h-11 w-full rounded-xl border border-hairline-strong bg-white px-3 text-sm"
               onChange={(event) => {
                 const iso = dateInputToIso(event.target.value);
                 if (iso) {

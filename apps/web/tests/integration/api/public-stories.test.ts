@@ -1,7 +1,11 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { apiFetch } from "../../helpers/api";
 import { ensureGuestInDb, setupGuestClient } from "../../helpers/auth";
-import { cleanupTestUserByDeviceId, disconnectTestPrisma, setUserEmailVerified } from "../../helpers/db";
+import {
+  cleanupTestUserByDeviceId,
+  disconnectTestPrisma,
+  setUserEmailVerified,
+} from "../../helpers/db";
 import {
   createCommunityStory,
   postStoryComment,
@@ -83,34 +87,30 @@ integration("Public Story social API", () => {
     await cleanupTestUserByDeviceId(commenter.deviceId);
   });
 
-  it(
-    "POST report hides story after 3 reports",
-    async () => {
-      const deviceIds: string[] = [];
-      try {
-        const author = await setupGuestClient("public-report-author");
-        deviceIds.push(author.deviceId);
-        const storyId = await createPublicStory(author.deviceId);
-        const reporterDeviceIds: string[] = [];
+  it("POST report hides story after 3 reports", async () => {
+    const deviceIds: string[] = [];
+    try {
+      const author = await setupGuestClient("public-report-author");
+      deviceIds.push(author.deviceId);
+      const storyId = await createPublicStory(author.deviceId);
+      const reporterDeviceIds: string[] = [];
 
-        for (let i = 0; i < 3; i += 1) {
-          const reporter = await ensureGuestInDb(`public-report-${i}`);
-          reporterDeviceIds.push(reporter.deviceId);
-          deviceIds.push(reporter.deviceId);
-          const res = await reportStory(storyId, { deviceId: reporter.deviceId });
-          expect(res.status).toBe(200);
-        }
-
-        const detail = await apiFetch(
-          `/api/v1/stories/public/${storyId}`,
-          {},
-          { deviceId: reporterDeviceIds[0] },
-        );
-        expect(detail.status).toBe(404);
-      } finally {
-        await Promise.all(deviceIds.map((id) => cleanupTestUserByDeviceId(id)));
+      for (let i = 0; i < 3; i += 1) {
+        const reporter = await ensureGuestInDb(`public-report-${i}`);
+        reporterDeviceIds.push(reporter.deviceId);
+        deviceIds.push(reporter.deviceId);
+        const res = await reportStory(storyId, { deviceId: reporter.deviceId });
+        expect(res.status).toBe(200);
       }
-    },
-    120_000,
-  );
+
+      const detail = await apiFetch(
+        `/api/v1/stories/public/${storyId}`,
+        {},
+        { deviceId: reporterDeviceIds[0] },
+      );
+      expect(detail.status).toBe(404);
+    } finally {
+      await Promise.all(deviceIds.map((id) => cleanupTestUserByDeviceId(id)));
+    }
+  }, 120_000);
 });

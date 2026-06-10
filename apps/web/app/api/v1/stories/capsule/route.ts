@@ -1,23 +1,20 @@
 import { CapsuleStoryListResponseSchema } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
-import { toCapsuleStorySummary } from "@/lib/capsule-mapper";
-import { syncExpiredCapsules } from "@/lib/capsule-utils";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import {
   buildCursorResponse,
   cursorWhereClause,
   parsePagination,
   resolveCursorRow,
 } from "@/lib/api/pagination";
+import { toCapsuleStorySummary } from "@/lib/capsule-mapper";
+import { syncExpiredCapsules } from "@/lib/capsule-utils";
+import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function GET(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -57,9 +54,7 @@ export async function GET(request: Request) {
     const { items: pageStories, pagination } = buildCursorResponse(stories, limit);
 
     const sealed = pageStories.filter((story) => story.isCapsuleActive).map(toCapsuleStorySummary);
-    const opened = pageStories
-      .filter((story) => !story.isCapsuleActive)
-      .map(toCapsuleStorySummary);
+    const opened = pageStories.filter((story) => !story.isCapsuleActive).map(toCapsuleStorySummary);
 
     const activeCapsuleCount = await prisma.story.count({
       where: {

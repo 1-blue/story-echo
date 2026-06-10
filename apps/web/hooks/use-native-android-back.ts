@@ -2,13 +2,8 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { tryCloseAndroidBackOverlays } from "@/lib/native/android-back";
-import {
-  getFallbackRoute,
-  isShellRoot,
-  normalizePath,
-} from "@/lib/native/navigation-fallback";
+import { getFallbackRoute, isShellRoot, normalizePath } from "@/lib/native/navigation-fallback";
 import { postNativeMessage } from "@/lib/native/webview";
 
 const ROOT_BACK_EXIT_MS = 2000;
@@ -56,7 +51,7 @@ export function useNativeAndroidBack() {
       }
 
       window.__storyechoLastRootBack = now;
-      toast("한 번 더 누르면 종료");
+      postNativeMessage({ type: "root-back-hint" });
       postBackResult({ handled: true });
       return true;
     };

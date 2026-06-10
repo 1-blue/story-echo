@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
 import { ClientOnly } from "@/components/client-only";
+import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
 import { SettingsPageClient } from "./_components/settings-page-client";
 import { SettingsPageSkeleton } from "./_components/settings-page-skeleton";
 

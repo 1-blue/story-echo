@@ -1,7 +1,10 @@
 "use client";
 
 import { AdBanner } from "@/components/app-shell/ad-banner";
-import { AdEligibilityProvider, useAdEligibility } from "@/components/app-shell/ad-eligibility-context";
+import {
+  AdEligibilityProvider,
+  useAdEligibility,
+} from "@/components/app-shell/ad-eligibility-context";
 import { AppHeader } from "@/components/app-shell/app-header";
 import { BottomTabBar } from "@/components/app-shell/bottom-tab-bar";
 import { APP_SHELL_MAX_WIDTH_CLASS } from "@/lib/app-layout";
@@ -12,7 +15,7 @@ function AppShellFrame({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className={`bg-canvas text-foreground flex min-h-dvh min-h-[-webkit-fill-available] flex-col ${APP_SHELL_MAX_WIDTH_CLASS}`}
+      className={`flex min-h-[-webkit-fill-available] min-h-dvh flex-col bg-canvas text-foreground ${APP_SHELL_MAX_WIDTH_CLASS}`}
     >
       <AppHeader />
       <div

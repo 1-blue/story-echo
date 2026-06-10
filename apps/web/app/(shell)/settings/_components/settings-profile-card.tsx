@@ -20,18 +20,18 @@ export function SettingsProfileCard({ user, onEditNickname }: SettingsProfileCar
     <button
       type="button"
       onClick={onEditNickname}
-      className="border-hairline hover:bg-surface-cream/40 flex w-full items-center gap-4 rounded-xl border bg-white p-4 text-left shadow-sm transition-colors"
+      className="flex w-full items-center gap-4 rounded-xl border border-hairline bg-white p-4 text-left shadow-sm transition-colors hover:bg-surface-cream/40"
     >
-      <div className="bg-primary-soft text-primary flex size-14 shrink-0 items-center justify-center rounded-full text-lg font-semibold">
+      <div className="bg-primary-soft flex size-14 shrink-0 items-center justify-center rounded-full text-lg font-semibold text-primary">
         {getInitial(user.nickname)}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-ink truncate text-lg font-semibold">{user.nickname ?? "닉네임 없음"}</p>
-        <p className="text-stone truncate text-sm">
+        <p className="truncate text-lg font-semibold text-ink">{user.nickname ?? "닉네임 없음"}</p>
+        <p className="truncate text-sm text-stone">
           {isGuest ? "게스트 · 이 기기에서만 사용 중" : (user.email ?? "회원")}
         </p>
       </div>
-      <ChevronRight className="text-stone size-5 shrink-0" strokeWidth={1.75} />
+      <ChevronRight className="size-5 shrink-0 text-stone" strokeWidth={1.75} />
     </button>
   );
 }

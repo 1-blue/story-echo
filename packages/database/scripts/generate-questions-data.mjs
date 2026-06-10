@@ -2,7 +2,7 @@
  * questions.data 월별 TS 파일 생성 (1회성·재실행 가능)
  * node packages/database/scripts/generate-questions-data.mjs
  */
-import { writeFileSync, mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 

@@ -13,11 +13,11 @@ type PostDetailPageClientProps = {
 function PostDetailFallback() {
   return (
     <div className="flex min-h-dvh flex-col">
-      <div className="border-hairline h-16 animate-pulse border-b bg-white" />
+      <div className="h-16 animate-pulse border-b border-hairline bg-white" />
       <div className="space-y-4 px-5 py-6">
-        <div className="bg-surface-cream/60 h-10 w-40 animate-pulse rounded" />
-        <div className="bg-surface-cream/60 h-32 animate-pulse rounded-xl" />
-        <div className="bg-surface-cream/60 h-24 animate-pulse rounded" />
+        <div className="h-10 w-40 animate-pulse rounded bg-surface-cream/60" />
+        <div className="h-32 animate-pulse rounded-xl bg-surface-cream/60" />
+        <div className="h-24 animate-pulse rounded bg-surface-cream/60" />
       </div>
     </div>
   );
@@ -59,8 +59,8 @@ function PostDetailPageInner({ postId }: PostDetailPageClientProps) {
           onReset={reset}
           fallback={(error) => (
             <div className="flex min-h-dvh flex-col items-center justify-center px-5 py-16 text-center">
-              <p className="text-charcoal text-base font-medium">토론을 불러오지 못했어요</p>
-              <p className="text-stone mt-2 text-sm">{getErrorMessage(error)}</p>
+              <p className="text-base font-medium text-charcoal">토론을 불러오지 못했어요</p>
+              <p className="mt-2 text-sm text-stone">{getErrorMessage(error)}</p>
             </div>
           )}
         >

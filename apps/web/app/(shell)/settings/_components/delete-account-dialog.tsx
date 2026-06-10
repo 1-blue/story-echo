@@ -1,14 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import {
-  getGetApiV1UsersMeQueryKey,
-  useDeleteApiV1UsersMe,
-} from "@storyecho/api-client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { getErrorMessage } from "@/lib/get-error-message";
+import { toast } from "sonner";
+import { getGetApiV1UsersMeQueryKey, useDeleteApiV1UsersMe } from "@storyecho/api-client";
 import {
   BottomSheet,
   BottomSheetContent,
@@ -17,6 +12,8 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
 } from "@/components/ui/bottom-sheet";
+import { Button } from "@/components/ui/button";
+import { getErrorMessage } from "@/lib/get-error-message";
 
 type DeleteAccountDialogProps = {
   open: boolean;
@@ -59,7 +56,11 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
           >
             탈퇴하기
           </Button>
-          <Button variant="outline" className="w-full rounded-full" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            className="w-full rounded-full"
+            onClick={() => onOpenChange(false)}
+          >
             취소
           </Button>
         </BottomSheetFooter>

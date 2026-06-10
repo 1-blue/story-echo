@@ -14,6 +14,7 @@ export const API_ERROR_MESSAGES: Record<string, string> = {
   AUTH_ERROR: "로그인 처리 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.",
   NICKNAME_TAKEN: "이미 사용 중인 닉네임이에요.",
   TODAY_STORY_EXISTS: "오늘의 질문에는 이미 이야기를 남겼어요.",
+  QUESTION_NOT_TODAY: "오늘의 질문에만 이야기를 남길 수 있어요.",
   REPLY_DEPTH_EXCEEDED: "답글은 한 단계까지만 남길 수 있어요.",
   AWS_UNAVAILABLE: "파일 업로드를 이용할 수 없어요.",
   AWS_ERROR: "파일 업로드에 실패했어요. 잠시 후 다시 시도해 주세요.",
@@ -22,8 +23,7 @@ export const API_ERROR_MESSAGES: Record<string, string> = {
   REPORT_ERROR: "신고 처리에 실패했어요. 잠시 후 다시 시도해 주세요.",
 };
 
-const ENGLISH_MESSAGE_PATTERN =
-  /^(failed|error|not found|unauthorized|invalid|required|http \d+)/i;
+const ENGLISH_MESSAGE_PATTERN = /^(failed|error|not found|unauthorized|invalid|required|http \d+)/i;
 
 export function getMessageForCode(code?: string, fallbackMessage?: string): string {
   if (code && API_ERROR_MESSAGES[code]) {

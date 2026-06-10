@@ -1,15 +1,12 @@
 "use client";
 
-import { toast } from "sonner";
-import {
-  getGetApiV1UsersMeQueryKey,
-  usePatchApiV1UsersMe,
-} from "@storyecho/api-client";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { getGetApiV1UsersMeQueryKey, usePatchApiV1UsersMe } from "@storyecho/api-client";
 import type { UserMe } from "@storyecho/schemas";
 import { Switch } from "@/components/ui/switch";
-import { SettingsRow, SettingsSection } from "./settings-section";
 import { getErrorMessage } from "@/lib/get-error-message";
+import { SettingsRow, SettingsSection } from "./settings-section";
 
 type SettingsNotificationRowProps = {
   user: UserMe;

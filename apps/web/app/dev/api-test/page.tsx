@@ -4,11 +4,11 @@ import { Component, Suspense, type ReactNode } from "react";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { useGetApiV1StoriesSuspense } from "@storyecho/api-client";
 import { ClientOnly } from "@/components/client-only";
-import { getErrorMessage } from "@/lib/get-error-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { StoryListItem } from "@/features/stories/types";
+import { getErrorMessage } from "@/lib/get-error-message";
 
 function StoriesContent() {
   const { data } = useGetApiV1StoriesSuspense();

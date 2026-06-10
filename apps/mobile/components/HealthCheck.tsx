@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
 import { StyleSheet, Text, View } from "react-native";
+import { useQuery } from "@tanstack/react-query";
 import Colors from "@/constants/Colors";
 
 async function fetchHealth() {

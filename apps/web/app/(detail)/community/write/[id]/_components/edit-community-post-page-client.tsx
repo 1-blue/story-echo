@@ -35,9 +35,9 @@ function EditCommunityPostFormLoader({
 
 function EditCommunityPostFallback() {
   return (
-    <div className="bg-canvas flex min-h-dvh flex-col px-5 py-6">
-      <div className="bg-surface-cream/60 mb-4 h-10 animate-pulse rounded" />
-      <div className="bg-surface-cream/60 h-full animate-pulse rounded-2xl" />
+    <div className="flex min-h-dvh flex-col bg-canvas px-5 py-6">
+      <div className="mb-4 h-10 animate-pulse rounded bg-surface-cream/60" />
+      <div className="h-full animate-pulse rounded-2xl bg-surface-cream/60" />
     </div>
   );
 }

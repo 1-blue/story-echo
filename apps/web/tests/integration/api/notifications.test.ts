@@ -1,15 +1,15 @@
 import { afterAll, describe, expect, it } from "vitest";
-import { hasIntegrationEnv } from "../../setup/env";
-
-const integration = hasIntegrationEnv() ? describe : describe.skip;
-import { prisma } from "@/lib/prisma";
 import { dispatchDailyNotifications } from "@/lib/notifications/dispatch-daily";
 import { getKstDayRangeUtc } from "@/lib/notifications/kst";
+import { prisma } from "@/lib/prisma";
 import { apiFetch } from "../../helpers/api";
 import { setupGuestClient } from "../../helpers/auth";
 import { cleanupTestUserByDeviceId, setUserEmailVerified } from "../../helpers/db";
 import { createCommunityPost } from "../../helpers/factories";
 import { parseCommunityPost, parseNotificationList, parseUserMe } from "../../helpers/parse-api";
+import { hasIntegrationEnv } from "../../setup/env";
+
+const integration = hasIntegrationEnv() ? describe : describe.skip;
 
 integration("notifications API", () => {
   afterAll(async () => {

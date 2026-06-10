@@ -11,13 +11,13 @@ export function DrawerCapsuleBanner({ activeCapsuleCount }: DrawerCapsuleBannerP
   return (
     <Link
       href="/capsule"
-      className="border-capsule/30 bg-capsule-soft mb-8 flex items-center justify-between rounded-lg border border-dashed p-4 transition-opacity hover:opacity-90"
+      className="mb-8 flex items-center justify-between rounded-lg border border-dashed border-capsule/30 bg-capsule-soft p-4 transition-opacity hover:opacity-90"
     >
-      <div className="text-charcoal flex items-center gap-2 text-sm font-medium">
-        <Lock className="text-capsule size-[18px]" strokeWidth={1.75} />
+      <div className="flex items-center gap-2 text-sm font-medium text-charcoal">
+        <Lock className="size-[18px] text-capsule" strokeWidth={1.75} />
         <span>봉인된 편지 {activeCapsuleCount}개</span>
       </div>
-      <span className="text-capsule flex items-center text-xs font-semibold">
+      <span className="flex items-center text-xs font-semibold text-capsule">
         타임캡슐 보기
         <ArrowRight className="ml-1 size-4" strokeWidth={1.75} />
       </span>

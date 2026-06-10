@@ -19,11 +19,13 @@ const AD_BLOCKED_PATHS = new Set(["/settings"]);
 export function AdEligibilityProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [pageEligible, setPageEligible] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
   const config = getAdSenseConfig();
 
-  useEffect(() => {
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setPageEligible(false);
-  }, [pathname]);
+  }
 
   const shouldRequestAd = useMemo(() => {
     if (!config) return false;

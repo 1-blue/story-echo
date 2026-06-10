@@ -41,8 +41,8 @@ export function CommunityPageClient() {
           onReset={reset}
           fallback={(error) => (
             <div className="flex flex-1 flex-col items-center justify-center px-5 py-16 text-center">
-              <p className="text-charcoal text-base font-medium">커뮤니티를 불러오지 못했어요</p>
-              <p className="text-stone mt-2 text-sm">{getErrorMessage(error)}</p>
+              <p className="text-base font-medium text-charcoal">커뮤니티를 불러오지 못했어요</p>
+              <p className="mt-2 text-sm text-stone">{getErrorMessage(error)}</p>
             </div>
           )}
         >

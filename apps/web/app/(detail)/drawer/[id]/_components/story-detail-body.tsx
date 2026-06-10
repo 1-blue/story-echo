@@ -10,7 +10,7 @@ export function StoryDetailBody({ bodyText, fontSize }: StoryDetailBodyProps) {
   return (
     <article
       className={cn(
-        "text-charcoal border-hairline-strong mb-10 border-l-2 pl-4 whitespace-pre-line",
+        "mb-10 border-l-2 border-hairline-strong pl-4 whitespace-pre-line text-charcoal",
         BODY_SIZE_CLASSES[fontSize],
       )}
     >

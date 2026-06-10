@@ -1,19 +1,16 @@
 import { CapsuleStoryDetailResponseSchema } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { toCapsuleStoryDetail } from "@/lib/capsule-mapper";
 import { syncExpiredCapsules } from "@/lib/capsule-utils";
+import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, context: RouteContext) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

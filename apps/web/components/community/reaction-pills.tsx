@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactionCount } from "@storyecho/schemas";
 import { motion, useReducedMotion } from "motion/react";
+import type { ReactionCount } from "@storyecho/schemas";
 import { EMOJI_DISPLAY } from "@/lib/community-mapper";
 import { cn } from "@/lib/utils";
 
@@ -70,7 +70,7 @@ export function ReactionPills({ reactions, onToggle, compact = false }: Reaction
   return (
     <div className={cn("flex items-center gap-3", compact && "pt-1")}>
       {visible.map((reaction) => (
-        <div key={reaction.emoji} className="text-slate flex items-center gap-1 text-xs">
+        <div key={reaction.emoji} className="flex items-center gap-1 text-xs text-slate">
           <span>{EMOJI_DISPLAY[reaction.emoji]}</span>
           <span>{reaction.count}</span>
         </div>

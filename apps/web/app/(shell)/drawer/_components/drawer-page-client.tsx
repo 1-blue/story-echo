@@ -6,7 +6,7 @@ import { getErrorMessage } from "@/lib/get-error-message";
 import { DrawerContent } from "./drawer-content";
 
 type DrawerPageClientProps = {
-  writeHref: string;
+  todayStoryId: string | null;
 };
 
 type ErrorBoundaryProps = {
@@ -39,7 +39,7 @@ class DrawerErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-export function DrawerPageClient({ writeHref }: DrawerPageClientProps) {
+export function DrawerPageClient({ todayStoryId }: DrawerPageClientProps) {
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
@@ -47,12 +47,12 @@ export function DrawerPageClient({ writeHref }: DrawerPageClientProps) {
           onReset={reset}
           fallback={(error) => (
             <div className="flex flex-1 flex-col items-center justify-center px-5 py-16 text-center">
-              <p className="text-charcoal text-base font-medium">서랍을 불러오지 못했어요</p>
-              <p className="text-stone mt-2 text-sm">{getErrorMessage(error)}</p>
+              <p className="text-base font-medium text-charcoal">서랍을 불러오지 못했어요</p>
+              <p className="mt-2 text-sm text-stone">{getErrorMessage(error)}</p>
             </div>
           )}
         >
-          <DrawerContent writeHref={writeHref} />
+          <DrawerContent todayStoryId={todayStoryId} />
         </DrawerErrorBoundary>
       )}
     </QueryErrorResetBoundary>

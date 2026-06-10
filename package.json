@@ -18,6 +18,7 @@
     "db:seed": "pnpm --filter @storyecho/database db:seed",
     "db:seed:prod": "pnpm --filter @storyecho/database db:seed:prod",
     "db:reset": "pnpm --filter @storyecho/database db:reset",
+    "generate:questions": "pnpm --filter @storyecho/database generate:questions",
     "test": "turbo test",
     "test:unit": "turbo test:unit",
     "test:integration": "turbo test:integration",

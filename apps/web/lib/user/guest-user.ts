@@ -2,10 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { generateUniqueGuestNickname } from "./generate-guest-nickname";
 
-export async function getOrCreateGuestUser(
-  deviceId: string,
-  db: PrismaClient = prisma,
-) {
+export async function getOrCreateGuestUser(deviceId: string, db: PrismaClient = prisma) {
   const existing = await db.user.findUnique({ where: { deviceId } });
   if (existing) return existing;
 

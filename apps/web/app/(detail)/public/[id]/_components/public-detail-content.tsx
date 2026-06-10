@@ -21,8 +21,8 @@ import { ReactionPills } from "@/components/community/reaction-pills";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { formatRelativeTime } from "@/lib/community-mapper";
 import { formatStoryDayLong } from "@/lib/format-story-date";
-import { PublicDetailHeader } from "./public-detail-header";
 import { getErrorMessage } from "@/lib/get-error-message";
+import { PublicDetailHeader } from "./public-detail-header";
 
 type PublicDetailContentProps = {
   storyId: string;

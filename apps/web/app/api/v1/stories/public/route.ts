@@ -1,34 +1,33 @@
 import { PublicStoryFeedListResponseSchema } from "@storyecho/schemas";
-import { prisma } from "@/lib/prisma";
-import { aggregateReactions, toPublicStoryFeedItem } from "@/lib/story-comment-mapper";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import {
   buildCursorResponse,
   cursorWhereClause,
   parsePagination,
   resolveCursorRow,
 } from "@/lib/api/pagination";
+import { prisma } from "@/lib/prisma";
+import { aggregateReactions, toPublicStoryFeedItem } from "@/lib/story-comment-mapper";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
 
 export async function GET(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
     const user = await resolveCurrentUser(request);
     const { searchParams } = new URL(request.url);
     const { cursor, limit } = parsePagination(searchParams);
+    const questionIdParam = searchParams.get("questionId");
+    const questionId = questionIdParam && questionIdParam.length > 0 ? questionIdParam : undefined;
 
     const baseWhere = {
       visibility: "community" as const,
-      questionId: { not: null },
       isCapsuleActive: false,
       hiddenFromFeed: false,
+      ...(questionId ? { questionId } : { questionId: { not: null } as const }),
     };
 
     const cursorRow = await resolveCursorRow(
@@ -67,9 +66,7 @@ export async function GET(request: Request) {
       }),
     ]);
 
-    const commentCountMap = new Map(
-      commentCounts.map((row) => [row.storyId, row._count._all]),
-    );
+    const commentCountMap = new Map(commentCounts.map((row) => [row.storyId, row._count._all]));
 
     const reactionsByStory = new Map<string, typeof reactions>();
     for (const id of storyIds) reactionsByStory.set(id, []);

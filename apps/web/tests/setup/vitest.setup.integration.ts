@@ -1,5 +1,5 @@
-import { config } from "dotenv";
 import path from "node:path";
+import { config } from "dotenv";
 import { beforeAll } from "vitest";
 import { getTestBaseUrl, hasIntegrationEnv } from "./env";
 

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { formatKoreanDate } from "@/lib/today-question";
 import {
   dayOfYearFromMonthDay,
   getKstMonthDay,
   normalizeMonthDay,
   questionIdForMonthDay,
 } from "@storyecho/database/question-calendar";
+import { formatKoreanDate } from "@/lib/today-question";
 
 describe("today-question", () => {
   it("formatKoreanDate includes month day weekday", () => {

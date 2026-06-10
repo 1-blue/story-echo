@@ -6,7 +6,9 @@ import type { IRoute } from "@/lib/routes/types";
 
 export const dynamic = "force-dynamic";
 
-function hasValidSitemap(route: IRoute): route is IRoute & { sitemap: NonNullable<IRoute["sitemap"]> } {
+function hasValidSitemap(
+  route: IRoute,
+): route is IRoute & { sitemap: NonNullable<IRoute["sitemap"]> } {
   return !!route.sitemap;
 }
 
@@ -16,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     ...generateSitemapFromRoutes(NAV_ROUTES.main.filter(hasValidSitemap)),
     ...generateSitemapFromRoutes(NAV_ROUTES.auth.filter(hasValidSitemap)),
+    ...generateSitemapFromRoutes(NAV_ROUTES.marketing.filter(hasValidSitemap)),
   ];
 
   try {

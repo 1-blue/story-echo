@@ -25,3 +25,8 @@ CREATE UNIQUE INDEX "notifications_capsule_once"
 
 CREATE INDEX "notifications_recipient_user_id_type_created_at_idx"
   ON "notifications"("recipient_user_id", "type", "created_at" DESC);
+
+-- Rename remaining constraints/indexes after table rename
+ALTER TABLE "notifications" RENAME CONSTRAINT "community_notifications_pkey" TO "notifications_pkey";
+ALTER TABLE "notifications" RENAME CONSTRAINT "community_notifications_recipient_user_id_fkey" TO "notifications_recipient_user_id_fkey";
+ALTER INDEX "community_notifications_recipient_user_id_read_at_created_a_idx" RENAME TO "notifications_recipient_user_id_read_at_created_at_idx";

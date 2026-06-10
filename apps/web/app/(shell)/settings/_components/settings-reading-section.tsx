@@ -1,22 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner";
-import { ChevronRight } from "lucide-react";
-import {
-  getGetApiV1UsersMeQueryKey,
-  usePatchApiV1UsersMe,
-} from "@storyecho/api-client";
 import { useQueryClient } from "@tanstack/react-query";
+import { ChevronRight } from "lucide-react";
+import { toast } from "sonner";
+import { getGetApiV1UsersMeQueryKey, usePatchApiV1UsersMe } from "@storyecho/api-client";
 import type { UserMe } from "@storyecho/schemas";
+import { FontSizeDialog } from "@/app/(detail)/drawer/[id]/_components/font-size-dialog";
 import {
   FONT_SIZE_OPTIONS,
-  type FontSizePreference,
   useFontSize,
+  type FontSizePreference,
 } from "@/app/(detail)/drawer/[id]/_hooks/use-font-size";
-import { FontSizeDialog } from "@/app/(detail)/drawer/[id]/_components/font-size-dialog";
-import { SettingsRow, SettingsSection } from "./settings-section";
 import { getErrorMessage } from "@/lib/get-error-message";
+import { SettingsRow, SettingsSection } from "./settings-section";
 
 type SettingsReadingSectionProps = {
   user: UserMe;
@@ -47,8 +44,10 @@ export function SettingsReadingSection({ user }: SettingsReadingSectionProps) {
     <>
       <SettingsSection title="읽기">
         <SettingsRow label="글자 크기" onClick={() => setShowFontDialog(true)}>
-          <span className="text-stone flex items-center gap-1 text-sm">
-            {fontSize === user.fontSize ? fontLabel : FONT_SIZE_OPTIONS.find((o) => o.value === fontSize)?.label}
+          <span className="flex items-center gap-1 text-sm text-stone">
+            {fontSize === user.fontSize
+              ? fontLabel
+              : FONT_SIZE_OPTIONS.find((o) => o.value === fontSize)?.label}
             <ChevronRight className="size-4" strokeWidth={1.75} />
           </span>
         </SettingsRow>

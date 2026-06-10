@@ -1,23 +1,14 @@
-import {
-  UpdateUserRequestSchema,
-  UserMeResponseSchema,
-} from "@storyecho/schemas";
+import { UpdateUserRequestSchema, UserMeResponseSchema } from "@storyecho/schemas";
+import { apiErrorBody, apiErrorResponse } from "@/lib/api/errors";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
-import {
-  deleteAuthUser,
-  resolveCurrentUser,
-} from "@/lib/user/resolve-current-user";
-import { toUserMeDto } from "@/lib/user/user-mapper";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
-import { apiErrorResponse, apiErrorBody } from "@/lib/api/errors";
+import { deleteAuthUser, resolveCurrentUser } from "@/lib/user/resolve-current-user";
+import { toUserMeDto } from "@/lib/user/user-mapper";
 
 export async function GET(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -37,10 +28,7 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {
@@ -91,10 +79,7 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   if (!isDatabaseConfigured()) {
-    return Response.json(
-      apiErrorBody("DB_UNAVAILABLE"),
-      { status: 503 },
-    );
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
   }
 
   try {

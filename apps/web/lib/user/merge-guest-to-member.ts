@@ -52,7 +52,8 @@ export async function mergeGuestToMember(
     await tx.user.update({
       where: { id: memberId },
       data: {
-        fontSize: member.fontSize === "md" && guest.fontSize !== "md" ? guest.fontSize : member.fontSize,
+        fontSize:
+          member.fontSize === "md" && guest.fontSize !== "md" ? guest.fontSize : member.fontSize,
         notificationsEnabled: member.notificationsEnabled || guest.notificationsEnabled,
         upgradedAt: member.upgradedAt ?? new Date(),
       },

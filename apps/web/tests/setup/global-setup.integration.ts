@@ -1,9 +1,8 @@
-import type { ChildProcess } from "node:child_process";
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
 import path, { join } from "node:path";
-import { getTestBaseUrl, hasIntegrationEnv } from "./env";
 import { disconnectTestPrisma } from "../helpers/db";
+import { getTestBaseUrl, hasIntegrationEnv } from "./env";
 
 declare global {
   var __integrationServerProcess: ChildProcess | undefined;
@@ -89,22 +88,18 @@ async function waitForServer(url: string, timeoutMs = 120_000): Promise<void> {
 }
 
 async function startProductionServer(baseUrl: string): Promise<ChildProcess> {
-  const serverProcess = spawn(
-    "pnpm",
-    ["exec", "next", "start", "-H", "127.0.0.1", "-p", "3000"],
-    {
-      cwd: WEB_APP_ROOT,
-      stdio: "pipe",
-      shell: true,
-      detached: true,
-      env: {
-        ...process.env,
-        PORT: "3000",
-        HOSTNAME: "127.0.0.1",
-        NEXT_PUBLIC_APP_URL: baseUrl,
-      },
+  const serverProcess = spawn("pnpm", ["exec", "next", "start", "-H", "127.0.0.1", "-p", "3000"], {
+    cwd: WEB_APP_ROOT,
+    stdio: "pipe",
+    shell: true,
+    detached: true,
+    env: {
+      ...process.env,
+      PORT: "3000",
+      HOSTNAME: "127.0.0.1",
+      NEXT_PUBLIC_APP_URL: baseUrl,
     },
-  );
+  });
 
   serverProcess.stdout?.on("data", (d) => process.stdout.write(d));
   serverProcess.stderr?.on("data", (d) => process.stderr.write(d));

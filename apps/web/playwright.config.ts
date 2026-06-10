@@ -1,6 +1,6 @@
-import { config as loadEnv } from "dotenv";
 import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
+import { config as loadEnv } from "dotenv";
 
 loadEnv({ path: path.resolve(__dirname, "../../packages/database/.env") });
 loadEnv({ path: path.resolve(__dirname, ".env.local") });

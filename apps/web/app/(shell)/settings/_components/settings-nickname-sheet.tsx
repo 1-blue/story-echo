@@ -1,13 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner";
-import {
-  getGetApiV1UsersMeQueryKey,
-  usePatchApiV1UsersMe,
-} from "@storyecho/api-client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { getGetApiV1UsersMeQueryKey, usePatchApiV1UsersMe } from "@storyecho/api-client";
 import {
   BottomSheet,
   BottomSheetContent,
@@ -16,6 +12,7 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
 } from "@/components/ui/bottom-sheet";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getErrorMessage } from "@/lib/get-error-message";
 
@@ -72,10 +69,18 @@ export function SettingsNicknameSheet({
           maxLength={30}
         />
         <BottomSheetFooter className="mt-4 gap-2 sm:flex-col">
-          <Button className="w-full rounded-full" onClick={handleSave} disabled={patchUser.isPending}>
+          <Button
+            className="w-full rounded-full"
+            onClick={handleSave}
+            disabled={patchUser.isPending}
+          >
             저장
           </Button>
-          <Button variant="ghost" className="w-full rounded-full" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="ghost"
+            className="w-full rounded-full"
+            onClick={() => onOpenChange(false)}
+          >
             취소
           </Button>
         </BottomSheetFooter>

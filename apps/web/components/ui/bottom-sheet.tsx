@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetClose,
@@ -12,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 type BottomSheetContentProps = React.ComponentPropsWithoutRef<typeof SheetContent> & {
   showHandle?: boolean;
@@ -40,14 +40,14 @@ const BottomSheetContent = React.forwardRef<
       side="bottom"
       showClose={showClose}
       className={cn(
-        "border-hairline mx-auto max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl border-b-0 p-0",
+        "mx-auto max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl border-b-0 border-hairline p-0",
         className,
       )}
       {...props}
     >
       {showHandle && (
         <div className="flex justify-center pt-3 pb-2">
-          <div className="bg-hairline-strong h-1.5 w-12 rounded-full" aria-hidden="true" />
+          <div className="h-1.5 w-12 rounded-full bg-hairline-strong" aria-hidden="true" />
         </div>
       )}
       {unpadded ? children : <div className="px-6 pb-8">{children}</div>}

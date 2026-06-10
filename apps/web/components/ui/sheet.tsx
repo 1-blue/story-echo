@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 import { useAndroidBackOverlay } from "@/lib/native/android-back";
+import { cn } from "@/lib/utils";
 
 type SheetRootProps = React.ComponentPropsWithoutRef<typeof SheetPrimitive.Root>;
 
@@ -45,7 +45,7 @@ const SheetOverlay = React.forwardRef<
   <SheetPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/30 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/30 backdrop-blur-sm",
       className,
     )}
     {...props}
@@ -118,7 +118,7 @@ const SheetContent = React.forwardRef<
       >
         {children}
         {showClose && (
-          <SheetPrimitive.Close className="ring-offset-background focus:ring-ring absolute right-4 top-[calc(var(--safe-area-top)+1rem)] rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none disabled:pointer-events-none">
+          <SheetPrimitive.Close className="absolute top-[calc(var(--safe-area-top)+1rem)] right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:outline-none disabled:pointer-events-none">
             <X className="size-4" />
             <span className="sr-only">Close</span>
           </SheetPrimitive.Close>
@@ -148,7 +148,7 @@ const SheetTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
     ref={ref}
-    className={cn("text-charcoal text-lg leading-none font-semibold tracking-tight", className)}
+    className={cn("text-lg leading-none font-semibold tracking-tight text-charcoal", className)}
     {...props}
   />
 ));
@@ -160,7 +160,7 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}
-    className={cn("text-stone text-sm", className)}
+    className={cn("text-sm text-stone", className)}
     {...props}
   />
 ));

@@ -14,8 +14,8 @@ export function CommunityShell() {
     <>
       <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]">
         <div className="mb-6 flex flex-col gap-1">
-          <h2 className="text-ink text-2xl font-semibold">커뮤니티</h2>
-          <p className="text-slate text-base">오늘의 질문에 대한 생각을 나눠보세요</p>
+          <h2 className="text-2xl font-semibold text-ink">커뮤니티</h2>
+          <p className="text-base text-slate">오늘의 질문에 대한 생각을 나눠보세요</p>
         </div>
 
         <CommunitySearch query={query} onQueryChange={setQuery} />

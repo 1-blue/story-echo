@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { BlurFade } from "@/components/magicui/blur-fade";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BlurFade } from "@/components/magicui/blur-fade";
 
 export function LandingHero() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-8 px-5 py-12">
       <BlurFade delay={0} className="space-y-2 text-center">
-        <Badge variant="echo">StoryEcho</Badge>
+        <Badge variant="echo">이야기해줘</Badge>
         <h1 className="font-display text-3xl leading-tight font-medium">이야기해줘</h1>
         <p className="text-muted-foreground">매일 하나의 질문. 오늘의 이야기, 나중에 다시 읽기.</p>
       </BlurFade>

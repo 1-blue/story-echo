@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from "react";
 import {
-  CAPSULE_MONTH_PRESETS,
-  CAPSULE_YEAR_PRESETS,
   addMonths,
   addYears,
+  CAPSULE_MONTH_PRESETS,
+  CAPSULE_YEAR_PRESETS,
   formatUnlockPreview,
 } from "@/lib/capsule-utils";
 import { cn } from "@/lib/utils";
@@ -34,7 +34,7 @@ export function CapsuleDurationPicker({ unlockAt, onChange }: CapsuleDurationPic
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-charcoal text-lg font-semibold">언제 열까요?</h2>
+      <h2 className="text-lg font-semibold text-charcoal">언제 열까요?</h2>
 
       <div className="flex flex-wrap gap-2.5">
         {CAPSULE_MONTH_PRESETS.map((preset) => {
@@ -78,14 +78,14 @@ export function CapsuleDurationPicker({ unlockAt, onChange }: CapsuleDurationPic
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="capsule-unlock-date" className="text-charcoal text-sm font-medium">
+        <label htmlFor="capsule-unlock-date" className="text-sm font-medium text-charcoal">
           직접 날짜 선택
         </label>
         <input
           id="capsule-unlock-date"
           type="date"
           min={minDate}
-          className="border-hairline-strong h-11 w-full rounded-xl border bg-white px-3 text-sm"
+          className="h-11 w-full rounded-xl border border-hairline-strong bg-white px-3 text-sm"
           onChange={(event) => {
             if (!event.target.value) return;
             const date = new Date(`${event.target.value}T09:00:00.000Z`);
@@ -96,7 +96,7 @@ export function CapsuleDurationPicker({ unlockAt, onChange }: CapsuleDurationPic
       </div>
 
       {unlockAt && (
-        <p className="text-capsule text-sm font-medium">{formatUnlockPreview(unlockAt)}</p>
+        <p className="text-sm font-medium text-capsule">{formatUnlockPreview(unlockAt)}</p>
       )}
     </section>
   );

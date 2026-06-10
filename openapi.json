@@ -776,6 +776,64 @@
           "data"
         ]
       },
+      "QuestionArchiveItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "day": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 31
+          },
+          "publicStoryCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "month",
+          "day",
+          "publicStoryCount"
+        ]
+      },
+      "QuestionArchiveListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionArchiveItem"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "QuestionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/QuestionArchiveItem"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
       "PublicQuestionAnswer": {
         "type": "object",
         "properties": {
@@ -1503,6 +1561,34 @@
           "code",
           "storyId"
         ]
+      },
+      "QuestionNotTodayError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "QUESTION_NOT_TODAY"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "code"
+        ]
+      },
+      "StoryCreateConflictError": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/TodayStoryExistsError"
+          },
+          {
+            "$ref": "#/components/schemas/QuestionNotTodayError"
+          }
+        ]
       }
     },
     "parameters": {}
@@ -1539,6 +1625,85 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TodayQuestionResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questions": {
+      "get": {
+        "tags": [
+          "Questions"
+        ],
+        "responses": {
+          "200": {
+            "description": "365-day question archive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionArchiveListResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questions/{id}": {
+      "get": {
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question detail with public story count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1674,11 +1839,11 @@
             }
           },
           "409": {
-            "description": "Today's question story already exists",
+            "description": "Story create conflict (not today's question or duplicate today story)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TodayStoryExistsError"
+                  "$ref": "#/components/schemas/StoryCreateConflictError"
                 }
               }
             }
@@ -1771,6 +1936,15 @@
             },
             "required": false,
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "questionId",
             "in": "query"
           }
         ],

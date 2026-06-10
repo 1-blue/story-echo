@@ -1,11 +1,7 @@
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
+import { CommunityAuthorSchema, CommunityCommentSchema, ReactionCountSchema } from "./community";
 import { PaginationMetaSchema } from "./pagination";
-import {
-  CommunityAuthorSchema,
-  CommunityCommentSchema,
-  ReactionCountSchema,
-} from "./community";
 
 extendZodWithOpenApi(z);
 
@@ -50,6 +46,21 @@ export const TodayStoryExistsErrorSchema = z
   .openapi("TodayStoryExistsError");
 
 export type TodayStoryExistsError = z.infer<typeof TodayStoryExistsErrorSchema>;
+
+export const QuestionNotTodayErrorSchema = z
+  .object({
+    message: z.string(),
+    code: z.literal("QUESTION_NOT_TODAY"),
+  })
+  .openapi("QuestionNotTodayError");
+
+export type QuestionNotTodayError = z.infer<typeof QuestionNotTodayErrorSchema>;
+
+export const StoryCreateConflictErrorSchema = z
+  .union([TodayStoryExistsErrorSchema, QuestionNotTodayErrorSchema])
+  .openapi("StoryCreateConflictError");
+
+export type StoryCreateConflictError = z.infer<typeof StoryCreateConflictErrorSchema>;
 
 export const UpdateStoryRequestSchema = z
   .object({

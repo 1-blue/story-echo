@@ -1,4 +1,4 @@
-import { test, expect } from "../fixtures/playwright-fixtures";
+import { expect, test } from "../fixtures/playwright-fixtures";
 
 test.describe("Public social flow", () => {
   test("member community story appears on home feed", async ({ memberPage }) => {

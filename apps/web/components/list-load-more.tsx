@@ -13,7 +13,9 @@ export function ListLoadMore({ sentinelRef, isLoading, hasMore }: ListLoadMorePr
 
   return (
     <div ref={sentinelRef} className="flex justify-center py-6">
-      {isLoading && <Loader2 className="text-stone size-5 animate-spin" aria-label="더 불러오는 중" />}
+      {isLoading && (
+        <Loader2 className="size-5 animate-spin text-stone" aria-label="더 불러오는 중" />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import type { UserMe } from "@storyecho/schemas";
 import type { User } from "@prisma/client";
+import type { UserMe } from "@storyecho/schemas";
 
 export function toUserMeDto(user: User): UserMe {
   return {

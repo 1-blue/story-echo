@@ -79,9 +79,11 @@ export function extractCookies(setCookieHeader: string | null): string {
 export async function mergeCookies(existing: string, response: Response): Promise<string> {
   const headers = response.headers as Headers & { getSetCookie?: () => string[] };
   const raw =
-    headers.getSetCookie?.() ??
-    ([response.headers.get("set-cookie")].filter(Boolean) as string[]);
-  const next = raw.map((c) => extractCookies(c)).filter(Boolean).join("; ");
+    headers.getSetCookie?.() ?? ([response.headers.get("set-cookie")].filter(Boolean) as string[]);
+  const next = raw
+    .map((c) => extractCookies(c))
+    .filter(Boolean)
+    .join("; ");
   if (!existing) return next;
   if (!next) return existing;
   return `${existing}; ${next}`;

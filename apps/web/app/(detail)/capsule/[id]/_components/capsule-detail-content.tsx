@@ -13,10 +13,10 @@ import {
 } from "@storyecho/api-client";
 import { formatUnlockDateKo } from "@/lib/capsule-utils";
 import { formatStoryDayLong } from "@/lib/format-story-date";
+import { getErrorMessage } from "@/lib/get-error-message";
 import { CapsuleDetailHeader } from "./capsule-detail-header";
 import { DeleteSheet } from "./delete-sheet";
 import { SealedOverlay } from "./sealed-overlay";
-import { getErrorMessage } from "@/lib/get-error-message";
 
 type CapsuleDetailContentProps = {
   capsuleId: string;

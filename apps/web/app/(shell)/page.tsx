@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
-import {
-  formatKoreanDate,
-  getTodayQuestion,
-  getTodayStoryForUser,
-} from "@/lib/today-question";
 import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
+import { formatKoreanDate, getTodayQuestion, getTodayStoryForUser } from "@/lib/today-question";
 import { resolveCurrentUserFromHeaders } from "@/lib/user/resolve-current-user";
 import { HomePageClient } from "./_components/home-page-client";
 

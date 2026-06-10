@@ -13,7 +13,11 @@ export const PresignUploadRequestSchema = z
   .object({
     contentType: PresignContentTypeSchema,
     fileName: z.string().min(1).max(255),
-    fileSize: z.number().int().positive().max(50 * 1024 * 1024),
+    fileSize: z
+      .number()
+      .int()
+      .positive()
+      .max(50 * 1024 * 1024),
   })
   .openapi("PresignUploadRequest");
 

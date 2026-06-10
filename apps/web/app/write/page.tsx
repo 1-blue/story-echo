@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAwsConfigured } from "@/lib/env/aws";
+import { getWriteCapabilities } from "@/lib/get-write-capabilities";
 import { getSharedMetadata } from "@/lib/seo/get-shared-metadata";
 import { getTodayQuestion, getTodayStoryForUser } from "@/lib/today-question";
-import { getWriteCapabilities } from "@/lib/get-write-capabilities";
 import { resolveCurrentUserFromHeaders } from "@/lib/user/resolve-current-user";
 import { WriteStoryForm } from "./_components/write-story-form";
 

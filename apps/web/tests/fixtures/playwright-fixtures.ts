@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks -- Playwright fixture `use` callback, not React */
 import { test as base, type Page } from "@playwright/test";
+import { randomDeviceId, registerGuest } from "../helpers/auth";
 import { getE2EAdminCredentials } from "../setup/env";
-import { registerGuest, randomDeviceId } from "../helpers/auth";
 
 type Fixtures = {
   guestPage: Page;

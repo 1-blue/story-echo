@@ -1,9 +1,6 @@
-import type { StoryComment as DbStoryComment, Story as DbStory, User } from "@storyecho/database";
+import type { Story as DbStory, StoryComment as DbStoryComment, User } from "@storyecho/database";
 import type { CommunityComment, PublicStoryFeedItem, ReactionCount } from "@storyecho/schemas";
-import {
-  aggregateReactions,
-  toCommunityAuthor,
-} from "@/lib/community-mapper";
+import { aggregateReactions, toCommunityAuthor } from "@/lib/community-mapper";
 
 type StoryWithUser = DbStory & {
   user: Pick<User, "id" | "nickname">;

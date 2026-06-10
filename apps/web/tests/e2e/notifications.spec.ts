@@ -1,4 +1,4 @@
-import { test, expect } from "../fixtures/playwright-fixtures";
+import { expect, test } from "../fixtures/playwright-fixtures";
 
 test.describe("Notifications drawer", () => {
   test("opens notification drawer from header", async ({ guestPage }) => {

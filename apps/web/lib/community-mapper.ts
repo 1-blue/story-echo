@@ -1,9 +1,9 @@
 import type {
-  CommunityComment as DbComment,
-  CommunityPost as DbPost,
   CommunityReaction,
   CommunityReactionEmoji,
   CommunityReactionTargetType,
+  CommunityComment as DbComment,
+  CommunityPost as DbPost,
   User,
 } from "@storyecho/database";
 import type {

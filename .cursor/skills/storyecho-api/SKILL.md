@@ -3,7 +3,8 @@ name: storyecho-api
 description: >-
   StoryEcho API 계약·Route Handler 수정 워크플로. zod SSOT → openapi.json → orval
   파이프라인을 따른다. API 추가/변경, openapi.json, orval 훅, Route Handler,
-  packages/schemas 수정 시 이 skill을 따른다.
+  packages/schemas 수정 시 이 skill을 따른다. 비즈니스 규칙·페이지 정책은
+  storyecho-policy skill(.md/정책.md)을 참조한다.
 ---
 
 # StoryEcho API 수정 워크플로
@@ -85,4 +86,4 @@ curl http://localhost:3000/api/v1/health
 - 계약: `packages/schemas/src/`
 - OpenAPI 생성: `scripts/generate-openapi.ts`
 - orval: `orval.config.ts`
-- SSOT 원칙: `개발.md` §2
+- SSOT 원칙: `개발.md` §2 · 비즈니스 규칙: `정책.md` · [storyecho-policy](../storyecho-policy/SKILL.md)

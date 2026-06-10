@@ -3,8 +3,8 @@
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import type { PhotoUploadItem } from "@/features/stories/types";
-import { cn } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/get-error-message";
+import { cn } from "@/lib/utils";
 
 type PhotoUploadGridProps = {
   photos: PhotoUploadItem[];
@@ -57,9 +57,7 @@ export function PhotoUploadGrid({
             ) : (
               <>
                 <ImagePlus className="mb-1 size-6" />
-                <span className="text-xs">
-                  {photos.length}/8
-                </span>
+                <span className="text-xs">{photos.length}/8</span>
               </>
             )}
             <input

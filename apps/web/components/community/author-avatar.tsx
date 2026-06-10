@@ -11,7 +11,7 @@ export function AuthorAvatar({ nickname, size = "sm" }: AuthorAvatarProps) {
 
   return (
     <div
-      className={`bg-surface-cream text-primary flex ${dimension} shrink-0 items-center justify-center rounded-full font-semibold ${textSize}`}
+      className={`flex bg-surface-cream text-primary ${dimension} shrink-0 items-center justify-center rounded-full font-semibold ${textSize}`}
     >
       {getInitial(nickname)}
     </div>

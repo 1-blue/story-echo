@@ -1,11 +1,8 @@
 "use client";
 
 import { Flag, Pencil, Trash2 } from "lucide-react";
+import { BottomSheet, BottomSheetContent } from "@/components/ui/bottom-sheet";
 import { Button } from "@/components/ui/button";
-import {
-  BottomSheet,
-  BottomSheetContent,
-} from "@/components/ui/bottom-sheet";
 
 type PostActionSheetProps = {
   open: boolean;
@@ -35,7 +32,7 @@ export function PostActionSheet({
               <button
                 type="button"
                 onClick={onEdit}
-                className="text-charcoal hover:bg-surface-cream/60 flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors"
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-charcoal transition-colors hover:bg-surface-cream/60"
               >
                 <Pencil className="size-5" strokeWidth={1.75} />
                 수정
@@ -44,7 +41,7 @@ export function PostActionSheet({
                 type="button"
                 onClick={onDelete}
                 disabled={isDeleting}
-                className="text-destructive hover:bg-surface-cream/60 flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors disabled:opacity-50"
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-destructive transition-colors hover:bg-surface-cream/60 disabled:opacity-50"
               >
                 <Trash2 className="size-5" strokeWidth={1.75} />
                 삭제
@@ -54,7 +51,7 @@ export function PostActionSheet({
             <button
               type="button"
               onClick={onReport}
-              className="text-charcoal hover:bg-surface-cream/60 flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors"
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-charcoal transition-colors hover:bg-surface-cream/60"
             >
               <Flag className="size-5" strokeWidth={1.75} />
               신고
