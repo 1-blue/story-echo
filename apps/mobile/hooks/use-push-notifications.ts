@@ -4,17 +4,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-import {
-  registerPushToken,
-  setNotificationsEnabled,
-  unregisterPushToken,
-} from "@/lib/push-api";
+import type { NotificationPermissionFailureReason } from "@/lib/push-messages";
 
 const PROMPTED_KEY = "@storyecho/notification_prompted";
 
 export type NotificationPermissionOutcome = {
   granted: boolean;
   needsSettings: boolean;
+  reason?: NotificationPermissionFailureReason;
+  expoPushToken?: string;
+  platform?: "ios" | "android";
 };
 
 Notifications.setNotificationHandler({
@@ -56,26 +55,7 @@ async function getExpoPushToken(): Promise<string | null> {
   return token.data;
 }
 
-export function usePushNotifications(deviceId: string | null) {
-  const deviceIdRef = useRef(deviceId);
-  deviceIdRef.current = deviceId;
-
-  const registerTokenForDevice = useCallback(async (): Promise<boolean> => {
-    const currentDeviceId = deviceIdRef.current;
-    if (!currentDeviceId) {
-      return false;
-    }
-
-    const token = await getExpoPushToken();
-    if (!token) {
-      return false;
-    }
-
-    const platform = Platform.OS === "ios" ? "ios" : "android";
-    await registerPushToken(currentDeviceId, token, platform);
-    return true;
-  }, []);
-
+export function usePushNotifications(_deviceId: string | null) {
   const requestPermissionAndRegister =
     useCallback(async (): Promise<NotificationPermissionOutcome> => {
       const existing = await Notifications.getPermissionsAsync();
@@ -91,37 +71,17 @@ export function usePushNotifications(deviceId: string | null) {
       if (finalStatus !== "granted") {
         const needsSettings =
           finalStatus === "denied" && (Platform.OS === "android" || canAskAgain === false);
-        return { granted: false, needsSettings };
+        return { granted: false, needsSettings, reason: "permission_denied" };
       }
 
-      const registered = await registerTokenForDevice();
-      return { granted: registered, needsSettings: false };
-    }, [registerTokenForDevice]);
-
-  useEffect(() => {
-    if (!deviceId) {
-      return;
-    }
-
-    let cancelled = false;
-
-    void (async () => {
-      const prompted = await AsyncStorage.getItem(PROMPTED_KEY);
-      if (prompted || cancelled) {
-        return;
+      const expoPushToken = await getExpoPushToken();
+      if (!expoPushToken) {
+        return { granted: false, needsSettings: false, reason: "token_failed" };
       }
 
-      await AsyncStorage.setItem(PROMPTED_KEY, "1");
-      const outcome = await requestPermissionAndRegister();
-      if (outcome.granted && !cancelled) {
-        await setNotificationsEnabled(deviceId, true);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [deviceId, requestPermissionAndRegister]);
+      const platform = Platform.OS === "ios" ? "ios" : "android";
+      return { granted: true, needsSettings: false, expoPushToken, platform };
+    }, []);
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener(() => {
@@ -133,33 +93,18 @@ export function usePushNotifications(deviceId: string | null) {
 
   return {
     requestPermissionAndRegister,
-    unregisterPush: useCallback(async () => {
-      const currentDeviceId = deviceIdRef.current;
-      if (!currentDeviceId) {
-        return;
-      }
-      await unregisterPushToken(currentDeviceId);
+    hasAutoPrompted: useCallback(async () => {
+      const prompted = await AsyncStorage.getItem(PROMPTED_KEY);
+      return prompted === "1";
+    }, []),
+    markAutoPrompted: useCallback(async () => {
+      await AsyncStorage.setItem(PROMPTED_KEY, "1");
     }, []),
   };
 }
 
 export async function handleNotificationPermissionRequest(
-  deviceId: string | null,
   register: () => Promise<NotificationPermissionOutcome>,
 ): Promise<NotificationPermissionOutcome> {
-  if (!deviceId) {
-    return { granted: false, needsSettings: false };
-  }
-
   return register();
-}
-
-export async function handleUnregisterPush(
-  deviceId: string | null,
-  unregister: () => Promise<void>,
-): Promise<void> {
-  if (!deviceId) {
-    return;
-  }
-  await unregister();
 }

@@ -53,6 +53,8 @@ export function buildNavigationBridgeScript(): string {
 
       postDeviceId();
       window.addEventListener('storage', postDeviceId);
+      window.addEventListener('storyecho-device-id-ready', postDeviceId);
+      window.__storyechoPostDeviceId = postDeviceId;
       setInterval(postDeviceId, 2000);
     })();
     true;

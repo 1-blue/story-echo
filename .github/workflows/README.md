@@ -11,6 +11,8 @@ PR 및 `main`/`master` push 시 [ci.yml](./ci.yml)이 실행됩니다.
 | `test-integration` | Vitest — Route Handler fetch 테스트 | **필수**    |
 | `test-e2e`         | Playwright — 19 pages               | **필수**    |
 
+CI는 **DB seed를 실행하지 않습니다.** E2E/integration은 migrate deploy 후 **이미 seed된 CI DB**와 GitHub Secrets(`E2E_ADMIN_*`)를 전제합니다. 로컬에서 `pnpm db:seed` / `pnpm db:seed:prod`를 수동 실행하세요.
+
 ## Repository Secrets
 
 | Secret                          | 용도                              |
@@ -43,6 +45,7 @@ pnpm --filter web test:integration
 # · dev DB: pnpm db:seed / prod DB: pnpm db:seed:prod (대상 DB는 packages/database/.env DATABASE_URL)
 
 # E2E (CI와 동일: build 1회 → playwright webServer는 pnpm start만)
+# CI DB는 seed 하지 않음 — 로컬/CI DB에 admin·질문 등은 수동 seed 또는 기존 데이터 전제
 pnpm --filter web build
 pnpm --filter web exec playwright install chromium
 pnpm --filter web test:e2e

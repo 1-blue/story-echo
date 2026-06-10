@@ -24,8 +24,8 @@ export async function createPresignedUpload(params: {
   const client = new S3Client({
     region: env.AWS_REGION,
     credentials: {
-      accessKeyId: env.AWS_ACCESS_KEY,
-      secretAccessKey: env.AWS_ACCESS_SECRET_KEY,
+      accessKeyId: env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
     },
   });
 

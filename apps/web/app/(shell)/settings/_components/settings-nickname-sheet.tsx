@@ -65,6 +65,9 @@ export function SettingsNicknameSheet({
         <Input
           value={nickname}
           onChange={(event) => setNickname(event.target.value)}
+          onFocus={(event) => {
+            event.currentTarget.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }}
           placeholder="닉네임"
           maxLength={30}
         />
