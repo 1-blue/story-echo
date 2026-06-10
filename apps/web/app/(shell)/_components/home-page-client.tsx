@@ -19,7 +19,7 @@ export function HomePageClient({
   useAdEligible(true);
 
   return (
-    <main className="flex flex-1 flex-col overflow-y-auto px-5 pt-6 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]">
+    <main className="flex flex-1 flex-col overflow-y-auto px-5 pt-6 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]" data-shell-scroll>
       <div className="mx-auto flex w-full max-w-md flex-col items-center">
         <BlurFade delay={0}>
           <p className="relative mb-6 w-full text-center text-xs tracking-widest text-stone uppercase">

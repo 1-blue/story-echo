@@ -1,8 +1,10 @@
 import { useCallback, useRef, useState, type RefObject } from "react";
+import { Linking } from "react-native";
 import type { WebView } from "react-native-webview";
 import {
   handleNotificationPermissionRequest,
   handleUnregisterPush,
+  type NotificationPermissionOutcome,
   usePushNotifications,
 } from "@/hooks/use-push-notifications";
 import {
@@ -11,10 +13,14 @@ import {
   type NotificationPermissionResultMessage,
 } from "@/lib/push-messages";
 
-function injectPermissionResult(webViewRef: RefObject<WebView | null>, granted: boolean) {
+function injectPermissionResult(
+  webViewRef: RefObject<WebView | null>,
+  outcome: NotificationPermissionOutcome,
+) {
   const payload: NotificationPermissionResultMessage = {
     type: PUSH_MESSAGE_TYPES.notificationPermissionResult,
-    granted,
+    granted: outcome.granted,
+    needsSettings: outcome.needsSettings,
   };
   webViewRef.current?.injectJavaScript(`
     window.dispatchEvent(new CustomEvent('storyecho-notification-permission', {
@@ -51,13 +57,16 @@ export function useNotificationBridge(webViewRef: RefObject<WebView | null>) {
           setDeviceId(message.deviceId);
           return true;
         case PUSH_MESSAGE_TYPES.requestNotificationPermission: {
-          const granted = await handleNotificationPermissionRequest(
+          const outcome = await handleNotificationPermissionRequest(
             deviceIdRef.current,
             requestPermissionAndRegister,
           );
-          injectPermissionResult(webViewRef, granted);
+          injectPermissionResult(webViewRef, outcome);
           return true;
         }
+        case PUSH_MESSAGE_TYPES.openAppSettings:
+          await Linking.openSettings();
+          return true;
         case PUSH_MESSAGE_TYPES.unregisterPush:
           await handleUnregisterPush(deviceIdRef.current, unregisterPush);
           injectPushUnregistered(webViewRef);

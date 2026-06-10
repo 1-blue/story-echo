@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { getGetApiV1UsersMeQueryKey, usePostApiV1AuthLogin } from "@storyecho/api-client";
+import { getGetApiV1UsersMeQueryKey, getApiV1UsersMe, usePostApiV1AuthLogin } from "@storyecho/api-client";
 import { LoginRequestSchema, type LoginRequest } from "@storyecho/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,14 +26,30 @@ export function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
+  const completeLogin = async () => {
+    await queryClient.invalidateQueries({ queryKey: getGetApiV1UsersMeQueryKey() });
+    toast.success("로그인했어요.");
+    router.push(nextPath && nextPath.startsWith("/") ? nextPath : "/settings");
+    router.refresh();
+  };
+
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       await loginMutation.mutateAsync({ data: values });
-      await queryClient.invalidateQueries({ queryKey: getGetApiV1UsersMeQueryKey() });
-      toast.success("로그인했어요.");
-      router.push(nextPath && nextPath.startsWith("/") ? nextPath : "/settings");
-      router.refresh();
+      await completeLogin();
     } catch (error) {
+      try {
+        const me = await queryClient.fetchQuery({
+          queryKey: getGetApiV1UsersMeQueryKey(),
+          queryFn: () => getApiV1UsersMe(),
+        });
+        if (me.data.role !== "guest") {
+          await completeLogin();
+          return;
+        }
+      } catch {
+        // session fallback failed — show original error
+      }
       toast.error(getErrorMessage(error));
     }
   });

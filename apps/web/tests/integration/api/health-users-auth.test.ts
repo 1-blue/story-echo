@@ -2,7 +2,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { apiFetch } from "../../helpers/api";
 import { loginAsAdmin, setupGuestClient } from "../../helpers/auth";
 import { cleanupTestUserByDeviceId, disconnectTestPrisma } from "../../helpers/db";
-import { parseUserMe } from "../../helpers/parse-api";
+import { parseUserMe, parseTodayQuestion } from "../../helpers/parse-api";
 import { hasIntegrationEnv } from "../../setup/env";
 
 const integration = hasIntegrationEnv() ? describe : describe.skip;
@@ -66,6 +66,39 @@ integration("Health · Users · Auth API", () => {
     const { cookie, status } = await loginAsAdmin();
     expect(status).toBe(200);
     expect(cookie.length).toBeGreaterThanOrEqual(0);
+  });
+
+  it("POST /auth/login merges guest data when deviceId is present", async () => {
+    const { deviceId } = await setupGuestClient("guest-login-merge");
+    const todayRes = await apiFetch("/api/v1/questions/today", {}, { deviceId });
+    const questionId = parseTodayQuestion(todayRes.json).data.id;
+    if (!questionId) return;
+
+    const storyRes = await apiFetch(
+      "/api/v1/stories",
+      {
+        method: "POST",
+        json: {
+          questionId,
+          bodyText: "게스트 merge 테스트 이야기",
+          photoUrls: [],
+          visibility: "private",
+          isCapsule: false,
+        },
+      },
+      { deviceId },
+    );
+    expect(storyRes.status).toBe(201);
+
+    const { cookie, status, data } = await loginAsAdmin(deviceId);
+    expect(status).toBe(200);
+    expect((data as { data?: { role?: string } }).data?.role).not.toBe("guest");
+
+    const meRes = await apiFetch("/api/v1/users/me", {}, { deviceId, cookie });
+    expect(meRes.status).toBe(200);
+    expect(parseUserMe(meRes.json).data.role).not.toBe("guest");
+
+    await cleanupTestUserByDeviceId(deviceId);
   });
 
   it("POST /auth/logout returns 200", async () => {

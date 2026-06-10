@@ -11,6 +11,7 @@ import {
   resolveCursorRow,
 } from "@/lib/api/pagination";
 import { aggregateReactions, toCommunityPostSummary } from "@/lib/community-mapper";
+import { notifyContentEvent } from "@/lib/slack/notify-content-event";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
 import { resolveCurrentUser } from "@/lib/user/resolve-current-user";
@@ -135,6 +136,13 @@ export async function POST(request: Request) {
 
     const body = CommunityPostResponseSchema.parse({
       data: toCommunityPostSummary(post, aggregateReactions([], user.id), 0),
+    });
+
+    void notifyContentEvent({
+      kind: "community_post",
+      nickname: post.user.nickname,
+      resourceId: post.id,
+      preview: parsed.data.bodyText,
     });
 
     return Response.json(body, { status: 201 });

@@ -59,7 +59,7 @@ export function CapsuleContent() {
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]">
+      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]" data-shell-scroll>
         <div className="mb-6 flex flex-col gap-1">
           <h2 className="text-2xl font-semibold text-ink">타임캡슐</h2>
           <p className="text-base text-slate">미래의 나에게 봉인해 둔 편지예요</p>

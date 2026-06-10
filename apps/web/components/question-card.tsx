@@ -59,6 +59,13 @@ export function QuestionCard({ question, todayStoryId }: QuestionCardProps) {
         >
           <Link href={ROUTES.questions.url}>{ROUTES.questions.label}</Link>
         </Button>
+        <Button
+          asChild
+          variant="outline"
+          className="h-auto w-full rounded-full border-hairline-strong bg-transparent py-3 text-sm text-charcoal hover:bg-surface-cream active:scale-[0.98]"
+        >
+          <Link href={ROUTES.about.url}>{ROUTES.about.label}</Link>
+        </Button>
       </div>
     </article>
   );

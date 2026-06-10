@@ -23,7 +23,7 @@ export function SettingsPageClient() {
   }, [user.fontSize]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]">
+      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[calc(var(--shell-tab-height)+var(--ad-strip-height)+2rem+var(--safe-area-bottom))]" data-shell-scroll>
       <div className="mb-6 flex flex-col gap-1">
         <h2 className="text-2xl font-semibold text-ink">설정</h2>
         <p className="text-base text-slate">앱 사용 환경과 계정을 관리해요</p>

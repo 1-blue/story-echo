@@ -4,6 +4,7 @@ test.describe("Home", () => {
   test("shows today question and navigation", async ({ guestPage }) => {
     await guestPage.goto("/");
     await expect(guestPage.getByRole("link", { name: /이야기하기/ })).toBeVisible();
+    await expect(guestPage.getByRole("link", { name: "서비스 소개" })).toBeVisible();
     await guestPage.getByRole("link", { name: /이야기하기/ }).click();
     await expect(guestPage).toHaveURL(/\/write/);
   });
