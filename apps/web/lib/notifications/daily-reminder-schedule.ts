@@ -1,0 +1,6 @@
+/** KST 기준 오늘의 질문 푸시 알림 발송 시각 (유저-facing 카피 SSOT) */
+export const DAILY_QUESTION_REMINDER_TIME_KST = "오전 8시";
+
+export const DAILY_QUESTION_REMINDER_SCHEDULE_LABEL = `매일 ${DAILY_QUESTION_REMINDER_TIME_KST}`;
+
+export const DAILY_QUESTION_REMINDER_SETTINGS_DESCRIPTION = `${DAILY_QUESTION_REMINDER_SCHEDULE_LABEL}에 오늘의 질문 알림을 보내드려요.`;

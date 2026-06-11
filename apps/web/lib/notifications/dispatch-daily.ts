@@ -1,6 +1,6 @@
 import { syncExpiredCapsules } from "@/lib/capsule-utils";
 import { createNotification } from "@/lib/notifications/create";
-import { getKstDayRangeUtc, isUnlockDateKstToday } from "@/lib/notifications/kst";
+import { isUnlockDateKstToday } from "@/lib/notifications/kst";
 import {
   type ExpoPushMessage,
   sendExpoPushNotifications,
@@ -10,7 +10,6 @@ import { getTodayQuestion } from "@/lib/today-question";
 
 export type DispatchDailyOptions = {
   now?: Date;
-  force?: boolean;
 };
 
 export type DispatchDailyResult = {
@@ -18,18 +17,18 @@ export type DispatchDailyResult = {
   capsuleUnlocked: number;
   pushSent: number;
   pushFailed: number;
+  pushSkippedNoToken: number;
 };
 
 export async function dispatchDailyNotifications(
   options: DispatchDailyOptions = {},
 ): Promise<DispatchDailyResult> {
   const now = options.now ?? new Date();
-  const force = options.force ?? false;
-  const { start, end } = getKstDayRangeUtc(now);
   let dailyReminders = 0;
   let capsuleUnlocked = 0;
   let pushSent = 0;
   let pushFailed = 0;
+  let pushSkippedNoToken = 0;
 
   const todayQuestion = await getTodayQuestion();
   const pushBody =
@@ -52,17 +51,6 @@ export async function dispatchDailyNotifications(
   const pushMessages: ExpoPushMessage[] = [];
 
   for (const recipient of recipients) {
-    if (!force) {
-      const alreadySent = await prisma.notification.findFirst({
-        where: {
-          recipientUserId: recipient.id,
-          type: "daily_question_reminder",
-          createdAt: { gte: start, lt: end },
-        },
-      });
-      if (alreadySent) continue;
-    }
-
     await createNotification({
       recipientUserId: recipient.id,
       type: "daily_question_reminder",
@@ -78,6 +66,8 @@ export async function dispatchDailyNotifications(
         sound: "default",
         data: { url: "/" },
       });
+    } else {
+      pushSkippedNoToken += 1;
     }
   }
 
@@ -126,5 +116,5 @@ export async function dispatchDailyNotifications(
     capsuleUnlocked += 1;
   }
 
-  return { dailyReminders, capsuleUnlocked, pushSent, pushFailed };
+  return { dailyReminders, capsuleUnlocked, pushSent, pushFailed, pushSkippedNoToken };
 }

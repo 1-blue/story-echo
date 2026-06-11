@@ -31,9 +31,10 @@ function renderWithQuery(ui: ReactNode) {
 }
 
 describe("SettingsNotificationRow", () => {
-  it("renders notification switch", () => {
+  it("renders notification switch and schedule hint", () => {
     renderWithQuery(<SettingsNotificationRow user={user} />);
     expect(screen.getByText("알림 받기")).toBeInTheDocument();
+    expect(screen.getByText(/매일 오전 8시에 오늘의 질문 알림/)).toBeInTheDocument();
   });
 
   it("calls patch when toggled", async () => {

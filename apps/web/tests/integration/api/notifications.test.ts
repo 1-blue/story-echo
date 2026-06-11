@@ -1,6 +1,5 @@
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { dispatchDailyNotifications } from "@/lib/notifications/dispatch-daily";
-import { getKstDayRangeUtc } from "@/lib/notifications/kst";
 import { prisma } from "@/lib/prisma";
 import { apiFetch } from "../../helpers/api";
 import { setupGuestClient } from "../../helpers/auth";
@@ -87,7 +86,7 @@ integration("notifications API", () => {
     await cleanupTestUserByDeviceId(deviceId);
   });
 
-  it("dispatchDailyNotifications creates daily_question_reminder once per KST day", async () => {
+  it("dispatchDailyNotifications sends on every invocation", async () => {
     const { deviceId } = await setupGuestClient("notify-daily");
     const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
     const userId = parseUserMe(me.json).data.id;
@@ -114,24 +113,27 @@ integration("notifications API", () => {
     expect(first.pushSent).toBeGreaterThanOrEqual(1);
 
     const second = await dispatchDailyNotifications();
-    expect(second.dailyReminders).toBe(0);
-    expect(second.pushSent).toBe(0);
-
-    const forced = await dispatchDailyNotifications({ force: true });
-    expect(forced.dailyReminders).toBeGreaterThanOrEqual(1);
-    expect(forced.pushSent).toBeGreaterThanOrEqual(1);
-
-    const { start, end } = getKstDayRangeUtc();
-    const count = await prisma.notification.count({
-      where: {
-        recipientUserId: userId,
-        type: "daily_question_reminder",
-        createdAt: { gte: start, lt: end },
-      },
-    });
-    expect(count).toBeGreaterThanOrEqual(2);
+    expect(second.dailyReminders).toBeGreaterThanOrEqual(1);
+    expect(second.pushSent).toBeGreaterThanOrEqual(1);
 
     vi.unstubAllGlobals();
+    await cleanupTestUserByDeviceId(deviceId);
+  });
+
+  it("dispatchDailyNotifications skips phone push when push token is missing", async () => {
+    const { deviceId } = await setupGuestClient("notify-no-push");
+    const me = await apiFetch("/api/v1/users/me", {}, { deviceId });
+    const userId = parseUserMe(me.json).data.id;
+    await prisma.user.update({
+      where: { id: userId },
+      data: { notificationsEnabled: true },
+    });
+
+    const result = await dispatchDailyNotifications();
+    expect(result.dailyReminders).toBeGreaterThanOrEqual(1);
+    expect(result.pushSent).toBe(0);
+    expect(result.pushSkippedNoToken).toBeGreaterThanOrEqual(1);
+
     await cleanupTestUserByDeviceId(deviceId);
   });
 });

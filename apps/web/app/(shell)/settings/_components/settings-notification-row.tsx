@@ -23,6 +23,7 @@ import {
   unregisterNativePush,
 } from "@/lib/native-bridge";
 import { registerPushTokenFromWeb, unregisterPushTokenFromWeb } from "@/lib/register-push-token";
+import { DAILY_QUESTION_REMINDER_SETTINGS_DESCRIPTION } from "@/lib/notifications/daily-reminder-schedule";
 import { SettingsRow, SettingsSection } from "./settings-section";
 
 type SettingsNotificationRowProps = {
@@ -49,13 +50,16 @@ export function SettingsNotificationRow({ user }: SettingsNotificationRowProps) 
           return;
         }
 
-        if (outcome.expoPushToken && outcome.platform) {
-          try {
-            await registerPushTokenFromWeb(outcome.expoPushToken, outcome.platform);
-          } catch (error) {
-            toast.error(getErrorMessage(error));
-            return;
-          }
+        if (!outcome.expoPushToken || !outcome.platform) {
+          toast.message("푸시 알림 등록에 실패했어요. 잠시 후 다시 시도해 주세요.");
+          return;
+        }
+
+        try {
+          await registerPushTokenFromWeb(outcome.expoPushToken, outcome.platform);
+        } catch (error) {
+          toast.error(getErrorMessage(error));
+          return;
         }
       } else if (
         typeof Notification !== "undefined" &&
@@ -90,6 +94,9 @@ export function SettingsNotificationRow({ user }: SettingsNotificationRowProps) 
             disabled={patchUser.isPending}
           />
         </SettingsRow>
+        <p className="border-t border-hairline px-4 py-3 text-left text-xs leading-relaxed text-stone">
+          {DAILY_QUESTION_REMINDER_SETTINGS_DESCRIPTION}
+        </p>
       </SettingsSection>
 
       <Dialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen}>

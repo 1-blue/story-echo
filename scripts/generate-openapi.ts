@@ -1214,18 +1214,29 @@ registry.registerPath({
   method: "post",
   path: "/api/v1/cron/notifications",
   tags: ["Cron"],
-  parameters: [
-    {
-      name: "force",
-      in: "query",
-      required: false,
-      schema: { type: "boolean" },
-      description: "Skip same-day deduplication for manual testing",
-    },
-  ],
   responses: {
     200: {
       description: "Daily notifications dispatched",
+      content: { "application/json": { schema: CronNotificationsResponseSchema } },
+    },
+    401: {
+      description: "Unauthorized",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+    503: {
+      description: "Cron or database error",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/cron/notifications",
+  tags: ["Cron"],
+  responses: {
+    200: {
+      description: "Daily notifications dispatched (Vercel Cron)",
       content: { "application/json": { schema: CronNotificationsResponseSchema } },
     },
     401: {
