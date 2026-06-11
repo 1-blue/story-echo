@@ -1342,13 +1342,17 @@
           },
           "pushFailed": {
             "type": "integer"
+          },
+          "pushSkippedNoToken": {
+            "type": "integer"
           }
         },
         "required": [
           "dailyReminders",
           "capsuleUnlocked",
           "pushSent",
-          "pushFailed"
+          "pushFailed",
+          "pushSkippedNoToken"
         ]
       },
       "CronNotificationsResponse": {
@@ -3795,20 +3799,46 @@
         "tags": [
           "Cron"
         ],
-        "parameters": [
-          {
-            "name": "force",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean"
-            },
-            "description": "Skip same-day deduplication for manual testing"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Daily notifications dispatched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CronNotificationsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Cron or database error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Cron"
+        ],
+        "responses": {
+          "200": {
+            "description": "Daily notifications dispatched (Vercel Cron)",
             "content": {
               "application/json": {
                 "schema": {

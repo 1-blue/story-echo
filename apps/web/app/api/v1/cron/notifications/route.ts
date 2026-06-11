@@ -21,11 +21,8 @@ async function handleCron(request: Request) {
     return apiErrorResponse(503, "DB_UNAVAILABLE");
   }
 
-  const url = new URL(request.url);
-  const force = url.searchParams.get("force") === "true";
-
   try {
-    const result = await dispatchDailyNotifications({ force });
+    const result = await dispatchDailyNotifications();
     const body = CronNotificationsResponseSchema.parse({ data: result });
     return Response.json(body);
   } catch {

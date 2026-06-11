@@ -84,6 +84,8 @@ export const CronNotificationsResultSchema = z
     capsuleUnlocked: z.number().int(),
     pushSent: z.number().int(),
     pushFailed: z.number().int(),
+    /** push_tokens 없어서 in-app 알림만 생성된 유저 수 */
+    pushSkippedNoToken: z.number().int(),
   })
   .openapi("CronNotificationsResult");
 
