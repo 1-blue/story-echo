@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getFallbackRoute, isShellRoot, normalizePath } from "@/lib/native/navigation-fallback";
+import { computeCanGoBack, getFallbackRoute, isShellRoot, normalizePath } from "@/lib/native/navigation-fallback";
 
 describe("normalizePath", () => {
   it("strips /app prefix", () => {
@@ -26,6 +26,19 @@ describe("isShellRoot", () => {
     expect(isShellRoot("/community/write")).toBe(false);
     expect(isShellRoot("/write")).toBe(false);
     expect(isShellRoot("/notifications")).toBe(false);
+  });
+});
+
+describe("computeCanGoBack", () => {
+  it("returns false for shell roots", () => {
+    expect(computeCanGoBack("/")).toBe(false);
+    expect(computeCanGoBack("/drawer")).toBe(false);
+  });
+
+  it("returns true for detail and write routes", () => {
+    expect(computeCanGoBack("/capsule/write")).toBe(true);
+    expect(computeCanGoBack("/community/write")).toBe(true);
+    expect(computeCanGoBack("/write")).toBe(true);
   });
 });
 

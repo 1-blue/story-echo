@@ -12,6 +12,10 @@ export function isShellRoot(pathname: string): boolean {
   return SHELL_ROOTS.has(normalizePath(pathname));
 }
 
+export function computeCanGoBack(pathname: string): boolean {
+  return !isShellRoot(pathname);
+}
+
 export function getFallbackRoute(pathname: string): string | null {
   const path = normalizePath(pathname);
 

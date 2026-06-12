@@ -56,6 +56,49 @@ integration("notifications API", () => {
     await cleanupTestUserByDeviceId(commenter.deviceId);
   });
 
+  it("DELETE /api/v1/notifications deletes by id and read notifications", async () => {
+    const author = await setupGuestClient("notify-delete-author");
+    const meA = await apiFetch("/api/v1/users/me", {}, { deviceId: author.deviceId });
+    await setUserEmailVerified(parseUserMe(meA.json).data.id, true);
+    const post = await createCommunityPost("notify delete target", { deviceId: author.deviceId });
+    const postId = parseCommunityPost(post.json).data.id;
+
+    const commenter = await setupGuestClient("notify-delete-commenter");
+    const meB = await apiFetch("/api/v1/users/me", {}, { deviceId: commenter.deviceId });
+    await setUserEmailVerified(parseUserMe(meB.json).data.id, true);
+
+    await apiFetch(
+      `/api/v1/community/posts/${postId}/comments`,
+      { method: "POST", json: { bodyText: "hello" } },
+      { deviceId: commenter.deviceId },
+    );
+
+    const authorId = parseUserMe(meA.json).data.id;
+    const row = await prisma.notification.findFirst({
+      where: { recipientUserId: authorId, type: "comment_on_post", postId },
+    });
+    expect(row).not.toBeNull();
+
+    await apiFetch(
+      "/api/v1/notifications",
+      { method: "PATCH", json: { ids: [row!.id] } },
+      { deviceId: author.deviceId },
+    );
+
+    const deleteReadRes = await apiFetch(
+      "/api/v1/notifications",
+      { method: "DELETE", json: { deleteRead: true } },
+      { deviceId: author.deviceId },
+    );
+    expect(deleteReadRes.status).toBe(200);
+
+    const afterDelete = await prisma.notification.findFirst({ where: { id: row!.id } });
+    expect(afterDelete).toBeNull();
+
+    await cleanupTestUserByDeviceId(author.deviceId);
+    await cleanupTestUserByDeviceId(commenter.deviceId);
+  });
+
   it("PUT/DELETE /users/me/push-token registers and removes token", async () => {
     const { deviceId } = await setupGuestClient("notify-push-token");
     const putRes = await apiFetch(

@@ -55,6 +55,15 @@ export const MarkNotificationsReadRequestSchema = z
 
 export type MarkNotificationsReadRequest = z.infer<typeof MarkNotificationsReadRequestSchema>;
 
+export const DeleteNotificationsRequestSchema = z
+  .object({
+    ids: z.array(z.string().uuid()).optional(),
+    deleteRead: z.boolean().optional(),
+  })
+  .openapi("DeleteNotificationsRequest");
+
+export type DeleteNotificationsRequest = z.infer<typeof DeleteNotificationsRequestSchema>;
+
 /** @deprecated Use NotificationTypeSchema */
 export const CommunityNotificationTypeSchema = NotificationTypeSchema;
 /** @deprecated Use NotificationSchema */

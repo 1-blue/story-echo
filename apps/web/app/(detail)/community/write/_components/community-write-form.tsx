@@ -19,12 +19,7 @@ import type { TodayQuestion } from "@/lib/today-question";
 import { getCommunityBlockedMessage, type WriteCapabilities } from "@/lib/write-capabilities";
 import { CommunityWriteHeader } from "./community-write-header";
 import { EmailVerificationDialog } from "./email-verification-dialog";
-
-type QuestionOption = {
-  id: string | null;
-  text: string;
-  label: string;
-};
+import { PreviousQuestionPicker } from "./previous-question-picker";
 
 type QuestionMode = "today" | "previous" | "free";
 
@@ -36,7 +31,6 @@ type CommunityWriteFormBaseProps = {
 type CreateCommunityWriteFormProps = CommunityWriteFormBaseProps & {
   mode: "create";
   todayQuestion: TodayQuestion;
-  previousQuestions: QuestionOption[];
 };
 
 type EditCommunityWriteFormProps = CommunityWriteFormBaseProps & {
@@ -62,8 +56,8 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
     if (isEdit) return props.initialQuestionText ? "today" : "free";
     return "today";
   });
-  const [selectedPreviousId, setSelectedPreviousId] = useState<string | null>(
-    !isEdit ? (props.previousQuestions[0]?.id ?? null) : null,
+  const [selectedPrevious, setSelectedPrevious] = useState<{ id: string; text: string } | null>(
+    null,
   );
   const [showVerification, setShowVerification] = useState(false);
 
@@ -75,7 +69,6 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
   });
 
   const todayQuestion = !isEdit ? props.todayQuestion : null;
-  const previousQuestions = !isEdit ? props.previousQuestions : [];
 
   const selectedQuestion = isEdit
     ? {
@@ -86,11 +79,13 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
     : mode === "today"
       ? todayQuestion!
       : mode === "previous"
-        ? (previousQuestions.find((q) => q.id === selectedPreviousId) ?? {
-            id: null,
-            text: "질문을 선택해주세요",
-            label: "이전 질문",
-          })
+        ? selectedPrevious
+          ? { ...selectedPrevious, label: "이전 질문" }
+          : {
+              id: null,
+              text: "질문을 선택해주세요",
+              label: "이전 질문",
+            }
         : { id: null, text: "자유 주제", label: "자유 주제" };
 
   const isSubmitting = createPost.isPending || updatePost.isPending || photoUpload.isUploading;
@@ -98,6 +93,11 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
   const handleSubmit = async () => {
     if (!bodyText.trim()) {
       toast.error("내용을 입력해주세요.");
+      return;
+    }
+
+    if (!isEdit && mode === "previous" && !selectedPrevious) {
+      toast.error("이전 질문을 선택해주세요.");
       return;
     }
 
@@ -176,28 +176,19 @@ export function CommunityWriteForm(props: CommunityWriteFormProps) {
               />
             </div>
 
-            {mode === "previous" && previousQuestions.length > 0 && (
-              <div className="flex flex-col gap-2">
-                {previousQuestions.map((question) => (
-                  <button
-                    key={question.id}
-                    type="button"
-                    onClick={() => setSelectedPreviousId(question.id)}
-                    className={`rounded-lg border border-hairline px-3 py-2 text-left text-sm transition-colors ${
-                      selectedPreviousId === question.id
-                        ? "border-primary bg-terracotta-soft/40"
-                        : "bg-white hover:bg-surface-cream/60"
-                    }`}
-                  >
-                    {question.text}
-                  </button>
-                ))}
-              </div>
+            {mode === "previous" && todayQuestion?.id && (
+              <PreviousQuestionPicker
+                todayQuestionId={todayQuestion.id}
+                selectedId={selectedPrevious?.id ?? null}
+                onSelect={(id, text) => setSelectedPrevious({ id, text })}
+              />
             )}
           </section>
         )}
 
-        {mode !== "free" && selectedQuestion.text !== "자유 주제" && (
+        {mode !== "free" &&
+          selectedQuestion.text !== "자유 주제" &&
+          selectedQuestion.text !== "질문을 선택해주세요" && (
           <div className="flex items-start gap-3 rounded-xl border border-hairline bg-white p-4 shadow-sm">
             <Quote className="mt-0.5 size-6 shrink-0 text-primary opacity-70" strokeWidth={1.75} />
             <p className="font-display text-lg leading-snug text-ink">{selectedQuestion.text}</p>

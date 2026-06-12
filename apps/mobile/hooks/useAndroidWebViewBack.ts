@@ -5,6 +5,19 @@ import type { WebView } from "react-native-webview";
 const ROOT_BACK_EXIT_MS = 2000;
 const ROOT_BACK_HINT = "한 번 더 누르면 종료";
 
+const RETRY_NAVIGATE_BACK_SCRIPT = `
+  (function() {
+    if (typeof window.__storyechoNavigateBack === "function") {
+      window.__storyechoNavigateBack();
+      return;
+    }
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "back-result", handled: false }));
+    }
+  })();
+  true;
+`;
+
 type BackResultMessage = {
   type: "back-result";
   handled?: boolean;
@@ -52,6 +65,7 @@ export function useAndroidWebViewBack(webViewRef: RefObject<WebView | null>) {
   const [canGoBack, setCanGoBack] = useState(false);
   const canGoBackRef = useRef(false);
   const lastRootBackAtRef = useRef(0);
+  const retryBackRef = useRef(false);
 
   useEffect(() => {
     canGoBackRef.current = canGoBack;
@@ -88,6 +102,7 @@ export function useAndroidWebViewBack(webViewRef: RefObject<WebView | null>) {
 
       if (payload.allowExit) {
         lastRootBackAtRef.current = 0;
+        retryBackRef.current = false;
         if (Platform.OS === "android") {
           BackHandler.exitApp();
         }
@@ -95,14 +110,17 @@ export function useAndroidWebViewBack(webViewRef: RefObject<WebView | null>) {
       }
 
       if (payload.handled) {
+        retryBackRef.current = false;
         return;
       }
 
-      if (canGoBackRef.current && webViewRef.current) {
-        webViewRef.current.goBack();
+      if (canGoBackRef.current && webViewRef.current && !retryBackRef.current) {
+        retryBackRef.current = true;
+        webViewRef.current.injectJavaScript(RETRY_NAVIGATE_BACK_SCRIPT);
         return;
       }
 
+      retryBackRef.current = false;
       tryNativeRootExit();
     },
     [tryNativeRootExit, webViewRef],
@@ -111,18 +129,8 @@ export function useAndroidWebViewBack(webViewRef: RefObject<WebView | null>) {
   const onAndroidBackPress = useCallback(() => {
     if (!webViewRef.current) return false;
 
-    webViewRef.current.injectJavaScript(`
-      (function() {
-        if (typeof window.__storyechoNavigateBack === "function") {
-          window.__storyechoNavigateBack();
-          return;
-        }
-        if (window.ReactNativeWebView) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({ type: "back-result", handled: false }));
-        }
-      })();
-      true;
-    `);
+    retryBackRef.current = false;
+    webViewRef.current.injectJavaScript(RETRY_NAVIGATE_BACK_SCRIPT);
     return true;
   }, [webViewRef]);
 

@@ -42,6 +42,7 @@ import {
 } from "../packages/schemas/src/index.ts";
 import {
   MarkNotificationsReadRequestSchema,
+  DeleteNotificationsRequestSchema,
   NotificationListResponseSchema,
 } from "../packages/schemas/src/notification.ts";
 import { PaginationQuerySchema } from "../packages/schemas/src/pagination.ts";
@@ -101,6 +102,7 @@ registry.register("ToggleCommunityReactionResponse", ToggleCommunityReactionResp
 registry.register("CommunityUserSearchResponse", CommunityUserSearchResponseSchema);
 registry.register("NotificationListResponse", NotificationListResponseSchema);
 registry.register("MarkNotificationsReadRequest", MarkNotificationsReadRequestSchema);
+registry.register("DeleteNotificationsRequest", DeleteNotificationsRequestSchema);
 registry.register("ReportCommunityPostRequest", ReportCommunityPostRequestSchema);
 
 registry.registerPath({
@@ -1035,6 +1037,35 @@ registry.registerPath({
           schema: z.object({ data: z.object({ ok: z.literal(true) }) }),
         },
       },
+    },
+    503: {
+      description: "Database unavailable",
+      content: { "application/json": { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "delete",
+  path: "/api/v1/notifications",
+  tags: ["Notifications"],
+  request: {
+    body: {
+      content: { "application/json": { schema: DeleteNotificationsRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "Notifications deleted",
+      content: {
+        "application/json": {
+          schema: z.object({ data: z.object({ ok: z.literal(true) }) }),
+        },
+      },
+    },
+    400: {
+      description: "Validation error",
+      content: { "application/json": { schema: ErrorResponseSchema } },
     },
     503: {
       description: "Database unavailable",

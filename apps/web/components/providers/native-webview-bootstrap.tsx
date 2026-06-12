@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { isShellRoot, normalizePath } from "@/lib/native/navigation-fallback";
+import { computeCanGoBack, normalizePath } from "@/lib/native/navigation-fallback";
 import { isNativeWebView, postNativeMessage } from "@/lib/native/webview";
 
 function isScrollAtTop(): boolean {
@@ -67,7 +67,7 @@ export function NativeWebViewBootstrap() {
     postNativeMessage({
       type: "navigation",
       pathname: normalizedPath,
-      canGoBack: !isShellRoot(normalizedPath),
+      canGoBack: computeCanGoBack(pathname),
     });
   }, [pathname]);
 
