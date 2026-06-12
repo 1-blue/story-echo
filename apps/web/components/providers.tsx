@@ -6,7 +6,7 @@ import { DeviceIdBootstrap } from "./providers/device-id-bootstrap";
 import { NativeAndroidBackBootstrap } from "./providers/native-android-back-bootstrap";
 import { NativeWebViewBootstrap } from "./providers/native-webview-bootstrap";
 import { PullRefreshBootstrap } from "./providers/pull-refresh-bootstrap";
-import { VisualViewportBootstrap } from "./providers/visual-viewport-bootstrap";
+import { KeyboardInsetProvider } from "./providers/keyboard-inset-context";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -26,9 +26,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <DeviceIdBootstrap />
       <NativeWebViewBootstrap />
       <PullRefreshBootstrap />
-      <VisualViewportBootstrap />
-      <NativeAndroidBackBootstrap />
-      {children}
+      <KeyboardInsetProvider>
+        <NativeAndroidBackBootstrap />
+        {children}
+      </KeyboardInsetProvider>
     </QueryClientProvider>
   );
 }

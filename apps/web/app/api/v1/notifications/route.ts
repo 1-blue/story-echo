@@ -1,4 +1,5 @@
 import {
+  DeleteNotificationsRequestSchema,
   MarkNotificationsReadRequestSchema,
   NotificationListResponseSchema,
 } from "@storyecho/schemas";
@@ -92,6 +93,43 @@ export async function PATCH(request: Request) {
         },
         data: { readAt: now },
       });
+    }
+
+    return Response.json({ data: { ok: true } });
+  } catch {
+    return apiErrorResponse(503, "DB_ERROR");
+  }
+}
+
+export async function DELETE(request: Request) {
+  if (!isDatabaseConfigured()) {
+    return Response.json(apiErrorBody("DB_UNAVAILABLE"), { status: 503 });
+  }
+
+  try {
+    const user = await resolveCurrentUser(request);
+    const json: unknown = await request.json();
+    const parsed = DeleteNotificationsRequestSchema.safeParse(json);
+
+    if (!parsed.success) {
+      return apiErrorResponse(400, "VALIDATION_ERROR");
+    }
+
+    const { ids, deleteRead } = parsed.data;
+
+    if (deleteRead) {
+      await prisma.notification.deleteMany({
+        where: { recipientUserId: user.id, readAt: { not: null } },
+      });
+    } else if (ids?.length) {
+      await prisma.notification.deleteMany({
+        where: {
+          recipientUserId: user.id,
+          id: { in: ids },
+        },
+      });
+    } else {
+      return apiErrorResponse(400, "VALIDATION_ERROR");
     }
 
     return Response.json({ data: { ok: true } });

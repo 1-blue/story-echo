@@ -69,7 +69,7 @@ export function StoryEchoWebView() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [atTop, setAtTop] = useState(true);
-  const { setCanGoBack, handleNativeMessage } = useAndroidWebViewBack(webViewRef);
+  const { handleNativeMessage } = useAndroidWebViewBack(webViewRef);
   const { handleBridgeMessage } = useNotificationBridge(webViewRef);
 
   const injectSafeArea = useCallback(() => {
@@ -104,19 +104,11 @@ export function StoryEchoWebView() {
     finishRefresh();
   }, [finishRefresh, injectSafeArea]);
 
-  const handleLoadProgress = useCallback(
-    (event: { nativeEvent: { canGoBack: boolean } }) => {
-      setCanGoBack(event.nativeEvent.canGoBack);
-    },
-    [setCanGoBack],
-  );
-
   const handleNavigationStateChange = useCallback(
-    (state: WebViewNavigation) => {
-      setCanGoBack(state.canGoBack);
+    (_state: WebViewNavigation) => {
       injectSafeArea();
     },
-    [setCanGoBack, injectSafeArea],
+    [injectSafeArea],
   );
 
   const handleMessage = useCallback(
@@ -203,7 +195,6 @@ export function StoryEchoWebView() {
         </View>
       )}
       onLoadEnd={handleLoadEnd}
-      onLoadProgress={handleLoadProgress}
       onNavigationStateChange={handleNavigationStateChange}
       onMessage={handleMessage}
       onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}

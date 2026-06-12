@@ -4,6 +4,7 @@ import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
+import { useKeyboardInsetRegistration } from "@/components/providers/keyboard-inset-context";
 import { useAndroidBackOverlay } from "@/lib/native/android-back";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ function Sheet({ open, defaultOpen, onOpenChange, ...props }: SheetRootProps) {
   );
 
   useAndroidBackOverlay(isOpen, () => handleOpenChange(false));
+  useKeyboardInsetRegistration(isOpen);
 
   return (
     <SheetPrimitive.Root

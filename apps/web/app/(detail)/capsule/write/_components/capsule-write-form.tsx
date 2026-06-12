@@ -95,7 +95,7 @@ export function CapsuleWriteForm({ photoUploadEnabled }: CapsuleWriteFormProps) 
             value={bodyText}
             onChange={(event) => setBodyText(event.target.value)}
             placeholder="미래의 나에게 전하고 싶은 말을 적어주세요."
-            className="min-h-[240px] resize-none border-none bg-transparent p-0 text-lg text-ink shadow-none placeholder:text-stone focus-visible:ring-0"
+            className="min-h-[240px] resize-none rounded-none border-none bg-transparent p-0 text-lg text-ink shadow-none placeholder:text-stone focus-visible:ring-0"
           />
           {!bodyText.trim() && (
             <p className="text-xs text-stone">편지를 작성하면 봉인할 수 있어요.</p>

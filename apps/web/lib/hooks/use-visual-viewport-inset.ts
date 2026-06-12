@@ -12,8 +12,13 @@ function updateKeyboardInset(): void {
   document.documentElement.style.setProperty("--keyboard-inset-bottom", `${keyboardInset}px`);
 }
 
-export function useVisualViewportInset(): void {
+export function useVisualViewportInset(enabled: boolean): void {
   useEffect(() => {
+    if (!enabled) {
+      document.documentElement.style.removeProperty("--keyboard-inset-bottom");
+      return;
+    }
+
     updateKeyboardInset();
 
     const viewport = window.visualViewport;
@@ -31,5 +36,5 @@ export function useVisualViewportInset(): void {
       window.removeEventListener("orientationchange", updateKeyboardInset);
       document.documentElement.style.removeProperty("--keyboard-inset-bottom");
     };
-  }, []);
+  }, [enabled]);
 }

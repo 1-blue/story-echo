@@ -3,11 +3,15 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { tryCloseAndroidBackOverlays } from "@/lib/native/android-back";
-import { getFallbackRoute, isShellRoot, normalizePath } from "@/lib/native/navigation-fallback";
+import {
+  computeCanGoBack,
+  getFallbackRoute,
+  isShellRoot,
+  normalizePath,
+} from "@/lib/native/navigation-fallback";
 import { postNativeMessage } from "@/lib/native/webview";
 
 const ROOT_BACK_EXIT_MS = 2000;
-const NAVIGATION_BACK_FALLBACK_MS = 100;
 
 function postBackResult(result: { handled: boolean; allowExit?: boolean }) {
   postNativeMessage({ type: "back-result", ...result });
@@ -28,15 +32,15 @@ export function useNativeAndroidBack() {
 
       const currentPath = normalizePath(pathname);
       if (!isShellRoot(currentPath)) {
+        const fallback = getFallbackRoute(currentPath);
         router.back();
 
-        window.setTimeout(() => {
+        window.requestAnimationFrame(() => {
           const nextPath = normalizePath(window.location.pathname);
-          if (nextPath === currentPath) {
-            const fallback = getFallbackRoute(currentPath);
-            if (fallback) router.push(fallback);
+          if (nextPath === currentPath && fallback) {
+            router.push(fallback);
           }
-        }, NAVIGATION_BACK_FALLBACK_MS);
+        });
 
         postBackResult({ handled: true });
         return true;
@@ -59,7 +63,7 @@ export function useNativeAndroidBack() {
     postNativeMessage({
       type: "navigation",
       pathname: normalizePath(pathname),
-      canGoBack: !isShellRoot(normalizePath(pathname)),
+      canGoBack: computeCanGoBack(pathname),
     });
 
     return () => {
