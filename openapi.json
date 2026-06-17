@@ -131,6 +131,31 @@
           "data"
         ]
       },
+      "QuestionTagKey": {
+        "type": "string",
+        "enum": [
+          "memory",
+          "experience",
+          "emotion",
+          "relationship",
+          "goal",
+          "growth",
+          "gratitude",
+          "daily",
+          "future",
+          "self",
+          "reflection",
+          "hope",
+          "place",
+          "food",
+          "scent",
+          "weather",
+          "sound",
+          "object",
+          "echo",
+          "timecapsule"
+        ]
+      },
       "DrawerStory": {
         "type": "object",
         "properties": {
@@ -149,6 +174,13 @@
           "questionText": {
             "type": "string",
             "nullable": true
+          },
+          "questionTags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionTagKey"
+            },
+            "default": []
           },
           "photoUrls": {
             "type": "array",
@@ -742,31 +774,6 @@
             "type": "boolean"
           }
         }
-      },
-      "QuestionTagKey": {
-        "type": "string",
-        "enum": [
-          "memory",
-          "experience",
-          "emotion",
-          "relationship",
-          "goal",
-          "growth",
-          "gratitude",
-          "daily",
-          "future",
-          "self",
-          "reflection",
-          "hope",
-          "place",
-          "food",
-          "scent",
-          "weather",
-          "sound",
-          "object",
-          "echo",
-          "timecapsule"
-        ]
       },
       "TodayQuestion": {
         "type": "object",

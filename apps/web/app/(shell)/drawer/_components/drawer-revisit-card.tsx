@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronRight, History } from "lucide-react";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { QuestionTagBadges } from "@/components/question/question-tag-badges";
 import type { DrawerStoryItem } from "@/features/stories/types";
 import { formatStoryDayLong } from "@/lib/format-story-date";
 
@@ -23,9 +24,12 @@ export function DrawerRevisitCard({ story }: DrawerRevisitCardProps) {
             <span className="text-xs font-semibold">오늘의 회상</span>
           </div>
           <p className="mb-1 text-xs text-stone">{formatStoryDayLong(story.createdAt)}</p>
-          <h3 className="mb-1 line-clamp-1 text-base font-semibold text-ink">
-            {story.questionText ?? "오늘의 질문"}
-          </h3>
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <h3 className="line-clamp-1 text-base font-semibold text-ink">
+              {story.questionText ?? "오늘의 질문"}
+            </h3>
+            <QuestionTagBadges tags={story.questionTags} max={2} />
+          </div>
           <p className="line-clamp-1 text-sm text-charcoal">{story.bodyText}</p>
         </div>
         <ChevronRight className="mt-1 size-5 shrink-0 text-primary" strokeWidth={1.75} />

@@ -1,26 +1,31 @@
 "use client";
 
-import { Flag } from "lucide-react";
 import { BottomSheet, BottomSheetContent } from "@/components/ui/bottom-sheet";
 import { Button } from "@/components/ui/button";
 
-type DeleteSheetProps = {
+type StoryDeleteSheetProps = {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
   isSubmitting: boolean;
+  title: string;
+  description: string;
 };
 
-export function DeleteSheet({ open, onClose, onConfirm, isSubmitting }: DeleteSheetProps) {
+export function StoryDeleteSheet({
+  open,
+  onClose,
+  onConfirm,
+  isSubmitting,
+  title,
+  description,
+}: StoryDeleteSheetProps) {
   return (
     <BottomSheet open={open} onOpenChange={(next) => !next && onClose()}>
       <BottomSheetContent>
         <div className="text-center">
-          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-surface-cream text-charcoal">
-            <Flag className="size-6" strokeWidth={1.75} />
-          </div>
-          <h3 className="mb-2 text-xl font-semibold text-ink">타임캡슐을 삭제할까요?</h3>
-          <p className="mb-6 text-sm leading-relaxed text-slate">삭제하면 복구할 수 없어요.</p>
+          <h3 className="mb-2 text-xl font-semibold text-ink">{title}</h3>
+          <p className="mb-6 text-sm leading-relaxed text-slate">{description}</p>
           <div className="flex flex-col gap-2">
             <Button
               variant="destructive"

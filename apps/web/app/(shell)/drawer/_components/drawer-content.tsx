@@ -61,6 +61,7 @@ export function DrawerContent({ todayStoryId = null }: DrawerContentProps) {
     .map((story) => ({
       ...story,
       photoUrls: story.photoUrls ?? [],
+      questionTags: story.questionTags ?? [],
     }));
 
   const {

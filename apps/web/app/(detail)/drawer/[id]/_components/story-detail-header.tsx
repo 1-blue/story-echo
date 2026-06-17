@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ALargeSmall, ArrowLeft, Bookmark, Pencil } from "lucide-react";
+import { ALargeSmall, ArrowLeft, Bookmark, MoreVertical, Pencil } from "lucide-react";
 import { useGetApiV1StoriesIdSuspense } from "@storyecho/api-client";
 import { Button } from "@/components/ui/button";
 import { useToggleStoryBookmark } from "@/lib/stories/use-toggle-story-bookmark";
@@ -11,9 +11,14 @@ import { cn } from "@/lib/utils";
 type StoryDetailHeaderProps = {
   storyId: string;
   onFontSizeClick: () => void;
+  onDelete: () => void;
 };
 
-export function StoryDetailHeader({ storyId, onFontSizeClick }: StoryDetailHeaderProps) {
+export function StoryDetailHeader({
+  storyId,
+  onFontSizeClick,
+  onDelete,
+}: StoryDetailHeaderProps) {
   const router = useRouter();
   const { data } = useGetApiV1StoriesIdSuspense(storyId);
   const story = data.data;
@@ -77,6 +82,16 @@ export function StoryDetailHeader({ storyId, onFontSizeClick }: StoryDetailHeade
           onClick={onFontSizeClick}
         >
           <ALargeSmall className="size-5" strokeWidth={1.75} />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-10 text-slate"
+          aria-label="삭제"
+          onClick={onDelete}
+        >
+          <MoreVertical className="size-5" strokeWidth={1.75} />
         </Button>
       </div>
     </header>

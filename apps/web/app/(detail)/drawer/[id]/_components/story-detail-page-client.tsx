@@ -2,8 +2,15 @@
 
 import { Component, Suspense, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { QueryErrorResetBoundary, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import {
+  getGetApiV1StoriesDrawerQueryKey,
+  useDeleteApiV1StoriesId,
+} from "@storyecho/api-client";
 import { ClientOnly } from "@/components/client-only";
+import { StoryDeleteSheet } from "@/components/story/story-delete-sheet";
 import { Button } from "@/components/ui/button";
 import { getErrorMessage, isNotFoundError } from "@/lib/get-error-message";
 import { useFontSize } from "../_hooks/use-font-size";
@@ -62,12 +69,31 @@ type StoryDetailPageClientProps = {
 };
 
 function StoryDetailPageInner({ storyId }: StoryDetailPageClientProps) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const deleteMutation = useDeleteApiV1StoriesId();
   const { fontSize, setFontSize } = useFontSize();
   const [fontDialogOpen, setFontDialogOpen] = useState(false);
+  const [showDeleteSheet, setShowDeleteSheet] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      await deleteMutation.mutateAsync({ id: storyId });
+      await queryClient.invalidateQueries({ queryKey: getGetApiV1StoriesDrawerQueryKey() });
+      toast.success("이야기를 삭제했어요.");
+      router.push("/drawer");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-canvas text-foreground">
-      <StoryDetailHeader storyId={storyId} onFontSizeClick={() => setFontDialogOpen(true)} />
+      <StoryDetailHeader
+        storyId={storyId}
+        onFontSizeClick={() => setFontDialogOpen(true)}
+        onDelete={() => setShowDeleteSheet(true)}
+      />
       <QueryErrorResetBoundary>
         {({ reset }) => (
           <StoryDetailErrorBoundary
@@ -111,6 +137,14 @@ function StoryDetailPageInner({ storyId }: StoryDetailPageClientProps) {
         onOpenChange={setFontDialogOpen}
         fontSize={fontSize}
         onFontSizeChange={setFontSize}
+      />
+      <StoryDeleteSheet
+        open={showDeleteSheet}
+        onClose={() => setShowDeleteSheet(false)}
+        onConfirm={handleDelete}
+        isSubmitting={deleteMutation.isPending}
+        title="이야기를 삭제할까요?"
+        description="삭제하면 복구할 수 없어요."
       />
     </div>
   );

@@ -30,7 +30,7 @@ export async function GET(request: Request, context: RouteContext) {
         visibility: { in: ["private", "community"] },
       },
       include: {
-        question: { select: { text: true } },
+        question: { select: { text: true, tags: true } },
       },
     });
 
@@ -68,7 +68,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const story = await prisma.story.findFirst({
       where: { id, userId: user.id },
       include: {
-        question: { select: { text: true } },
+        question: { select: { text: true, tags: true } },
       },
     });
 
@@ -102,7 +102,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         ...(parsed.data.isBookmarked !== undefined && { isBookmarked: parsed.data.isBookmarked }),
       },
       include: {
-        question: { select: { text: true } },
+        question: { select: { text: true, tags: true } },
       },
     });
 
