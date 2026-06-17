@@ -13,6 +13,7 @@ import {
   QuestionArchiveListResponseSchema,
   QuestionNotTodayErrorSchema,
   QuestionResponseSchema,
+  StoryDetailResponseSchema,
   StoryResponseSchema,
   TodayQuestionResponseSchema,
   TodayStoryExistsErrorSchema,
@@ -29,6 +30,7 @@ export function parseApiJson<T extends z.ZodType>(schema: T, json: unknown): z.i
 }
 
 export const parseStory = (json: unknown) => parseApiJson(StoryResponseSchema, json);
+export const parseStoryDetail = (json: unknown) => parseApiJson(StoryDetailResponseSchema, json);
 export const parseUserMe = (json: unknown) => parseApiJson(UserMeResponseSchema, json);
 export const parseTodayQuestion = (json: unknown) =>
   parseApiJson(TodayQuestionResponseSchema, json);

@@ -14,6 +14,7 @@ import {
   parseErrorResponse,
   parseQuestionNotTodayError,
   parseStory,
+  parseStoryDetail,
   parseTodayQuestion,
   parseTodayStoryExistsError,
   parseUserMe,
@@ -98,12 +99,16 @@ integration("Questions · Stories API", () => {
     await cleanupTestUserByDeviceId(deviceId);
   });
 
-  it("GET /stories/drawer returns user stories", async () => {
+  it("GET /stories/drawer returns user stories with question tags", async () => {
     const { deviceId } = await setupGuestClient("story-drawer");
     await createPrivateStory("drawer item", { deviceId });
     const res = await apiFetch("/api/v1/stories/drawer", {}, { deviceId });
     expect(res.status).toBe(200);
-    expect(parseDrawerList(res.json).data.length).toBeGreaterThan(0);
+    const body = parseDrawerList(res.json);
+    expect(body.data.length).toBeGreaterThan(0);
+    expect(body.data[0].questionTags).toEqual(expect.any(Array));
+    const withQuestion = body.data.find((item) => item.questionTags.length > 0);
+    expect(withQuestion).toBeTruthy();
     await cleanupTestUserByDeviceId(deviceId);
   });
 
@@ -114,6 +119,7 @@ integration("Questions · Stories API", () => {
 
     const getRes = await apiFetch(`/api/v1/stories/${id}`, {}, { deviceId });
     expect(getRes.status).toBe(200);
+    expect(parseStoryDetail(getRes.json).data.questionTags).toEqual(expect.any(Array));
 
     const patchRes = await apiFetch(
       `/api/v1/stories/${id}`,

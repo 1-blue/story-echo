@@ -2,6 +2,7 @@ import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 import { CommunityAuthorSchema, CommunityCommentSchema, ReactionCountSchema } from "./community";
 import { PaginationMetaSchema } from "./pagination";
+import { QuestionTagKeySchema } from "./question";
 
 extendZodWithOpenApi(z);
 
@@ -98,6 +99,7 @@ export const DrawerStorySchema = z
     bodyText: z.string().max(5000),
     createdAt: z.string().datetime(),
     questionText: z.string().nullable(),
+    questionTags: z.array(QuestionTagKeySchema).default([]),
     photoUrls: z.array(z.string().url()).max(8).default([]),
     isCapsule: z.boolean(),
     isCapsuleActive: z.boolean(),

@@ -1,4 +1,5 @@
 import type { Story as DbStory } from "@storyecho/database";
+import { isQuestionTagKey } from "@storyecho/database/question-tags";
 import type { Story } from "@storyecho/schemas";
 
 export function toStoryDto(story: DbStory): Story {
@@ -21,7 +22,7 @@ export function isDatabaseConfigured(): boolean {
 }
 
 type StoryWithQuestion = DbStory & {
-  question: { text: string } | null;
+  question: { text: string; tags: string[] } | null;
 };
 
 export function buildQuestionEchoCounts(
@@ -45,12 +46,17 @@ export function isEchoStoryFromCounts(
   return (echoCounts.get(questionId) ?? 0) >= 2;
 }
 
+function toQuestionTags(tags: string[] | undefined | null) {
+  return (tags ?? []).filter(isQuestionTagKey);
+}
+
 export function toDrawerStoryDto(story: StoryWithQuestion, isEchoStory = false) {
   return {
     id: story.id,
     bodyText: story.bodyText,
     createdAt: story.createdAt.toISOString(),
     questionText: story.question?.text ?? null,
+    questionTags: toQuestionTags(story.question?.tags),
     photoUrls: Array.isArray(story.photoUrls) ? (story.photoUrls as string[]) : [],
     isCapsule: story.isCapsule,
     isCapsuleActive: story.isCapsuleActive,

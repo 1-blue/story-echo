@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, ChevronRight } from "lucide-react";
 import { StoryMetaBadges } from "@/components/story/story-meta-badges";
+import { QuestionTagBadges } from "@/components/question/question-tag-badges";
 import type { DrawerStoryItem } from "@/features/stories/types";
 import { formatStoryDay } from "@/lib/format-story-date";
 import { useToggleStoryBookmark } from "@/lib/stories/use-toggle-story-bookmark";
@@ -80,9 +81,12 @@ export function DrawerStoryCard({ story }: DrawerStoryCardProps) {
         </button>
       </div>
 
-      <h3 className="mb-1 line-clamp-1 text-base font-semibold text-ink">
-        {story.questionText ?? "오늘의 질문"}
-      </h3>
+      <div className="mb-1 flex flex-wrap items-center gap-2">
+        <h3 className="line-clamp-1 text-base font-semibold text-ink">
+          {story.questionText ?? "오늘의 질문"}
+        </h3>
+        <QuestionTagBadges tags={story.questionTags} max={2} />
+      </div>
       <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-slate">{story.bodyText}</p>
 
       <div className="flex items-end justify-between gap-3">

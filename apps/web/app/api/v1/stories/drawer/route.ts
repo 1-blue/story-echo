@@ -47,7 +47,7 @@ export async function GET(request: Request) {
           ...cursorWhereClause(cursorRow),
         },
         include: {
-          question: { select: { text: true } },
+          question: { select: { text: true, tags: true } },
         },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: limit + 1,

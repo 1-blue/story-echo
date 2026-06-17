@@ -15,7 +15,7 @@ import { formatUnlockDateKo } from "@/lib/capsule-utils";
 import { formatStoryDayLong } from "@/lib/format-story-date";
 import { getErrorMessage } from "@/lib/get-error-message";
 import { CapsuleDetailHeader } from "./capsule-detail-header";
-import { DeleteSheet } from "./delete-sheet";
+import { StoryDeleteSheet } from "@/components/story/story-delete-sheet";
 import { SealedOverlay } from "./sealed-overlay";
 
 type CapsuleDetailContentProps = {
@@ -125,11 +125,13 @@ export function CapsuleDetailContent({ capsuleId }: CapsuleDetailContentProps) {
         </button>
       </div>
 
-      <DeleteSheet
+      <StoryDeleteSheet
         open={showDeleteSheet}
         onClose={() => setShowDeleteSheet(false)}
         onConfirm={handleDelete}
         isSubmitting={deleteMutation.isPending}
+        title="타임캡슐을 삭제할까요?"
+        description="삭제하면 복구할 수 없어요."
       />
     </>
   );

@@ -20,13 +20,18 @@ export function StoryDetailContent({ storyId, fontSize }: StoryDetailContentProp
   const story: StoryDetailItem = {
     ...data.data,
     photoUrls: data.data.photoUrls ?? [],
+    questionTags: data.data.questionTags ?? [],
   };
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 px-5 py-6 pb-12">
       <BlurFade>
         <StoryDetailMeta story={story} />
-        <StoryDetailQuestion questionText={story.questionText} fontSize={fontSize} />
+        <StoryDetailQuestion
+          questionText={story.questionText}
+          questionTags={story.questionTags}
+          fontSize={fontSize}
+        />
       </BlurFade>
       <StoryDetailBody bodyText={story.bodyText} fontSize={fontSize} />
       <StoryDetailGallery photoUrls={story.photoUrls} />
