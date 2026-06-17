@@ -26,7 +26,7 @@ integration("Questions archive API", () => {
     await disconnectTestPrisma();
   });
 
-  it("GET /questions returns archive list", async () => {
+  it("GET /questions returns archive list with tags", async () => {
     const res = await apiFetch("/api/v1/questions");
     expect(res.status).toBe(200);
     const body = parseQuestionArchiveList(res.json);
@@ -36,11 +36,27 @@ integration("Questions archive API", () => {
       text: expect.any(String),
       month: expect.any(Number),
       day: expect.any(Number),
+      tags: expect.any(Array),
       publicStoryCount: expect.any(Number),
     });
+    expect(body.data[0].tags.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("GET /questions/[id] returns question detail", async () => {
+  it("GET /questions?tags=memory filters by tag (OR)", async () => {
+    const res = await apiFetch("/api/v1/questions?tags=memory");
+    expect(res.status).toBe(200);
+    const body = parseQuestionArchiveList(res.json);
+    expect(body.data.length).toBeGreaterThan(0);
+    expect(body.data.every((item) => item.tags.includes("memory"))).toBe(true);
+  });
+
+  it("GET /questions?tags=invalid returns 400", async () => {
+    const res = await apiFetch("/api/v1/questions?tags=not-a-tag");
+    expect(res.status).toBe(400);
+    expect(parseErrorResponse(res.json).code).toBe("VALIDATION_ERROR");
+  });
+
+  it("GET /questions/[id] returns question detail with tags", async () => {
     const questionId = await getFirstQuestionId();
     expect(questionId).toBeTruthy();
 

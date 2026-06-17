@@ -18,7 +18,7 @@ export async function GET(_request: Request, context: RouteContext) {
   try {
     const question = await prisma.question.findUnique({
       where: { id },
-      select: { id: true, text: true, month: true, day: true },
+      select: { id: true, text: true, month: true, day: true, tags: true },
     });
 
     if (!question) {

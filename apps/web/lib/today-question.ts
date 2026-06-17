@@ -1,4 +1,6 @@
 import { getKstMonthDay, normalizeMonthDay } from "@storyecho/database/question-calendar";
+import { isQuestionTagKey } from "@storyecho/database/question-tags";
+import type { QuestionTagKey } from "@storyecho/schemas";
 import { getKstDayRangeUtc } from "@/lib/notifications/kst";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/story-mapper";
@@ -6,6 +8,7 @@ import { isDatabaseConfigured } from "@/lib/story-mapper";
 const FALLBACK_QUESTION = {
   id: null as string | null,
   text: "오늘 가장 기억에 남는 순간은 무엇인가요?",
+  tags: [] as QuestionTagKey[],
 };
 
 const KOREAN_WEEKDAYS = [
@@ -21,6 +24,7 @@ const KOREAN_WEEKDAYS = [
 export type TodayQuestion = {
   id: string | null;
   text: string;
+  tags: QuestionTagKey[];
 };
 
 export function formatKoreanDate(date: Date): string {
@@ -40,14 +44,18 @@ export async function getTodayQuestion(): Promise<TodayQuestion> {
     const { month, day } = normalizeMonthDay(kst.month, kst.day);
     const question = await prisma.question.findUnique({
       where: { month_day: { month, day } },
-      select: { id: true, text: true },
+      select: { id: true, text: true, tags: true },
     });
 
     if (!question) {
       return FALLBACK_QUESTION;
     }
 
-    return { id: question.id, text: question.text };
+    return {
+      id: question.id,
+      text: question.text,
+      tags: question.tags.filter(isQuestionTagKey),
+    };
   } catch {
     return FALLBACK_QUESTION;
   }

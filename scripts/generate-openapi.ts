@@ -30,6 +30,7 @@ import {
   PublicQuestionAnswerListResponseSchema,
   PublicStoryDetailResponseSchema,
   PublicStoryFeedListResponseSchema,
+  QuestionArchiveListQuerySchema,
   QuestionArchiveListResponseSchema,
   QuestionResponseSchema,
   StoryCreateConflictErrorSchema,
@@ -149,12 +150,23 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/questions",
   tags: ["Questions"],
+  request: {
+    query: QuestionArchiveListQuerySchema,
+  },
   responses: {
     200: {
       description: "365-day question archive",
       content: {
         "application/json": {
           schema: QuestionArchiveListResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Invalid query",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
         },
       },
     },

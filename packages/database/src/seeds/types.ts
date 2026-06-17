@@ -13,4 +13,5 @@ export type QuestionSeed = {
   text: string;
   month: number;
   day: number;
+  tags: string[];
 };

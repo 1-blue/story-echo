@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import type { QuestionArchiveItem } from "@storyecho/api-client";
+import { QuestionTagBadges } from "@/components/question/question-tag-badges";
 import { Badge } from "@/components/ui/badge";
 import { formatQuestionDate } from "@/lib/format-question-date";
 import { questionDetailRoute } from "@/lib/routes/routes";
@@ -35,6 +36,7 @@ export function QuestionListItem({ question, isToday }: QuestionListItemProps) {
               오늘
             </Badge>
           )}
+          <QuestionTagBadges tags={question.tags} max={2} />
           {question.publicStoryCount > 0 && (
             <Badge variant="secondary" className="px-2 py-0 text-[10px]">
               공개 {question.publicStoryCount}

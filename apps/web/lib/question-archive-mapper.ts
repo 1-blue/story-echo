@@ -1,10 +1,12 @@
-import type { QuestionArchiveItem } from "@storyecho/schemas";
+import type { QuestionArchiveItem, QuestionTagKey } from "@storyecho/schemas";
+import { isQuestionTagKey } from "@storyecho/database/question-tags";
 
 type QuestionRow = {
   id: string;
   text: string;
   month: number;
   day: number;
+  tags: string[];
 };
 
 const PUBLIC_STORY_WHERE = {
@@ -15,6 +17,10 @@ const PUBLIC_STORY_WHERE = {
 
 export { PUBLIC_STORY_WHERE };
 
+function toQuestionTagKeys(tags: string[]): QuestionTagKey[] {
+  return tags.filter(isQuestionTagKey);
+}
+
 export function toQuestionArchiveItem(
   question: QuestionRow,
   publicStoryCount: number,
@@ -24,6 +30,7 @@ export function toQuestionArchiveItem(
     text: question.text,
     month: question.month,
     day: question.day,
+    tags: toQuestionTagKeys(question.tags),
     publicStoryCount,
   };
 }

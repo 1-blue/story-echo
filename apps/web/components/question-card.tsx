@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { Check, PenLine } from "lucide-react";
+import { QuestionTagBadges } from "@/components/question/question-tag-badges";
 import { Button } from "@/components/ui/button";
+import type { QuestionTagKey } from "@/lib/question-tags";
 import { ROUTES } from "@/lib/routes/routes";
+import { cn } from "@/lib/utils";
 
 type QuestionCardProps = {
   question: string;
+  tags?: QuestionTagKey[];
   todayStoryId?: string | null;
 };
 
-export function QuestionCard({ question, todayStoryId }: QuestionCardProps) {
+export function QuestionCard({ question, tags = [], todayStoryId }: QuestionCardProps) {
   const hasTodayStory = Boolean(todayStoryId);
 
   return (
@@ -16,9 +20,18 @@ export function QuestionCard({ question, todayStoryId }: QuestionCardProps) {
       <div className="pointer-events-none absolute -top-12 -right-12 size-32 rounded-full bg-terracotta-soft opacity-40 blur-2xl" />
       <div className="pointer-events-none absolute -bottom-8 -left-8 size-24 rounded-full bg-surface-cream opacity-60 blur-xl" />
 
-      <h1 className="relative z-10 mt-3 mb-10 max-w-[280px] font-display text-[28px] leading-snug font-medium tracking-[-0.3px] break-keep text-ink">
+      <h1
+        className={cn(
+          "relative z-10 mt-3 max-w-[280px] font-display text-[28px] leading-snug font-medium tracking-[-0.3px] break-keep text-ink",
+          tags.length > 0 ? "mb-4" : "mb-10",
+        )}
+      >
         {question}
       </h1>
+
+      {tags.length > 0 && (
+        <QuestionTagBadges tags={tags} max={2} className="relative z-10 mb-8 justify-center" />
+      )}
 
       <div className="relative z-10 mt-auto flex w-full flex-col gap-3">
         {hasTodayStory ? (

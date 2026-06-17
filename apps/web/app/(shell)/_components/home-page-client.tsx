@@ -3,16 +3,19 @@
 import { useAdEligible } from "@/components/app-shell/ad-eligibility-context";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { QuestionCard, QuestionExploreLinks } from "@/components/question-card";
+import type { QuestionTagKey } from "@/lib/question-tags";
 import { PublicStoriesFeed } from "./public-stories-feed";
 
 type HomePageClientProps = {
   questionText: string;
+  questionTags?: QuestionTagKey[];
   dateLabel: string;
   todayStoryId?: string | null;
 };
 
 export function HomePageClient({
   questionText,
+  questionTags = [],
   dateLabel,
   todayStoryId = null,
 }: HomePageClientProps) {
@@ -29,7 +32,7 @@ export function HomePageClient({
         </BlurFade>
 
         <BlurFade delay={0.08} className="w-full">
-          <QuestionCard question={questionText} todayStoryId={todayStoryId} />
+          <QuestionCard question={questionText} tags={questionTags} todayStoryId={todayStoryId} />
         </BlurFade>
 
         <BlurFade delay={0.12} className="mt-6 w-full">

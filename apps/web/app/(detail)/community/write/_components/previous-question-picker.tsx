@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { useGetApiV1Questions } from "@storyecho/api-client";
+import { QuestionTagBadges } from "@/components/question/question-tag-badges";
+import { QuestionTagFilter } from "@/components/question/question-tag-filter";
 import { Input } from "@/components/ui/input";
+import type { QuestionTagKey } from "@/lib/question-tags";
 import { formatQuestionDate } from "@/lib/format-question-date";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +21,13 @@ export function PreviousQuestionPicker({
   onSelect,
 }: PreviousQuestionPickerProps) {
   const [search, setSearch] = useState("");
-  const { data, isLoading, isError } = useGetApiV1Questions({
-    query: { staleTime: 5 * 60_000 },
-  });
+  const [selectedTags, setSelectedTags] = useState<QuestionTagKey[]>([]);
+  const tagsQuery = selectedTags.length > 0 ? selectedTags.join(",") : undefined;
+
+  const { data, isLoading, isError } = useGetApiV1Questions(
+    { tags: tagsQuery },
+    { query: { staleTime: 5 * 60_000 } },
+  );
 
   const questions = useMemo(() => {
     const items = (data?.data ?? [])
@@ -46,14 +53,26 @@ export function PreviousQuestionPicker({
 
   if (questions.length === 0) {
     return (
-      <p className="text-sm text-stone">
-        {search.trim() ? "검색 결과가 없어요." : "선택할 수 있는 이전 질문이 없어요."}
-      </p>
+      <div className="flex flex-col gap-2">
+        <QuestionTagFilter selected={selectedTags} onChange={setSelectedTags} />
+        <Input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="질문 또는 날짜로 검색"
+          className="h-10 rounded-xl border-hairline bg-white"
+        />
+        <p className="text-sm text-stone">
+          {search.trim() || selectedTags.length > 0
+            ? "검색 결과가 없어요."
+            : "선택할 수 있는 이전 질문이 없어요."}
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-2">
+      <QuestionTagFilter selected={selectedTags} onChange={setSelectedTags} />
       <Input
         value={search}
         onChange={(event) => setSearch(event.target.value)}
@@ -75,9 +94,12 @@ export function PreviousQuestionPicker({
                   : "border-transparent hover:bg-surface-cream/60",
               )}
             >
-              <span className="text-xs font-medium text-stone">
-                {formatQuestionDate(question.month, question.day)}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-medium text-stone">
+                  {formatQuestionDate(question.month, question.day)}
+                </span>
+                <QuestionTagBadges tags={question.tags} max={2} />
+              </div>
               <span className="leading-relaxed text-charcoal">{question.text}</span>
             </button>
           );
