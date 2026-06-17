@@ -743,6 +743,31 @@
           }
         }
       },
+      "QuestionTagKey": {
+        "type": "string",
+        "enum": [
+          "memory",
+          "experience",
+          "emotion",
+          "relationship",
+          "goal",
+          "growth",
+          "gratitude",
+          "daily",
+          "future",
+          "self",
+          "reflection",
+          "hope",
+          "place",
+          "food",
+          "scent",
+          "weather",
+          "sound",
+          "object",
+          "echo",
+          "timecapsule"
+        ]
+      },
       "TodayQuestion": {
         "type": "object",
         "properties": {
@@ -753,6 +778,13 @@
           },
           "text": {
             "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionTagKey"
+            },
+            "default": []
           },
           "todayStoryId": {
             "type": "string",
@@ -796,6 +828,14 @@
             "minimum": 1,
             "maximum": 31
           },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionTagKey"
+            },
+            "minItems": 1,
+            "maxItems": 3
+          },
           "publicStoryCount": {
             "type": "integer",
             "minimum": 0
@@ -806,6 +846,7 @@
           "text",
           "month",
           "day",
+          "tags",
           "publicStoryCount"
         ]
       },
@@ -1745,6 +1786,16 @@
         "tags": [
           "Questions"
         ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "tags",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "365-day question archive",
@@ -1752,6 +1803,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/QuestionArchiveListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }

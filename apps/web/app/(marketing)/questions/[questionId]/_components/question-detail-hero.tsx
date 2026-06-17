@@ -3,6 +3,7 @@
 import type { QuestionArchiveItem } from "@storyecho/api-client";
 import { getKstMonthDay } from "@storyecho/database/question-calendar";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { QuestionTagBadges } from "@/components/question/question-tag-badges";
 import { Badge } from "@/components/ui/badge";
 import { formatQuestionDate } from "@/lib/format-question-date";
 
@@ -23,6 +24,7 @@ export function QuestionDetailHero({ question }: QuestionDetailHeroProps) {
           <Badge variant="outline">공개 {question.publicStoryCount}</Badge>
         )}
       </div>
+      <QuestionTagBadges tags={question.tags} className="justify-center" />
       <h2 className="font-display text-2xl leading-snug font-medium break-keep">{question.text}</h2>
       <p className="text-sm leading-relaxed text-muted-foreground">
         이 질문에 대한 공개 이야기예요. 작성 날짜와 관계없이 모아볼 수 있어요.

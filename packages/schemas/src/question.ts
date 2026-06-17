@@ -1,12 +1,18 @@
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+import { QUESTION_TAG_KEYS } from "@storyecho/database/question-tags";
 import { z } from "zod";
 
 extendZodWithOpenApi(z);
+
+export const QuestionTagKeySchema = z.enum(QUESTION_TAG_KEYS).openapi("QuestionTagKey");
+
+export type QuestionTagKey = z.infer<typeof QuestionTagKeySchema>;
 
 export const TodayQuestionSchema = z
   .object({
     id: z.string().uuid().nullable(),
     text: z.string(),
+    tags: z.array(QuestionTagKeySchema).default([]),
     todayStoryId: z.string().uuid().nullable().optional(),
   })
   .openapi("TodayQuestion");
@@ -49,11 +55,20 @@ export const QuestionArchiveItemSchema = z
     text: z.string(),
     month: z.number().int().min(1).max(12),
     day: z.number().int().min(1).max(31),
+    tags: z.array(QuestionTagKeySchema).min(1).max(3),
     publicStoryCount: z.number().int().min(0),
   })
   .openapi("QuestionArchiveItem");
 
 export type QuestionArchiveItem = z.infer<typeof QuestionArchiveItemSchema>;
+
+export const QuestionArchiveListQuerySchema = z
+  .object({
+    tags: z.string().optional(),
+  })
+  .openapi("QuestionArchiveListQuery");
+
+export type QuestionArchiveListQuery = z.infer<typeof QuestionArchiveListQuerySchema>;
 
 export const QuestionArchiveListResponseSchema = z
   .object({

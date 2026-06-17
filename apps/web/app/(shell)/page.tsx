@@ -26,6 +26,7 @@ export default async function AppHomePage() {
   return (
     <HomePageClient
       questionText={todayQuestion.text}
+      questionTags={todayQuestion.tags}
       dateLabel={dateLabel}
       todayStoryId={todayStoryId}
     />

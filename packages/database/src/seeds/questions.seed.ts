@@ -18,11 +18,13 @@ export const seedQuestions: SeedFn = async ({ prisma }) => {
         text: question.text,
         month: question.month,
         day: question.day,
+        tags: question.tags,
       },
       update: {
         text: question.text,
         month: question.month,
         day: question.day,
+        tags: question.tags,
       },
     });
 

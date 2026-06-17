@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('guest', 'member', 'admin');
 
@@ -8,13 +11,16 @@ CREATE TYPE "Visibility" AS ENUM ('private', 'community');
 CREATE TYPE "FontSize" AS ENUM ('sm', 'md', 'lg');
 
 -- CreateEnum
-CREATE TYPE "CommunityReactionTargetType" AS ENUM ('post', 'comment');
+CREATE TYPE "PushPlatform" AS ENUM ('android', 'ios');
+
+-- CreateEnum
+CREATE TYPE "CommunityReactionTargetType" AS ENUM ('post', 'comment', 'story', 'story_comment');
 
 -- CreateEnum
 CREATE TYPE "CommunityReactionEmoji" AS ENUM ('heart', 'sad', 'angry', 'fire', 'clap');
 
 -- CreateEnum
-CREATE TYPE "CommunityNotificationType" AS ENUM ('comment_on_post', 'reply_to_comment', 'mention');
+CREATE TYPE "NotificationType" AS ENUM ('comment_on_post', 'reply_to_comment', 'mention', 'comment_on_public_story', 'reply_to_story_comment', 'daily_question_reminder', 'capsule_unlocked');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -35,10 +41,23 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
+CREATE TABLE "push_tokens" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "expo_push_token" TEXT NOT NULL,
+    "platform" "PushPlatform" NOT NULL,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "push_tokens_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "questions" (
     "id" UUID NOT NULL,
     "text" TEXT NOT NULL,
-    "annual_key" TEXT,
+    "month" INTEGER NOT NULL,
+    "day" INTEGER NOT NULL,
+    "tags" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "questions_pkey" PRIMARY KEY ("id")
@@ -83,6 +102,19 @@ CREATE TABLE "story_reports" (
 );
 
 -- CreateTable
+CREATE TABLE "story_comments" (
+    "id" UUID NOT NULL,
+    "story_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "parent_id" UUID,
+    "body_text" TEXT NOT NULL,
+    "mentioned_user_ids" JSONB NOT NULL DEFAULT '[]',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "story_comments_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "community_posts" (
     "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
@@ -122,17 +154,18 @@ CREATE TABLE "community_reactions" (
 );
 
 -- CreateTable
-CREATE TABLE "community_notifications" (
+CREATE TABLE "notifications" (
     "id" UUID NOT NULL,
     "recipient_user_id" UUID NOT NULL,
-    "actor_user_id" UUID NOT NULL,
-    "type" "CommunityNotificationType" NOT NULL,
-    "post_id" UUID NOT NULL,
+    "actor_user_id" UUID,
+    "type" "NotificationType" NOT NULL,
+    "post_id" UUID,
+    "story_id" UUID,
     "comment_id" UUID,
     "read_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "community_notifications_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -156,6 +189,15 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "users_nickname_key" ON "users"("nickname");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "push_tokens_expo_push_token_key" ON "push_tokens"("expo_push_token");
+
+-- CreateIndex
+CREATE INDEX "push_tokens_user_id_idx" ON "push_tokens"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "questions_month_day_key" ON "questions"("month", "day");
+
+-- CreateIndex
 CREATE INDEX "stories_user_id_created_at_idx" ON "stories"("user_id", "created_at");
 
 -- CreateIndex
@@ -172,6 +214,12 @@ CREATE UNIQUE INDEX "user_question_log_user_id_question_id_shown_at_key" ON "use
 
 -- CreateIndex
 CREATE UNIQUE INDEX "story_reports_story_id_reporter_user_id_key" ON "story_reports"("story_id", "reporter_user_id");
+
+-- CreateIndex
+CREATE INDEX "story_comments_story_id_created_at_idx" ON "story_comments"("story_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "story_comments_parent_id_idx" ON "story_comments"("parent_id");
 
 -- CreateIndex
 CREATE INDEX "community_posts_hidden_from_feed_created_at_idx" ON "community_posts"("hidden_from_feed", "created_at" DESC);
@@ -192,10 +240,19 @@ CREATE INDEX "community_reactions_target_type_target_id_idx" ON "community_react
 CREATE UNIQUE INDEX "community_reactions_target_type_target_id_user_id_key" ON "community_reactions"("target_type", "target_id", "user_id");
 
 -- CreateIndex
-CREATE INDEX "community_notifications_recipient_user_id_read_at_created_a_idx" ON "community_notifications"("recipient_user_id", "read_at", "created_at" DESC);
+CREATE INDEX "notifications_recipient_user_id_read_at_created_at_idx" ON "notifications"("recipient_user_id", "read_at", "created_at" DESC);
+
+-- CreateIndex
+CREATE INDEX "notifications_recipient_user_id_type_created_at_idx" ON "notifications"("recipient_user_id", "type", "created_at" DESC);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "notifications_capsule_once" ON "notifications"("recipient_user_id", "type", "story_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "community_post_reports_post_id_reporter_user_id_key" ON "community_post_reports"("post_id", "reporter_user_id");
+
+-- AddForeignKey
+ALTER TABLE "push_tokens" ADD CONSTRAINT "push_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "stories" ADD CONSTRAINT "stories_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -216,6 +273,15 @@ ALTER TABLE "story_reports" ADD CONSTRAINT "story_reports_story_id_fkey" FOREIGN
 ALTER TABLE "story_reports" ADD CONSTRAINT "story_reports_reporter_user_id_fkey" FOREIGN KEY ("reporter_user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "story_comments" ADD CONSTRAINT "story_comments_story_id_fkey" FOREIGN KEY ("story_id") REFERENCES "stories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "story_comments" ADD CONSTRAINT "story_comments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "story_comments" ADD CONSTRAINT "story_comments_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "story_comments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "community_posts" ADD CONSTRAINT "community_posts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -234,13 +300,17 @@ ALTER TABLE "community_comments" ADD CONSTRAINT "community_comments_parent_id_fk
 ALTER TABLE "community_reactions" ADD CONSTRAINT "community_reactions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "community_notifications" ADD CONSTRAINT "community_notifications_recipient_user_id_fkey" FOREIGN KEY ("recipient_user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_recipient_user_id_fkey" FOREIGN KEY ("recipient_user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "community_notifications" ADD CONSTRAINT "community_notifications_actor_user_id_fkey" FOREIGN KEY ("actor_user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_actor_user_id_fkey" FOREIGN KEY ("actor_user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_story_id_fkey" FOREIGN KEY ("story_id") REFERENCES "stories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "community_post_reports" ADD CONSTRAINT "community_post_reports_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "community_posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "community_post_reports" ADD CONSTRAINT "community_post_reports_reporter_user_id_fkey" FOREIGN KEY ("reporter_user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

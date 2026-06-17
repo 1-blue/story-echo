@@ -1,3 +1,5 @@
+import { isQuestionTagKey } from "./question-tags";
+
 /** 평년 기준 — 윤년 2/29는 normalizeMonthDay에서 2/28 처리 */
 export const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const;
 
@@ -12,6 +14,7 @@ export type QuestionSeedLike = {
   text: string;
   month: number;
   day: number;
+  tags: string[];
 };
 
 export function normalizeMonthDay(month: number, day: number): MonthDay {
@@ -98,6 +101,15 @@ export function assertQuestionSeedsValid(seeds: QuestionSeedLike[]): void {
 
     if (seed.text.trim().length < 8) {
       throw new Error(`Text too short for ${key}`);
+    }
+
+    if (!Array.isArray(seed.tags) || seed.tags.length < 1 || seed.tags.length > 3) {
+      throw new Error(`Invalid tags for ${key}: expected 1-3 tags`);
+    }
+    for (const tag of seed.tags) {
+      if (!isQuestionTagKey(tag)) {
+        throw new Error(`Invalid tag "${tag}" for ${key}`);
+      }
     }
   }
 

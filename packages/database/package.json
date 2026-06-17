@@ -4,7 +4,8 @@
   "private": true,
   "exports": {
     ".": "./src/client.ts",
-    "./question-calendar": "./src/question-calendar.ts"
+    "./question-calendar": "./src/question-calendar.ts",
+    "./question-tags": "./src/question-tags.ts"
   },
   "scripts": {
     "generate:questions": "node scripts/import-questions-from-md.mjs",

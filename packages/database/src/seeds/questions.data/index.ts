@@ -33,6 +33,7 @@ export const QUESTION_SEEDS: QuestionSeed[] = RAW.map((row) => ({
   text: row.text,
   month: row.month,
   day: row.day,
+  tags: [...row.tags],
 }));
 
 assertQuestionSeedsValid(QUESTION_SEEDS);
