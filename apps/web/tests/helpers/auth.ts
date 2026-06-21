@@ -2,6 +2,33 @@ import { createTestDeviceId } from "../setup/env";
 import { apiFetch } from "./api";
 import { createGuestUser } from "./db";
 
+/** CI integration 실패 원인 추적용 — 비밀번호·키 값은 출력하지 않음 */
+function logLoginDebugContext(status: number, data: unknown) {
+  if (!process.env.CI) return;
+
+  const hasE2eEmail = Boolean(process.env.E2E_ADMIN_EMAIL);
+  const hasE2ePassword = Boolean(process.env.E2E_ADMIN_PASSWORD);
+  const email = process.env.E2E_ADMIN_EMAIL ?? process.env.SEED_ADMIN_EMAIL ?? "";
+  const password = process.env.E2E_ADMIN_PASSWORD ?? process.env.SEED_ADMIN_PASSWORD ?? "";
+
+  console.error("[integration/auth] login diagnostic", {
+    status,
+    response: data,
+    credentialSource:
+      hasE2eEmail && hasE2ePassword
+        ? "E2E_ADMIN_*"
+        : hasE2eEmail || hasE2ePassword
+          ? "E2E_ADMIN_* (partial — missing email or password)"
+          : "SEED_ADMIN_*",
+    email,
+    emailLength: email.length,
+    passwordLength: password.length,
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "(unset)",
+    anonKeyLength: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length ?? 0,
+    databaseUrlHasDevelopmentSchema: process.env.DATABASE_URL?.includes("schema=development") ?? false,
+  });
+}
+
 export async function registerGuest(deviceId: string) {
   return apiFetch("/api/v1/users/guest", {
     method: "POST",
@@ -31,6 +58,10 @@ export async function loginMember(
     ([response.headers.get("set-cookie")].filter(Boolean) as string[]);
   const cookie = cookieParts.map((c) => c.split(";")[0]).join("; ");
   const data = await response.json().catch(() => ({}));
+
+  if (response.status !== 200) {
+    logLoginDebugContext(response.status, data);
+  }
 
   return { cookie, status: response.status, data };
 }

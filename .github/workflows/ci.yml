@@ -86,6 +86,16 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
       # integration global-setup: BUILD_ID 있으면 build 생략 → next start만
       - run: pnpm --filter web build
+      # TODO: CI auth 디버깅용 — 원인 확인 후 제거
+      - name: Debug integration env (no secret values)
+        run: |
+          echo "E2E email len=${#E2E_ADMIN_EMAIL}"
+          echo "E2E pass len=${#E2E_ADMIN_PASSWORD}"
+          echo "SEED email len=${#SEED_ADMIN_EMAIL}"
+          echo "SEED pass len=${#SEED_ADMIN_PASSWORD}"
+          echo "SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}"
+          echo "ANON_KEY len=${#NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+          echo "DATABASE_URL has schema=development=$(echo "$DATABASE_URL" | grep -c 'schema=development' || true)"
       - run: pnpm --filter web test:integration
 
   test-e2e:
