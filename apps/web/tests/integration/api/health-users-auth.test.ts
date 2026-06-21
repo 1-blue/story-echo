@@ -63,14 +63,14 @@ integration("Health · Users · Auth API", () => {
   });
 
   it("POST /auth/login succeeds for admin", async () => {
-    const { cookie, status, data } = await loginAsAdmin();
-    expect(status, JSON.stringify(data)).toBe(200);
+    const { cookie, status } = await loginAsAdmin();
+    expect(status).toBe(200);
     expect(cookie.length).toBeGreaterThanOrEqual(0);
   });
 
   it("POST /auth/logout returns 200", async () => {
-    const { cookie, status: loginStatus, data: loginData } = await loginAsAdmin();
-    expect(loginStatus, JSON.stringify(loginData)).toBe(200);
+    const { cookie, status: loginStatus } = await loginAsAdmin();
+    expect(loginStatus).toBe(200);
     const res = await apiFetch("/api/v1/auth/logout", { method: "POST" }, { cookie });
     expect(res.status).toBe(200);
   });

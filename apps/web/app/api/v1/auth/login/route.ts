@@ -28,12 +28,6 @@ export async function POST(request: Request) {
     const parsed = LoginRequestSchema.safeParse(json);
 
     if (!parsed.success) {
-      if (process.env.CI) {
-        console.error("[auth/login] validation failed", {
-          email: typeof json === "object" && json !== null && "email" in json ? json.email : undefined,
-          issues: parsed.error.issues.map((i) => ({ path: i.path, code: i.code })),
-        });
-      }
       return apiErrorResponse(400, "VALIDATION_ERROR");
     }
 
@@ -44,21 +38,6 @@ export async function POST(request: Request) {
     });
 
     if (error || !data.user) {
-      if (process.env.CI) {
-        let supabaseHost = "(unset)";
-        try {
-          supabaseHost = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").host;
-        } catch {
-          supabaseHost = "(invalid url)";
-        }
-        console.error("[auth/login] signInWithPassword failed", {
-          supabaseHost,
-          email: parsed.data.email,
-          passwordLength: parsed.data.password.length,
-          supabaseMessage: error?.message,
-          supabaseStatus: error?.status,
-        });
-      }
       return apiErrorResponse(400, "AUTH_FAILED");
     }
 
