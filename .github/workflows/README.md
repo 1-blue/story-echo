@@ -11,21 +11,30 @@ PR 및 `main`/`master` push 시 [ci.yml](./ci.yml)이 실행됩니다.
 | `test-integration` | Vitest — Route Handler fetch 테스트 | **필수**    |
 | `test-e2e`         | Playwright — 19 pages               | **필수**    |
 
-CI는 **DB seed를 실행하지 않습니다.** E2E/integration은 migrate deploy 후 **이미 seed된 CI DB**와 GitHub Secrets(`E2E_ADMIN_*`)를 전제합니다. 로컬에서 `pnpm db:seed` / `pnpm db:seed:prod`를 수동 실행하세요.
+CI는 **DB seed를 실행하지 않습니다.** E2E/integration은 migrate deploy 후 **이미 seed된 `development` 스키마**와 GitHub Secrets(`E2E_ADMIN_*`)를 전제합니다. 로컬에서 `pnpm db:seed` / `pnpm db:seed:prod`를 수동 실행하세요.
+
+## Postgres 스키마 (단일 Supabase 프로젝트)
+
+| 스키마        | CI / 로컬                       | Vercel Production      |
+| ------------- | ------------------------------- | ---------------------- |
+| `development` | Secrets에 `&schema=development` | —                      |
+| `public`      | —                               | `schema` 파라미터 없음 |
 
 ## Repository Secrets
 
-| Secret                          | 용도                              |
-| ------------------------------- | --------------------------------- |
-| `DATABASE_URL`                  | Supabase Postgres (pooler)        |
-| `DIRECT_URL`                    | Prisma migrate (direct)           |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL              |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key                 |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Auth admin                        |
-| `E2E_ADMIN_EMAIL`               | emailVerified 회원 (E2E login)    |
-| `E2E_ADMIN_PASSWORD`            | 위 계정 비밀번호                  |
-| `SEED_ADMIN_EMAIL`              | (선택) integration login fallback |
-| `SEED_ADMIN_PASSWORD`           | (선택) integration login fallback |
+| Secret                          | 용도                                                   |
+| ------------------------------- | ------------------------------------------------------ |
+| `DATABASE_URL`                  | `story-echo` pooler + **`&schema=development`**        |
+| `DIRECT_URL`                    | direct + **`?schema=development`** (migrate deploy)    |
+| `NEXT_PUBLIC_SUPABASE_URL`      | `story-echo` project URL                               |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key                                               |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Auth admin (seed)                                      |
+| `E2E_ADMIN_EMAIL`               | **`admin-dev@test.com`** (실섭 admin과 분리)           |
+| `E2E_ADMIN_PASSWORD`            | dev Auth 비밀번호                                      |
+| `SEED_ADMIN_EMAIL`              | (선택) integration fallback — **`admin-dev@test.com`** |
+| `SEED_ADMIN_PASSWORD`           | (선택) dev Auth 비밀번호                               |
+
+**Vercel Production** env: `DATABASE_URL`에 `schema` 없음 (= `public`), admin은 `admin@test.com`.
 
 ## 로컬 실행
 
@@ -37,15 +46,13 @@ pnpm generate:api
 pnpm --filter @storyecho/schemas test:unit
 pnpm --filter web test:unit
 
-# Integration (packages/database/.env — dev DB + Supabase; CI는 GitHub Secrets)
-pnpm --filter web build   # CI workflow에서 1회만; vitest global-setup은 BUILD_ID 있으면 build 생략
+# Integration — apps/web/.env + packages/database/.env (Development 블록 활성)
+pnpm --filter web build
 pnpm --filter web test:integration
-# · next start + fetch — 프로덕션과 동일 스택 (의도적으로 무겁음)
-# · 게스트 API: X-Device-Id만 (Supabase getUser 생략)
-# · dev DB: pnpm db:seed / prod DB: pnpm db:seed:prod (대상 DB는 packages/database/.env DATABASE_URL)
+# · development 스키마: pnpm db:seed (최초 1회 migrate deploy + seed)
+# · public 시드: Production 블록 활성 → pnpm db:seed:prod
 
-# E2E (CI와 동일: build 1회 → playwright webServer는 pnpm start만)
-# CI DB는 seed 하지 않음 — 로컬/CI DB에 admin·질문 등은 수동 seed 또는 기존 데이터 전제
+# E2E
 pnpm --filter web build
 pnpm --filter web exec playwright install chromium
 pnpm --filter web test:e2e

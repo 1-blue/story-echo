@@ -24,19 +24,17 @@ pnpm install
 # 2. Generate OpenAPI + orval client
 pnpm generate:api
 
-# 3. Environment
-cp .env.example .env
-cp apps/web/.env.local.example apps/web/.env.local
-cp packages/database/.env.example packages/database/.env
-# TODO: 입력하기 — 아래 3곳에 동일한 DB/Supabase/AWS 값 복사
-#   · 루트 .env              → Prisma CLI 등
-#   · apps/web/.env.local    → Next.js web (필수)
-#   · packages/database/.env → pnpm db:migrate / db:seed
+# 3. Environment — 3개 `.env` (gitignore, 레포 루트·web·database)
+#    Supabase story-echo 1개 · Postgres development/public 주석 블록으로 전환
+#    로컬 기본: Development 블록 활성 (&schema=development, admin-dev@test.com)
+#    · /.env
+#    · apps/web/.env
+#    · packages/database/.env
 
-# 4. Database (Supabase URL 필요)
-pnpm db:migrate
-pnpm db:seed        # dev 프로필 시드
-# pnpm db:seed:prod # prod 프로필 시드 (대상 DB는 .env DATABASE_URL)
+# 4. Database
+pnpm exec prisma migrate deploy --schema=packages/database/prisma/schema.prisma
+pnpm db:seed        # development 스키마 + dev 프로필
+# pnpm db:seed:prod # public — Production 블록 활성 후
 
 # 5. Run web
 pnpm --filter web dev
@@ -46,8 +44,8 @@ pnpm --filter web dev
 
 비밀번호는 **Supabase Auth**(`auth.users`)에 저장됩니다. Prisma `users` 테이블에는 password 컬럼이 없습니다.
 
-1. `packages/database/.env`에 `SEED_ADMIN_PASSWORD` 설정 (예: `SEED_ADMIN_EMAIL=admin@storyecho.app`)
-2. `pnpm db:seed` 실행 → `[users] Supabase Auth 관리자 생성/갱신` 로그 확인 (prod 프로필은 `pnpm db:seed:prod`)
+1. `packages/database/.env` Development 블록에 `SEED_ADMIN_*` · `admin-dev@test.com` 설정
+2. `pnpm db:seed` → `[users] Supabase Auth 관리자 생성/갱신` 확인 (`public`은 Production 블록 + `pnpm db:seed:prod`)
 3. `/app/settings/login`에서 위 이메일·비밀번호로 로그인
 4. `/app/drawer`에서 잔디·이야기 목록 확인
 
@@ -60,7 +58,7 @@ pnpm --filter web dev
 | `pnpm db:migrate`          | Prisma migrate dev                                                        |
 | `pnpm db:seed`             | dev 프로필 시드 (관리자·365 질문·환영 커뮤니티 글)                        |
 | `pnpm db:seed:prod`        | prod 프로필 시드                                                          |
-| `pnpm db:reset`            | migrate reset — `.env`의 `DATABASE_URL` 대상 DB 초기화 + seed 훅 실행     |
+| `pnpm db:reset`            | migrate reset — **활성 env 블록**의 Postgres 스키마 초화 + seed           |
 | `pnpm --filter web dev`    | Next.js only                                                              |
 | `pnpm --filter mobile dev` | Expo WebView shell (see [apps/mobile/README.md](./apps/mobile/README.md)) |
 | `pnpm test:unit`           | Vitest unit + component                                                   |
